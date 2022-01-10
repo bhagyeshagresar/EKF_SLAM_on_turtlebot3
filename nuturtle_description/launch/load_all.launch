@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- <arg name="color" default="black" /> -->
+
+
+    <param name="black/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=black"/>
+    <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
+    <param name="green/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=green"/>
+    <param name="blue/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=blue"/>
+
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "black"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "red"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "green"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "blue"/>
+
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "black"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "red"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "green"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "blue"/>
+
+    <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_description)/config/basic_all.rviz -f world"/> -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/basic_all.rviz -f world"/>
+   
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 1 /world /red:base_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link2_broadcaster" args="0 1 0 0 0 0 1 /world /green:base_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link3_broadcaster" args="-1 0 0 0 0 0 1 /world /blue:base_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link4_broadcaster" args="0 -1 0 0 0 0 1 /world /black:base_link"/>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link5_broadcaster" args="1 0 0 0 0 0 1 /world /red:base_footprint"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link6_broadcaster" args="0 1 0 0 0 0 1 /world /green:base_footprint"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link7_broadcaster" args="-1 0 0 0 0 0 1 /world /blue:base_footprint"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link8_broadcaster" args="0 -1 0 0 0 0 1 /world /black:base_footprint"/>
+
+    
+    
+    <rosparam command = "load" file = "$(find nuturtle_description)/config/diff_params.yaml" /> 
+
+
+</launch>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <arg name="use_rviz" default="false"/>
+    <arg name="use_jsp" default="false"/>
+    <arg name="color" default="black" />
+
+
+
+    <param name="$(arg color)/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=$(arg color)"/>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "$(arg color)"/>
+
+
+    <group if="$(arg use_jsp)">
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "$(arg color)"/>
+        <!-- <arg name="use_jsp" default="false"/> -->
+    </group>    
+
+    <group if="$(arg use_rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_description)/config/basic.rviz -f $(arg color)" ns= "$(arg color)"/>
+            <!-- <remap from="rviz" to="$(arg color)/rviz"/> -->
+        <!-- <arg name="use_rviz" default="false"/> -->
+    </group>
+
+    <rosparam command = "load" file = "$(find nuturtle_description)/config/diff_params.yaml" /> 
+
+
+
+</launch>
