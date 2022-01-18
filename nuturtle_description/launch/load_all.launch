@@ -23,10 +23,10 @@
     <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_description)/config/basic_all.rviz -f world"/> -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/basic_all.rviz -f world"/>
    
-    <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 1 /world /red:base_link"/>
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 1 /world /red:base_link"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="link2_broadcaster" args="0 1 0 0 0 0 1 /world /green:base_link"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="link3_broadcaster" args="-1 0 0 0 0 0 1 /world /blue:base_link"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="link4_broadcaster" args="0 -1 0 0 0 0 1 /world /black:base_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link4_broadcaster" args="0 -1 0 0 0 0 1 /world /black:base_link"/> -->
 
     <node pkg="tf2_ros" type="static_transform_publisher" name="link5_broadcaster" args="1 0 0 0 0 0 1 /world /red:base_footprint"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="link6_broadcaster" args="0 1 0 0 0 0 1 /world /green:base_footprint"/>
