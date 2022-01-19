@@ -5,90 +5,167 @@
 
 namespace turtlelib
 {
+
+
+    std::ostream & operator<<(std::ostream & os, const Vector2D & v){
+        os << "[" << v.x << " " << v.y << "]" << endl;
+        return os;
+    }
+
+
+
+
+
+
+
     //Identity transformation
     Transform2D::Transform2D(){
-        double T_matrix[3][3]{
-            {1, 0, 0},
-            {0, 1, 0},
-            {0, 0, 1}
+        T_matrix[0][0] = cos(),
+        T_matrix[[0][1] = 0,
+        T_matrix[0][2] = 0,
+        T_matrix[1][0] = 0,
+        T_matrix[1][1] = 1,
+        T_matrix[1][2] = 0,
+        T_matrix[2][0] = 0,
+        T_matrix[2][1] = 0,
+        T_matrix[2][2] = 1,
+
         };
         
     }
     //Pure Translation
     Transform2D::Transform2D(Vector2D trans){
-        double T_matrix_translation[3][3]{
-            {0, 0, trans.x},
-            {0, 0, trans.y},
-            {0, 0, 1}
-        };
+        T_matrix[0][0] = 0;
+        T_matrix[[0][1] = 0;
+        T_matrix[0][2] = trans.x;
+        T_matrix[1][0] = 0;
+        T_matrix[1][1] = 0;
+        T_matrix[1][2] = trans.y;
+        T_matrix[2][0] = 0;
+        T_matrix[2][1] = 0;
+        T_matrix[2][2] = trans.z;
     }
 
     //Pure rotation
     Transform2D::Transform2D(double radians){
-        double T_matrix_rotation[3][3]{
-            {cos(rad2deg(radians)), -sin(rad2deg(radians)), 0},
-            {sin(rad2deg(radians)), cos(rad2deg(radians)), 0},
-            {0, 0, 1}
-        };
+        T_matrix[0][0] = cos(radians);
+        T_matrix[[0][1] = -sin(radians);
+        T_matrix[0][2] = 0;
+        T_matrix[1][0] = sin(radians);
+        T_matrix[1][1] = cos(radians);
+        T_matrix[1][2] = 0;
+        T_matrix[2][0] = 0;
+        T_matrix[2][1] = 0;
+        T_matrix[2][2] = 1;
     }
 
     //rotation and translation
     Transform2D::Transform2D(Vector2D trans, double radians){
-        double Trans_matrix[3][3]{
-            {cos(rad2deg(radians)), -sin(rad2deg(radians)), trans.x},
-            {sin(rad2deg(radians)), cos(rad2deg(radians)), trans.y},
-            {0, 0, 1}
-        };
+        T_matrix[0][0] = cos(radians);
+        T_matrix[[0][1] = -sin(radians);
+        T_matrix[0][2] = trans.x;
+        T_matrix[1][0] = sin(radians);
+        T_matrix[1][1] = cos(radians);
+        T_matrix[1][2] = trans.y;
+        T_matrix[2][0] = 0;
+        T_matrix[2][1] = 0;
+        T_matrix[2][2] = 1;
     
     }
 
-//     Vector2D Transform2D::operator()(Vector2D v) const{
-//         int Trans_matrix[3][3]{
-//             {cos(rad2deg(radians)), -sin(rad2deg(radians)), trans.x},
-//             {sin(rad2deg(radians), cos(rad2deg(radians)), trans.y},
-//             {0, 0, 1}
+    Vector2D Transform2D::operator()(Vector2D v) const{
+        // double Trans_matrix[3][3]{
+        //     {cos(radians)), -sin(rad2deg(radians)), trans.x},
+        //     {sin(rad2deg(radians), cos(rad2deg(radians)), trans.y},
+        //     {0, 0, 1}
         
-//         };
-//         int v_j[3] = {v.x, v.y, 1}; //pb
+        // };
 
-//         Vector2D v_new[3]; //not sure
-//         v_new[3] = v_j
+        // double Trans_matrix[3][3]{
+        //     {cos(radians), -sin(radians), x},
+        //     {sin(radians), cos(radians), y},
+        //     {0, 0, 1}
+
+        // }
+        double v_j[3] = {v.x, v.y, 1}; //pb
+
+        Vector2D v_new[3]; //not sure
+        v_new[3] = v_j;
 
 
-//     }
+    }
     
-//     for(int i = 0; i < 3; i++){
-//         for(int j = 0; j < 3; j++){
-//             int sum = 0;
-//             for (int k = 0; k < 3; k++){
-//                 sum += (Trans_matrix[i][k] * v_new[k])
-//             }
-//             v_new[i] = sum;
-//         }
-//         return v_new;
-//     }
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                int sum = 0;
+                for (int k = 0; k < 3; k++){
+                    sum += (T_matrix[i][k] * v_new[k])
+                }
+                v_new[i] = sum;
+        }
+        return v_new;
+    }
 
-//     //  for(int i=0; i<r1; i++){
-//     //         for(int j=0; j<c2; j++){
-//     //             int sum =0;
-//     //             for(int k=0; k<r2; k++){
-//     //                 sum += (m1[i][k] * m2[k][j]);
-//     //             }
-//     //             res[i][j] = sum;
-//     //         }
-//     //     }
+    //  for(int i=0; i<r1; i++){
+    //         for(int j=0; j<c2; j++){
+    //             int sum =0;
+    //             for(int k=0; k<r2; k++){
+    //                 sum += (m1[i][k] * m2[k][j]);
+    //             }
+    //             res[i][j] = sum;
+    //         }
+    //     }
     
-//     Transform2D::inv() const{
-        
-    
-        
-//         int inv_matrix[3][3]{
-//             {Trans_matrix[0][0], -Trans_matrix[0][1], -(trans.x*Trans_matrix[0][0] + trans.y*Trans_matrix[0][1])},
-//             {Trans_matrix[0][1], Trans_matrix[0][0], -trans.y*Trans_matrix[0][0] + trans.x*Trans_matrix[0][1]},
-//             {0, 0, 1}
-//         };
+    Transform2D::inv() const{
+            
+        int inv_matrix[0][0] = T_matrix[0][0];
+        int inv_matrix[0][1] = -T_matrix[0][1];
+        int inv_matrix[0][2] = -trans.x*T_matrix[0][0] - trans.y*T_matrix[1][0];
+        int inv_matrix[1][0] = T_matrix[0][1];
+        int inv_matrix[1][1] = T_matrix[1][1];
+        int inv_matrix[1][2] = -trans.y*T_matrix[0][0]+trans.y*T_matrix[0][1];
+        int inv_matrix[2][0] = 0;
+        int inv_matrix[2][1] = 0;
+        int inv_matrix[2][2] = 1;
 
-//    }
+        return inv_matrix;
+
+   }
+
+    Transform2D::Transform2D & operator*=(const Transform2D & rhs){
+        T_matrix[0][2] = T_matrix[0][2]*rhs[0][2];
+        T_matrix[1][2] = T_matrix[1][2]*rhs[0][2];
+
+
+
+        return *this;
+
+
+
+    }
+
+
+    Vector2D Transform2D::translation() const{
+
+        trans_vector[0] = T_matrix[0][2];
+        trans_vector[1] = T_matrix[1][2];
+        trans_vector[2] = T_matrix[2][2];
+
+        return trans_vector;
+
+    }
+
+
+    double Transform2D::rotation() const{
+        rot_vector[0][0] = T_matrix[0][0];
+        rot_vector[0][1] = T_matrix[0][1];
+        rot_vector[0][0] = T_matrix[0][0];
+        rot_vector[0][0] = T_matrix[0][0];
+
+
+
+
+    }
 
 //     Transform2D::Transform2D & operator*=(const Transform2D & rhs){
         
@@ -97,7 +174,8 @@ namespace turtlelib
 }
 
 
-
+// Tac = Tab*Tbc
+// Tab *= Tbc
 
 
 
