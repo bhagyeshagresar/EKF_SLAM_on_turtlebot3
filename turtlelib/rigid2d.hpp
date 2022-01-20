@@ -163,24 +163,41 @@ namespace turtlelib
         /// \brief \see operator<<(...) (declared outside this class)
         /// for a description
         friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
+
+        friend std::istream & operator>>(std::istream & is, Transform2D & tf);
+
+
+        // void Transform2D::set_variables(double theta, double x, double y) {
+        //     theta = theta;
+        //     x = x;
+        //     y = y;
+        // }
+        
+        
+        
+
+
+
     
     private:
-        double T_matrix[3][3]{
-            {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0}
-        }
-        double v_j[3] {0, 0, 0};
-        double inv_matrix[3][3]{
-             {0, 0, 0},
-             {0, 0, 0},
-             {0, 0, 0}
-        }
-        Vector2D trans_vector[3] {0, 0, 0};
-        Vector2D rot_vector[2][2]{
-            {0, 0},
-            {0, 0}
-        } 
+        double theta;
+        Vector2D v;
+        double T_matrix[3][3];
+        
+        // double v_j[3] {x, y, 1.0};
+        // double v_new[3] {0, 0, 0};
+        // double trans_vector = [v.x, v.y];
+        // double vector[3] {0, 0, 0};
+        // double inv_matrix[3][3]{
+        //      {0, 0, 0},
+        //      {0, 0, 0},
+        //      {0, 0, 0}
+        // };
+        // Vector2D trans_vector[3] {0, 0, 0};
+        // Vector2D rot_vector[2][2]{
+        //     {0, 0},
+        //     {0, 0}
+        // };
 
 
     };

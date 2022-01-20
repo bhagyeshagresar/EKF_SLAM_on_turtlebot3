@@ -1,5 +1,6 @@
 #include "rigid2d.hpp"
 #include <cmath>
+#include <iostream>
 
 
 
@@ -8,48 +9,51 @@ namespace turtlelib
 
 
     std::ostream & operator<<(std::ostream & os, const Vector2D & v){
-        os << "[" << v.x << " " << v.y << "]" << endl;
+        os << "[" << v.x << " " << v.y << "]" << std::endl;
         return os;
     }
 
 
+    std::istream & operator>>(std::istream & is, Vector2D & v){
+        is>> v.x >> v.y;
+        return is;
+    }
 
-
-
-
+    
 
     //Identity transformation
     Transform2D::Transform2D(){
-        T_matrix[0][0] = cos(),
-        T_matrix[[0][1] = 0,
-        T_matrix[0][2] = 0,
-        T_matrix[1][0] = 0,
-        T_matrix[1][1] = 1,
-        T_matrix[1][2] = 0,
-        T_matrix[2][0] = 0,
-        T_matrix[2][1] = 0,
-        T_matrix[2][2] = 1,
+        T_matrix[0][0] = cos(theta);
+        T_matrix[0][1] = -sin(theta);
+        T_matrix[0][2] = v.x;
+        T_matrix[1][0] = sin(theta);
+        T_matrix[1][1] = cos(theta);
+        T_matrix[1][2] = v.y;
+        T_matrix[2][0] = 0;
+        T_matrix[2][1] = 0;
+        T_matrix[2][2] = 1;
 
-        };
-        
+
     }
+        
+    
     //Pure Translation
     Transform2D::Transform2D(Vector2D trans){
         T_matrix[0][0] = 0;
-        T_matrix[[0][1] = 0;
+        T_matrix[0][1] = 0;
         T_matrix[0][2] = trans.x;
         T_matrix[1][0] = 0;
         T_matrix[1][1] = 0;
         T_matrix[1][2] = trans.y;
         T_matrix[2][0] = 0;
         T_matrix[2][1] = 0;
-        T_matrix[2][2] = trans.z;
+        T_matrix[2][2] = 1;
     }
 
     //Pure rotation
     Transform2D::Transform2D(double radians){
         T_matrix[0][0] = cos(radians);
-        T_matrix[[0][1] = -sin(radians);
+        T_matrix[0][1] = -sin(radians);
         T_matrix[0][2] = 0;
         T_matrix[1][0] = sin(radians);
         T_matrix[1][1] = cos(radians);
@@ -62,7 +66,7 @@ namespace turtlelib
     //rotation and translation
     Transform2D::Transform2D(Vector2D trans, double radians){
         T_matrix[0][0] = cos(radians);
-        T_matrix[[0][1] = -sin(radians);
+        T_matrix[0][1] = -sin(radians);
         T_matrix[0][2] = trans.x;
         T_matrix[1][0] = sin(radians);
         T_matrix[1][1] = cos(radians);
@@ -74,67 +78,46 @@ namespace turtlelib
     }
 
     Vector2D Transform2D::operator()(Vector2D v) const{
-        // double Trans_matrix[3][3]{
-        //     {cos(radians)), -sin(rad2deg(radians)), trans.x},
-        //     {sin(rad2deg(radians), cos(rad2deg(radians)), trans.y},
-        //     {0, 0, 1}
-        
-        // };
+       
 
-        // double Trans_matrix[3][3]{
-        //     {cos(radians), -sin(radians), x},
-        //     {sin(radians), cos(radians), y},
-        //     {0, 0, 1}
-
-        // }
-        double v_j[3] = {v.x, v.y, 1}; //pb
-
-        Vector2D v_new[3]; //not sure
-        v_new[3] = v_j;
+        Vector2D v_new; 
 
 
-    }
-    
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                int sum = 0;
-                for (int k = 0; k < 3; k++){
-                    sum += (T_matrix[i][k] * v_new[k])
-                }
-                v_new[i] = sum;
-        }
+        v_new.x = (cos(theta)*v.x) - (sin(theta)*v.y) + v.x;
+        v_new.y = (sin(theta)*v.y) + (cos(theta)*v.y) + v.y;
         return v_new;
     }
 
-    //  for(int i=0; i<r1; i++){
-    //         for(int j=0; j<c2; j++){
-    //             int sum =0;
-    //             for(int k=0; k<r2; k++){
-    //                 sum += (m1[i][k] * m2[k][j]);
-    //             }
-    //             res[i][j] = sum;
-    //         }
-    //     }
     
-    Transform2D::inv() const{
-            
-        int inv_matrix[0][0] = T_matrix[0][0];
-        int inv_matrix[0][1] = -T_matrix[0][1];
-        int inv_matrix[0][2] = -trans.x*T_matrix[0][0] - trans.y*T_matrix[1][0];
-        int inv_matrix[1][0] = T_matrix[0][1];
-        int inv_matrix[1][1] = T_matrix[1][1];
-        int inv_matrix[1][2] = -trans.y*T_matrix[0][0]+trans.y*T_matrix[0][1];
-        int inv_matrix[2][0] = 0;
-        int inv_matrix[2][1] = 0;
-        int inv_matrix[2][2] = 1;
+    Transform2D Transform2D::inv() const{
+        
+        Transform2D invT;
+        // invT.theta = 
+        invT.T_matrix[0][0] = cos(theta);
+        invT.T_matrix[0][1] = sin(theta);
+        invT.T_matrix[0][2] = -(v.x*cos(theta)) - (v.y*sin(theta));
+        invT.T_matrix[1][0] = -sin(theta);
+        invT.T_matrix[1][1] = cos(theta);
+        invT.T_matrix[1][2] = -(v.y*cos(theta))+(v.x*sin(theta));
+        invT.T_matrix[2][0] = 0;
+        invT.T_matrix[2][1] = 0;
+        invT.T_matrix[2][2] = 1;
 
-        return inv_matrix;
+        invT.theta = asin(invT.T_matrix[1][0]);
+        invT.v.x = invT.T_matrix[0][2];
+        invT.v.y = invT.T_matrix[1][2];
+        return invT;
 
    }
 
-    Transform2D::Transform2D & operator*=(const Transform2D & rhs){
-        T_matrix[0][2] = T_matrix[0][2]*rhs[0][2];
-        T_matrix[1][2] = T_matrix[1][2]*rhs[0][2];
+    Transform2D Transform2D:: & operator*=(const Transform2D & rhs){
+        Transform2D T_matrix2;
+        // Translational component
+        T_matrix2[0][2] = T_matrix[0][2]*rhs[0][2];
+        T_matrix2[1][2] = T_matrix[1][2]*rhs[0][2];
+        T_matrix2[1][2] = T_matrix[1][2]*rhs[0][2];
+
+
 
 
 
@@ -142,16 +125,17 @@ namespace turtlelib
 
 
 
-    }
+    // }
 
 
     Vector2D Transform2D::translation() const{
+        Vector2D v2;
 
-        trans_vector[0] = T_matrix[0][2];
-        trans_vector[1] = T_matrix[1][2];
-        trans_vector[2] = T_matrix[2][2];
+        v2.x = T_matrix2[0][2];
+        v2.y = T_matrix2[1][2];
 
-        return trans_vector;
+
+        return v2;
 
     }
 
@@ -167,17 +151,28 @@ namespace turtlelib
 
     }
 
-//     Transform2D::Transform2D & operator*=(const Transform2D & rhs){
-        
-//     }
+
+
+    std::istream & operator>>(std::istream & is, Transform2D & tf){
+        is >> tf.theta; 
+        tf.theta = turtlelib::deg2rad(tf.theta);
+        is >> tf.v.x;
+        is >> tf.v.y;
+        // tf = turtlelib::Transform2D(tf.v, tf.theta);
+        return is;
+    }
+
+    std::ostream & operator<<(std::ostream & os, const Transform2D & tf){
+        double theta = turtlelib::rad2deg(tf.theta);
+        // double theta = tf.theta;
+        os << theta <<" x: "<< tf.v.x << " y: " << tf.v.y;
+        return os;
+    }
+
+
+
 
 }
-
-
-// Tac = Tab*Tbc
-// Tab *= Tbc
-
-
 
 
 
@@ -267,6 +262,3 @@ namespace turtlelib
 
 
 
-int main(){
-    return 0;
-}
