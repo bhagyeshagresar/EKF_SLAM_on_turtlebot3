@@ -23,12 +23,12 @@ namespace turtlelib
 
     //Identity transformation
     Transform2D::Transform2D(){
-        T_matrix[0][0] = cos(theta);
-        T_matrix[0][1] = -sin(theta);
-        T_matrix[0][2] = v.x;
-        T_matrix[1][0] = sin(theta);
-        T_matrix[1][1] = cos(theta);
-        T_matrix[1][2] = v.y;
+        T_matrix[0][0] = 1;
+        T_matrix[0][1] = 0;
+        T_matrix[0][2] = 0;
+        T_matrix[1][0] = 0;
+        T_matrix[1][1] = 1;
+        T_matrix[1][2] = 0;
         T_matrix[2][0] = 0;
         T_matrix[2][1] = 0;
         T_matrix[2][2] = 1;
@@ -83,8 +83,8 @@ namespace turtlelib
         Vector2D v_new; 
 
 
-        v_new.x = (cos(theta)*v.x) - (sin(theta)*v.y) + v.x;
-        v_new.y = (sin(theta)*v.y) + (cos(theta)*v.y) + v.y;
+        v_new.x = (cos(theta)*v.x) - (sin(theta)*v.y) + T_matrix[0][2];
+        v_new.y = (sin(theta)*v.x) + (cos(theta)*v.y) + T_matrix[1][2];
         return v_new;
     }
 
@@ -176,6 +176,9 @@ namespace turtlelib
         return tf_star;
     }
 
+
+   
+
     
 
 
@@ -226,7 +229,7 @@ namespace turtlelib
 
 
 
-// // default constructor for Twist2D class
+// default constructor for Twist2D class
 // Twist2d::Twist2d()
 //     :theta_dot{0}, dx{0}, dy{0}, theta{0}, x{0}, y{0}{
         
@@ -235,7 +238,7 @@ namespace turtlelib
 
 
 
-// // output values in the twist2d object
+// output values in the twist2d object
 // std::ostream &operator<<(std::ostream &os, const Twist2d &t){
 //     os << t.twist_j;
 

@@ -49,15 +49,14 @@ int main(){
     std::cout << "Enter vector v_b" << std::endl;
     std::cin >> vb;
 
-    // vc = vb.translation();
-    vb = vb.translation();
-    va = Tab*vb;
+    //va
 
-    std::cout << va << std::endl;
-    //v_a
+    std::cout << "Enter v_a" << std::endl;
+    std::cout << Tab(vb) << std::endl;
 
     
-    // std::cout << 
+
+    
 
     return 0;
 }
