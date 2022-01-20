@@ -103,19 +103,37 @@ namespace turtlelib
         invT.T_matrix[2][1] = 0;
         invT.T_matrix[2][2] = 1;
 
-        invT.theta = asin(invT.T_matrix[1][0]);
+        invT.theta = -theta;
         invT.v.x = invT.T_matrix[0][2];
         invT.v.y = invT.T_matrix[1][2];
         return invT;
 
    }
 
-    Transform2D Transform2D:: & operator*=(const Transform2D & rhs){
-        Transform2D T_matrix2;
+    Transform2D & Transform2D::operator*=(const Transform2D & rhs){
         // Translational component
-        T_matrix2[0][2] = T_matrix[0][2]*rhs[0][2];
-        T_matrix2[1][2] = T_matrix[1][2]*rhs[0][2];
-        T_matrix2[1][2] = T_matrix[1][2]*rhs[0][2];
+        std::cout << theta << std::endl;
+        std::cout << v.x << std::endl;
+        std::cout << v.y << std::endl;
+
+        T_matrix[0][0] = cos(theta+rhs.theta);
+        T_matrix[0][1] = -sin(theta+rhs.theta);
+        T_matrix[0][2] = rhs.v.x*cos(theta)-sin(theta)*rhs.v.y + v.x;
+        T_matrix[1][0] = sin(theta+rhs.theta);
+        T_matrix[1][1] = cos(theta+rhs.theta);
+        T_matrix[1][2] = rhs.v.x*sin(theta)+cos(theta)*rhs.v.y + v.y;
+        T_matrix[2][0] = 0;
+        T_matrix[2][1] = 0;
+        T_matrix[2][2] = 1;
+
+
+        
+
+        theta = acos(cos(theta+rhs.theta));
+        v.x = T_matrix[0][2];
+        v.y = T_matrix[1][2];
+        
+
 
 
 
@@ -125,14 +143,15 @@ namespace turtlelib
 
 
 
-    // }
+
+    }
 
 
     Vector2D Transform2D::translation() const{
         Vector2D v2;
 
-        v2.x = T_matrix2[0][2];
-        v2.y = T_matrix2[1][2];
+        v2.x = T_matrix[0][2];
+        v2.y = T_matrix[1][2];
 
 
         return v2;
@@ -141,15 +160,24 @@ namespace turtlelib
 
 
     double Transform2D::rotation() const{
-        rot_vector[0][0] = T_matrix[0][0];
-        rot_vector[0][1] = T_matrix[0][1];
-        rot_vector[0][0] = T_matrix[0][0];
-        rot_vector[0][0] = T_matrix[0][0];
+        double theta_2;
+
+        theta_2 = theta;
 
 
-
-
+        return theta_2;
     }
+
+    Transform2D operator*(Transform2D lhs, const Transform2D & rhs){
+        std::cout << "start function called" << std::endl;
+        Transform2D tf_star;
+        tf_star = lhs;
+        tf_star *= rhs;
+        return tf_star;
+    }
+
+    
+
 
 
 

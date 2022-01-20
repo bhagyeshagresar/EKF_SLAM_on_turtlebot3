@@ -6,42 +6,58 @@
 int main(){
     
     turtlelib::Transform2D Tab, Tba, Tbc, Tcb, Tac, Tca;
+    turtlelib::Vector2D vb, va, vc;
     // turtlelib::Transform2D Tab_2(turtlelib::Vector2D v);
     // turtlelib::Transform2D Tab_3(turtlelib::deg2rad(theta));
 
-    std::cout << "Enter transform T_ab" << std::endl;
+    std::cout << "Enter transform T_{a,b}:" << std::endl;
    
     std::cin >> Tab;
     // std::cin >> turtlelib::Transform2D Tab_2(v);
     // std::cin >> turtlelib::Transform2D Tab_3(deg2theta);
 
-    //Tab
-    std::cout << "T_ab" << std::endl;
+    std::cout << "Enter transform T_{b,c}:" << std::endl;
+
+    std::cin >> Tbc;
+
     std::cout << Tab << std::endl;
 
-
     //inverse Tba
-    std::cout << "T_ba" << std::endl;
     Tba = Tab.inv();
     std::cout << Tba << std::endl;
 
 
     //Tbc
-    std::cout << "T_bc" << std::endl;
     std::cout << Tbc << std::endl;
 
 
     //Tcb
-    std::cout << "T_cb" << std::endl;
     Tcb = Tbc.inv();
     std::cout << Tcb << std::endl;
    
 
    //Tac
-    std::cout << "T_cb" << std::endl;
+    Tac = Tab*Tbc;
+    std::cout << Tac << std::endl;
+
+
+    //Tca
+    Tca = Tac.inv();
+    std::cout << Tca << std::endl;
+
     
+    std::cout << "Enter vector v_b" << std::endl;
+    std::cin >> vb;
 
+    // vc = vb.translation();
+    vb = vb.translation();
+    va = Tab*vb;
 
+    std::cout << va << std::endl;
+    //v_a
+
+    
+    // std::cout << 
 
     return 0;
 }
