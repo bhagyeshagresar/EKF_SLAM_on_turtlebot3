@@ -184,8 +184,9 @@ namespace turtlelib
     
     private:
         double theta;
-        Vector2D v;
-        double T_matrix[3][3];
+        // Vector2D v; //vector
+        Vector2D v2; //matrix v2
+        // double T_matrix[3][3];
         
         // double v_j[3] {x, y, 1.0};
         // double v_new[3] {0, 0, 0};
@@ -231,27 +232,27 @@ namespace turtlelib
     
     
     
-    class Twist2d
-    {
-        friend std::ostream &operator<<(std::ostream &os, const Twist2d &t);
-        friend std::istream &operator>>(std::istream &in, Twist2d &t);
-        private:
-            double theta_dot {0.0};
-            double dx {0.0};
-            double dy {0.0};
-            double theta {0.0};
-            double x {0.0};
-            double y {0.0};
+    // class Twist2d
+    // {
+    //     friend std::ostream &operator<<(std::ostream &os, const Twist2d &t);
+    //     friend std::istream &operator>>(std::istream &in, Twist2d &t);
+    //     private:
+    //         double theta_dot {0.0};
+    //         double dx {0.0};
+    //         double dy {0.0};
+    //         double theta {0.0};
+    //         double x {0.0};
+    //         double y {0.0};
             
-        public:
-            Twist2d();
+    //     public:
+    //         Twist2d();
             
-            //function to return Twist in frame i
-            //function to return Adj
-            //function to compute 2d twist in frame j
-            double twist_frame_i(double, double, double);
-            double adjoint(double, double, double);
-            double twist_frame_j(double, double);
+    //         //function to return Twist in frame i
+    //         //function to return Adj
+    //         //function to compute 2d twist in frame j
+    //         double twist_frame_i(double, double, double);
+    //         double adjoint(double, double, double);
+    //         double twist_frame_j(double, double);
 
 
 // Tab(Vb) = Va

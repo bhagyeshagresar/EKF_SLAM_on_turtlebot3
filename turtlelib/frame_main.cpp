@@ -16,7 +16,7 @@ int main(){
     // std::cin >> turtlelib::Transform2D Tab_2(v);
     // std::cin >> turtlelib::Transform2D Tab_3(deg2theta);
 
-    std::cout << "Enter transform T_{b,c}:" << std::endl;
+    // std::cout << "Enter transform T_{b,c}:" << std::endl;
 
     std::cin >> Tbc;
 
@@ -36,23 +36,28 @@ int main(){
     std::cout << Tcb << std::endl;
    
 
-   //Tac
+//    //Tac
     Tac = Tab*Tbc;
     std::cout << Tac << std::endl;
 
 
-    //Tca
+//     //Tca
     Tca = Tac.inv();
     std::cout << Tca << std::endl;
 
     
-    std::cout << "Enter vector v_b" << std::endl;
+//     std::cout << "Enter vector v_b" << std::endl;
     std::cin >> vb;
 
     //va
+    va = Tab(vb);
+    std::cout << va << std::endl;
+    vb = Tba(va);
+    std::cout << vb << std::endl;
+    vc = Tca(va);
+    std::cout << vc << std::endl;
 
-    std::cout << "Enter v_a" << std::endl;
-    std::cout << Tab(vb) << std::endl;
+    
 
     
 
