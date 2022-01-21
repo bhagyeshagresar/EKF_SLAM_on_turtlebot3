@@ -3,6 +3,11 @@
     
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nusim)/config/nusim.rviz"/>
 
+    <node name="nusim" type="nusim.cpp" pkg="nusim" output="screen">
+    </node>
+
+    
+
 
 
 
