@@ -67,7 +67,7 @@ namespace turtlelib
     }
 
     
-    Transform2D Transform2D::inv() const{
+    Transform2D Transform2D::inv() const{   
         
        
 
@@ -81,15 +81,15 @@ namespace turtlelib
    }
 
     Transform2D & Transform2D::operator*=(const Transform2D & rhs){
-       
+        std::cout << theta << std::endl;
         Transform2D rhs_v;
         rhs_v.v2.x = rhs.v2.x;
         rhs_v.v2.y = rhs.v2.y;
 
-        theta = theta+rhs.theta;
+        // theta = theta+rhs.theta;
         v2.x = v2.x + rhs_v.v2.x*cos(theta)-sin(theta)*rhs_v.v2.y;
         v2.y = v2.y + rhs_v.v2.x*sin(theta)+cos(theta)*rhs_v.v2.y;
-        
+        theta = theta+rhs.theta;
 
         return *this;
 

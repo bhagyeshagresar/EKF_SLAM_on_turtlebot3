@@ -10,7 +10,7 @@ class SimNode
 {
     
      private:
-        ros::NodeHandle n;
+        ros::NodeHandle n("~");
         ros::Publisher timestep_pub;
         ros::Publisher js_pub;
 
