@@ -18,7 +18,7 @@ Ans : The member variables and methods in a struct are public by default whereas
 
 
 3. Why is Vector2D a struct and Transform2DClass (refer to at least 2 specific C++ core guidelines in your answer)?
-
+Ans: The members of Vector2D are public by default and that would make accessing the variables defined in the struct easier.
 
 4. Why are some of the constructors in Transform2D explicit (refer to a specific C++ core guideline in your answer)?
 
