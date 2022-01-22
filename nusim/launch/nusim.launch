@@ -8,7 +8,7 @@
 
 
 
-
+    <rosparam file="$(find nusim)/config/basic_world.yaml"/>
 
 
 
