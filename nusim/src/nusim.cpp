@@ -2,7 +2,8 @@
 #include <std_msgs/UInt64.h>
 #include <ros/console.h>
 #include <iostream>
-#include "nusim/Reset.h"
+#include <std_srvs/Empty.h>
+// #include "nusim/Reset.h"
 
 // #include <sensor_msgs/JointState.h>
 // #include <tf2/transform_broadcaster.h>
@@ -12,9 +13,9 @@
 static std_msgs::UInt64 timestep;
 
 
-std_msgs::UInt64 reset_fn(nusim::Reset::Request &res){
+bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     timestep.data = 0;
-    return timestep;
+    return true;
 
 
 }
@@ -30,7 +31,7 @@ int main(int argc, char ** argv){
     // std_msgs::UInt64 timestep {0};
 
     ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 100);
-    ros::ServiceServer service = n.advertiseService("reset", reset_fn);
+    ros::ServiceServer service = nh.advertiseService("reset", reset_fn);
     // std_msgs::UInt64 timestep;
     timestep.data = 0;
 
