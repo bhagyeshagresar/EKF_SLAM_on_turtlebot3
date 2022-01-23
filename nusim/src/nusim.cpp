@@ -9,10 +9,13 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <geometry_msgs/Pose.h>
 #include "nusim/Teleport.h"
-
+#include "visualization_msgs/Marker.h"
+#include "visualization_msgs/MarkerArray.h"
 
 static std_msgs::UInt64 timestep;
-static double x, y, theta, rate;
+static double x, y, theta, rate, radius;
+static int num_markers;
+// static double x_m[], y_m[];
 
 
 bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
@@ -33,6 +36,7 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 
 
 
+
 int main(int argc, char ** argv){
     
     
@@ -49,12 +53,16 @@ int main(int argc, char ** argv){
     ros::ServiceServer teleport_service = nh.advertiseService("teleport", teleport_fn);
     sensor_msgs::JointState red_joint_state;
 
+    ros::Publisher vis_pub = nh.advertise<visualization_msgs::Marker>("obstacles", 0 );
 
     //get parameters
     nh.param("x", x, 0.0);
     nh.param("y", y, 0.0);
     nh.param("theta", theta, 0.0);
     nh.param("rate", rate, 500.0);
+    nh.getParam("num_markers", num_markers);
+    // nh.param("x_m", x_m, 1);
+
 
 
     timestep.data = 0;
@@ -81,7 +89,7 @@ int main(int argc, char ** argv){
         geometry_msgs::TransformStamped static_transformStamped;
         static_transformStamped.header.stamp = ros::Time::now();
         static_transformStamped.header.frame_id = "world";
-        static_transformStamped.child_frame_id = "red_base_footprint";
+        static_transformStamped.child_frame_id = "red:base_footprint";
         static_transformStamped.transform.translation.x = x;
         static_transformStamped.transform.translation.y = y;
         static_transformStamped.transform.translation.z = 0;
@@ -90,8 +98,48 @@ int main(int argc, char ** argv){
         static_transformStamped.transform.rotation.x = q.x();
         static_transformStamped.transform.rotation.y = q.y();
         static_transformStamped.transform.rotation.z = q.z();
-        static_transformStamped.transform.rotation.w = 1;
+        static_transformStamped.transform.rotation.w = q.w();
         static_broadcaster.sendTransform(static_transformStamped);
+
+        visualization_msgs::MarkerArray marker_array;
+        for (int i = 0; i < 3; i++){
+            visualization_msgs::Marker marker;
+            marker.header.frame_id = "world";
+            marker.header.stamp = ros::Time();
+            marker.ns = "obstacles";
+            marker.id = i;
+            marker.type = visualization_msgs::Marker:: CYLINDER;
+            marker.action = visualization_msgs::Marker::ADD;
+            marker.pose.position.x = 1;
+            marker.pose.position.y = 1;
+            marker.pose.position.z = 0;
+            marker.pose.orientation.x = 0.0;
+            marker.pose.orientation.y = 0.0;
+            marker.pose.orientation.z = 0.0;
+            marker.pose.orientation.w = 1.0;
+            marker.scale.x = radius*2;
+            marker.scale.y = radius*2;
+            marker.scale.z = 0.25;
+            marker.color.a = 1.0;
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.0;
+            marker.lifetime = ros::Duration();
+            
+            // vis_pub.publish(marker);
+            marker_array.markers.push_back(marker);
+            
+
+
+
+        }
+        vis_pub.publish(marker_array);
+
+
+
+
+
+
 
         r.sleep();
     }

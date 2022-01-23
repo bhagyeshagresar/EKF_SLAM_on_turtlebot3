@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
     
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nusim)/config/nusim.rviz -f red" ns= "red"/>
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nusim)/config/nusim.rviz"/>
 
     <node name="nusim_node" type="nusim_node" pkg="nusim" output="screen">
+        <!-- <param name="rate" type= "double" value="500"/>  -->
+        <rosparam file="$(find nusim)/config/basic_world.yaml"/>
+
     </node>
 
+    <include file="$(find nuturtle_description)/launch/load.launch">
+        <arg name="use_rviz" value="false"/>
+        <arg name="use_jsp" value="true"/>
+        <arg name="color" value="red"/>
+    </include>
 
 
-    <rosparam file="$(find nusim)/config/basic_world.yaml"/>
+    <!-- <rosparam file="$(find nusim)/config/basic_world.yaml"/> -->
 
 
-
+<!-- 
     <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "red"/>
@@ -19,7 +27,7 @@
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "red"/>
 
-    
+     -->
 
 
 
