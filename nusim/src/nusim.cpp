@@ -11,11 +11,15 @@
 #include "nusim/Teleport.h"
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
+#include <vector>
 
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
 // static double x_m[], y_m[];
+std::vector <double> x_m;
+std::vector <double> y_m;
+
 
 
 bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
@@ -53,7 +57,7 @@ int main(int argc, char ** argv){
     ros::ServiceServer teleport_service = nh.advertiseService("teleport", teleport_fn);
     sensor_msgs::JointState red_joint_state;
 
-    ros::Publisher vis_pub = nh.advertise<visualization_msgs::Marker>("obstacles", 0 );
+    ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 100, true);
 
     //get parameters
     nh.param("x", x, 0.0);
@@ -61,12 +65,54 @@ int main(int argc, char ** argv){
     nh.param("theta", theta, 0.0);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
+    nh.getParam("x_s", x_m);
+    nh.getParam("y_s", y_m);
+    nh.getParam("radius", radius);
+
+
+
     // nh.param("x_m", x_m, 1);
 
 
 
     timestep.data = 0;
-   
+    visualization_msgs::MarkerArray marker_array;
+        for (int i = 0; i < 3; i++){
+            visualization_msgs::Marker marker;
+            marker.header.frame_id = "world";
+            marker.header.stamp = ros::Time::now();
+            marker.ns = "obstacles";
+            marker.id = i;
+            marker.type = visualization_msgs::Marker:: CYLINDER;
+            marker.action = visualization_msgs::Marker::ADD;
+            marker.pose.position.x = x_m.at(i);
+            marker.pose.position.y = y_m.at(i);
+            marker.pose.position.z = 0;
+            marker.pose.orientation.x = 0.0;
+            marker.pose.orientation.y = 0.0;
+            marker.pose.orientation.z = 0.0;
+            marker.pose.orientation.w = 1.0;
+            marker.scale.x = radius*2;
+            marker.scale.y = radius*2;
+            marker.scale.z = 0.25;
+            marker.color.a = 1.0;
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.0;
+            ROS_INFO("check for rviz");
+            marker.lifetime = ros::Duration();
+            
+            // vis_pub.publish(marker);
+            marker_array.markers.push_back(marker);
+            // vis_pub.publish(marker_array);
+
+
+
+
+        }
+    vis_pub.publish(marker_array);
+
+
 
     ros::Rate r(rate);
 
@@ -74,7 +120,7 @@ int main(int argc, char ** argv){
 
         pub.publish(timestep);
         ros::spinOnce();
-        ROS_INFO("%ld", timestep.data);
+        // ROS_INFO("%ld", timestep.data);
         timestep.data++;
 
         red_joint_state.name.push_back("wheel_joint_1");
@@ -101,41 +147,7 @@ int main(int argc, char ** argv){
         static_transformStamped.transform.rotation.w = q.w();
         static_broadcaster.sendTransform(static_transformStamped);
 
-        visualization_msgs::MarkerArray marker_array;
-        for (int i = 0; i < 3; i++){
-            visualization_msgs::Marker marker;
-            marker.header.frame_id = "world";
-            marker.header.stamp = ros::Time();
-            marker.ns = "obstacles";
-            marker.id = i;
-            marker.type = visualization_msgs::Marker:: CYLINDER;
-            marker.action = visualization_msgs::Marker::ADD;
-            marker.pose.position.x = 1;
-            marker.pose.position.y = 1;
-            marker.pose.position.z = 0;
-            marker.pose.orientation.x = 0.0;
-            marker.pose.orientation.y = 0.0;
-            marker.pose.orientation.z = 0.0;
-            marker.pose.orientation.w = 1.0;
-            marker.scale.x = radius*2;
-            marker.scale.y = radius*2;
-            marker.scale.z = 0.25;
-            marker.color.a = 1.0;
-            marker.color.r = 1.0;
-            marker.color.g = 0.0;
-            marker.color.b = 0.0;
-            marker.lifetime = ros::Duration();
-            
-            // vis_pub.publish(marker);
-            marker_array.markers.push_back(marker);
-            
-
-
-
-        }
-        vis_pub.publish(marker_array);
-
-
+       
 
 
 
