@@ -10,13 +10,29 @@ namespace turtlelib
 
     std::ostream & operator<<(std::ostream & os, const Vector2D & v){
 
-        os << "[" << v.x << " " << v.y << "]" << std::endl;
+        os << "[" << v.x << " " << v.y << "]";
         return os;
     }
 
 
     std::istream & operator>>(std::istream & is, Vector2D & v){
-        is>> v.x >> v.y;
+        char c;
+        c = is.peek();
+
+        if (c = '['){
+            is.get();
+        }        
+        is >> v.x;
+        is >> v.y;
+        
+        char c1;
+        c1 = is.peek();
+
+        if (c1 = ']'){
+            is.get();
+        }
+
+
         return is;
     }
 
@@ -83,7 +99,6 @@ namespace turtlelib
    }
 
     Transform2D & Transform2D::operator*=(const Transform2D & rhs){
-        std::cout << theta << std::endl;
         Transform2D rhs_v;
         rhs_v.v2.x = rhs.v2.x;
         rhs_v.v2.y = rhs.v2.y;
@@ -144,10 +159,13 @@ namespace turtlelib
 
 
     std::istream & operator>>(std::istream & is, Transform2D & tf){
-        is >> tf.theta; 
+        std::string s1, s2, s3;
+        
+        
+        is >> s1 >> tf.theta; 
         tf.theta = turtlelib::deg2rad(tf.theta);
-        is >> tf.v2.x;
-        is >> tf.v2.y;
+        is >> s2 >> tf.v2.x;
+        is >> s3 >> tf.v2.y;
         return is;
     }
 
@@ -162,9 +180,22 @@ namespace turtlelib
 
     //twist 2d input
     std::istream &operator>>(std::istream &is, Twist2D &t){
+        char c;
+        c = is.peek();
+
+         if (c = '['){
+            is.get();
+        }        
         is >> t.theta_dot;
         is >> t.x_dot;
         is >> t.y_dot;
+       
+        char c1;
+        c1 = is.peek();
+
+        if (c1 = ']'){
+            is.get();
+        }
         
         return is;
 
@@ -173,7 +204,7 @@ namespace turtlelib
 
     //twist 2d output
     std::ostream &operator<<(std::ostream &os, const Twist2D &t){
-        os << "[" << t.theta_dot << " " << t.x_dot << " " << t.y_dot << "]" << std::endl;
+        os << "[" << t.theta_dot << " " << t.x_dot << " " << t.y_dot << "]";
 
     return os;
     }
