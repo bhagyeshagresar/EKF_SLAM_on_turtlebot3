@@ -89,6 +89,18 @@ namespace turtlelib
     };
 
 
+    struct Twist2D
+    {
+        
+        double theta_dot = 0.0;
+
+        double x_dot = 0.0;
+
+        double y_dot = 0.0;
+
+    };
+
+
 
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
     /// os - stream to output to
@@ -166,44 +178,18 @@ namespace turtlelib
 
         friend std::istream & operator>>(std::istream & is, Transform2D & tf);
 
-        Vector2D frames(Vector2D v, Transform2D T);
-
-        // void Transform2D::set_variables(double theta, double x, double y) {
-        //     theta = theta;
-        //     x = x;
-        //     y = y;
-        // }
-
-
-        
-        
-        
-
+        Twist2D new_twist(Twist2D V);
 
 
     
     private:
+        Vector2D v2;
+        Twist2D V; //twist v3
+
         double theta;
-        // Vector2D v; //vector
-        Vector2D v2; //matrix v2
-        // double T_matrix[3][3];
-        
-        // double v_j[3] {x, y, 1.0};
-        // double v_new[3] {0, 0, 0};
-        // double trans_vector = [v.x, v.y];
-        // double vector[3] {0, 0, 0};
-        // double inv_matrix[3][3]{
-        //      {0, 0, 0},
-        //      {0, 0, 0},
-        //      {0, 0, 0}
-        // };
-        // Vector2D trans_vector[3] {0, 0, 0};
-        // Vector2D rot_vector[2][2]{
-        //     {0, 0},
-        //     {0, 0}
-        // };
-
-
+         //vector v2
+        // Twist2D V; //twist v3
+       
     };
 
 
@@ -226,38 +212,12 @@ namespace turtlelib
     /// HINT: This function should be implemented in terms of *=
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
-    
-    
 
-    
-    
-    
-    // class Twist2d
-    // {
-    //     friend std::ostream &operator<<(std::ostream &os, const Twist2d &t);
-    //     friend std::istream &operator>>(std::istream &in, Twist2d &t);
-    //     private:
-    //         double theta_dot {0.0};
-    //         double dx {0.0};
-    //         double dy {0.0};
-    //         double theta {0.0};
-    //         double x {0.0};
-    //         double y {0.0};
-            
-    //     public:
-    //         Twist2d();
-            
-    //         //function to return Twist in frame i
-    //         //function to return Adj
-    //         //function to compute 2d twist in frame j
-    //         double twist_frame_i(double, double, double);
-    //         double adjoint(double, double, double);
-    //         double twist_frame_j(double, double);
+    // std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
+    std::istream &operator>>(std::istream &in, Twist2D &t);
 
-// Tab(Vb) = Va
-
-    // };
+    std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
 }
 

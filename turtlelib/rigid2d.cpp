@@ -9,6 +9,7 @@ namespace turtlelib
     //vector
 
     std::ostream & operator<<(std::ostream & os, const Vector2D & v){
+
         os << "[" << v.x << " " << v.y << "]" << std::endl;
         return os;
     }
@@ -73,9 +74,10 @@ namespace turtlelib
 
         Transform2D invT;
 
-        invT.theta = -theta;
         invT.v2.x = -(v2.x*cos(theta))-(v2.y*sin(theta));
         invT.v2.y = -(v2.y*cos(theta))+(v2.x*sin(theta));
+        invT.theta = -theta;
+       
         return invT;
 
    }
@@ -128,6 +130,17 @@ namespace turtlelib
     }
 
 
+    Twist2D Transform2D::new_twist(Twist2D V){
+        Twist2D V_new;
+        
+        V_new.theta_dot = V.theta_dot;
+        V_new.x_dot = v2.y*V.theta_dot + V.x_dot*cos(theta) -V.y_dot*sin(theta);
+        V_new.y_dot = -v2.x*V.theta_dot + V.x_dot*sin(theta) + V.y_dot*cos(theta);
+
+        return V_new;
+    }
+
+
 
 
     std::istream & operator>>(std::istream & is, Transform2D & tf){
@@ -147,6 +160,25 @@ namespace turtlelib
     }
 
 
+    //twist 2d input
+    std::istream &operator>>(std::istream &is, Twist2D &t){
+        is >> t.theta_dot;
+        is >> t.x_dot;
+        is >> t.y_dot;
+        
+        return is;
+
+    }
+
+
+    //twist 2d output
+    std::ostream &operator<<(std::ostream &os, const Twist2D &t){
+        os << "[" << t.theta_dot << " " << t.x_dot << " " << t.y_dot << "]" << std::endl;
+
+    return os;
+    }
+
+    
 
 
 }
@@ -156,54 +188,15 @@ namespace turtlelib
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// default constructor for Twist2D class
-// Twist2d::Twist2d()
-//     :theta_dot{0}, dx{0}, dy{0}, theta{0}, x{0}, y{0}{
-        
-
-//     }
-
-
-
 // output values in the twist2d object
-// std::ostream &operator<<(std::ostream &os, const Twist2d &t){
+// std::ostream &operator<<(std::ostream &os, const Twist2D &t){
 //     os << t.twist_j;
 
 //     return os;
 // }
 
-// // insert values in the twist2d object  j
-// std::istream &operator>>(std::istream &in, Twist2d &t){
-//     cout << "enter values " << endl;
-//     in >> t.thetadot;
-//     in >> t.dx;
-//     in >> t.dy;
-//     in >> t.theta;
-//     in >> t.x;
-//     in >> t.y;
-
-//     return in;
-
-// }
+// insert values in the twist2d object  j
+   
 
 
 // //function to return Twist vector in frame i

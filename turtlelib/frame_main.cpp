@@ -7,6 +7,7 @@ int main(){
     
     turtlelib::Transform2D Tab, Tba, Tbc, Tcb, Tac, Tca;
     turtlelib::Vector2D vb, va, vc;
+    turtlelib::Twist2D V_b, V_a, V_c;
     // turtlelib::Transform2D Tab_2(turtlelib::Vector2D v);
     // turtlelib::Transform2D Tab_3(turtlelib::deg2rad(theta));
 
@@ -54,10 +55,23 @@ int main(){
     std::cout << va << std::endl;
     vb = Tba(va);
     std::cout << vb << std::endl;
-    vc = Tca(va);
+    vc = Tcb(vb);
     std::cout << vc << std::endl;
 
-    
+    std::cout << "Enter Twist Vb" << std::endl;
+
+    std::cin >> V_b;
+
+    V_a = Tab.new_twist(V_b);
+    V_b = Tba.new_twist(V_a);
+    V_c = Tca.new_twist(V_a);
+    std::cout << V_a << std::endl;
+    std::cout << V_b << std::endl;
+    std::cout << V_c << std::endl;
+
+
+
+
 
     
 
