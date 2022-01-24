@@ -100,6 +100,9 @@ namespace turtlelib
 
     };
 
+    Vector2D unit_vector(Vector2D v);
+
+
 
 
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
@@ -171,6 +174,7 @@ namespace turtlelib
         /// \brief get the angular displacement of the transform
         /// \return the angular displacement, in radians
         double rotation() const;
+
 
         /// \brief \see operator<<(...) (declared outside this class)
         /// for a description

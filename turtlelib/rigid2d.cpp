@@ -36,7 +36,14 @@ namespace turtlelib
         return is;
     }
 
-    
+    Vector2D unit_vector(Vector2D v){
+        Vector2D unit_v;
+
+        unit_v.x = v.x/sqrt(v.x + v.y);
+        unit_v.y = v.y/sqrt(v.x + v.y);
+
+        return unit_v;
+    }
 
     //Identity transformation
     Transform2D::Transform2D()
@@ -137,6 +144,9 @@ namespace turtlelib
         return theta_2;
     }
 
+
+    
+
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs){
         Transform2D tf_star;
         tf_star = lhs;
@@ -208,6 +218,8 @@ namespace turtlelib
 
     return os;
     }
+
+    
 
     
 

@@ -6,7 +6,7 @@
 int main(){
     
     turtlelib::Transform2D Tab, Tba, Tbc, Tcb, Tac, Tca;
-    turtlelib::Vector2D vb, va, vc;
+    turtlelib::Vector2D vb, va, vc, v_bhat;
     turtlelib::Twist2D V_b, V_a, V_c;
     // turtlelib::Transform2D Tab_2(turtlelib::Vector2D v);
     // turtlelib::Transform2D Tab_3(turtlelib::deg2rad(theta));
@@ -56,11 +56,13 @@ int main(){
     std::cin >> vb;
 
     //va
+    v_bhat = unit_vector(vb);
     va = Tab(vb);
     vb = Tba(va);
     vc = Tcb(vb);
 
-    std::cout << "v_a:" << va << std::endl;
+    std::cout << "v_bhat: " << v_bhat << std::endl;
+    std::cout << "v_a: " << va << std::endl;
     std::cout << "v_b: " << vb << std::endl;
     std::cout << "v_c: " << vc << std::endl;
 
