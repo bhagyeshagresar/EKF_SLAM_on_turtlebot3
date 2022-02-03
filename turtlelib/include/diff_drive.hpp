@@ -3,17 +3,17 @@
 
 namespace turtlelib{
 
-    struct wheels
+    struct Wheels
     {
-        /// \brief the wheel right
+        /// \brief right wheel pos
         double wheel_right = 0.0;
 
-        /// \brief the wheel left
+        /// \brief left wheel pos
         double wheel_left = 0.0;
     };
 
 
-    struct configuration
+    struct Configuration
     {
         double x_config = 0.0;
 
@@ -25,6 +25,22 @@ namespace turtlelib{
 
 
     class DiffDrive
+    {
+        public:
+
+        Wheels forward_kinematics(Wheels w);
+
+    
 
 
-}
+
+        private:
+
+        Wheels w;
+        Configuration q;
+
+
+    }
+
+
+};
