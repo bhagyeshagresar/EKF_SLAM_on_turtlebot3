@@ -184,6 +184,9 @@ namespace turtlelib
 
         Twist2D new_twist(Twist2D V);
 
+        /// \brief integrate the twist
+        /// \return Transformation in the same body frame
+
 
     
     private:
@@ -224,5 +227,9 @@ namespace turtlelib
     std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
 }
+
+
+
+    // Transform2D integrate_twist(Twist2D V);
 
 #endif

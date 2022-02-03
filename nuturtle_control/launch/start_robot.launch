@@ -1,0 +1,7 @@
+<launch>
+
+    <rosparam command = "load"  file="$(find nuturtle_description)/config/diff_params.yaml"/>
+
+
+
+</launch>

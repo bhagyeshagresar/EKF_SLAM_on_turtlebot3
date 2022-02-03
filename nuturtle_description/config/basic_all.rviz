@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
-        - /RobotModel1/Status1
         - /RobotModel2
         - /RobotModel3
         - /RobotModel4
@@ -59,7 +58,7 @@ Visualization Manager:
       Value: true
     - Alpha: 1
       Class: rviz/RobotModel
-      Collision Enabled: false
+      Collision Enabled: true
       Enabled: true
       Links:
         All Links Enabled: true
@@ -67,35 +66,35 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_footprint:
+        red:base_footprint:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_scan:
+        red:base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        caster_back_link:
+        red:base_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        "red : wheel_left_link":
+        red:caster_back_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "red : wheel_right_link":
+        red:imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        red:wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        red:wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -108,7 +107,7 @@ Visualization Manager:
       Visual Enabled: true
     - Alpha: 1
       Class: rviz/RobotModel
-      Collision Enabled: false
+      Collision Enabled: true
       Enabled: true
       Links:
         All Links Enabled: true
@@ -116,39 +115,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_footprint:
+        green:base_footprint:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_scan:
+        green:base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        caster_back_link:
+        green:base_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "green : wheel_left_link":
+        green:caster_back_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "green : wheel_right_link":
+        green:imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        green:wheel_left_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        imu_link:
+        green:wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: green/robot_description
       TF Prefix: ""
@@ -157,7 +156,7 @@ Visualization Manager:
       Visual Enabled: true
     - Alpha: 1
       Class: rviz/RobotModel
-      Collision Enabled: false
+      Collision Enabled: true
       Enabled: true
       Links:
         All Links Enabled: true
@@ -165,39 +164,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_footprint:
+        black:base_footprint:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_scan:
+        black:base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "black : wheel_left_link":
+        black:base_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "black : wheel_right_link":
+        black:caster_back_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        caster_back_link:
+        black:imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        black:wheel_left_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        imu_link:
+        black:wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: black/robot_description
       TF Prefix: ""
@@ -206,7 +205,7 @@ Visualization Manager:
       Visual Enabled: true
     - Alpha: 1
       Class: rviz/RobotModel
-      Collision Enabled: false
+      Collision Enabled: true
       Enabled: true
       Links:
         All Links Enabled: true
@@ -214,39 +213,39 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_footprint:
+        blue:base_footprint:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_scan:
+        blue:base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "blue : wheel_left_link":
+        blue:base_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        "blue : wheel_right_link":
+        blue:caster_back_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        caster_back_link:
+        blue:imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        blue:wheel_left_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        imu_link:
+        blue:wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: blue/robot_description
       TF Prefix: ""
@@ -257,7 +256,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -281,7 +280,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10
+      Distance: 3.0662412643432617
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -297,9 +296,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.785398006439209
+      Pitch: 0.19039824604988098
       Target Frame: <Fixed Frame>
-      Yaw: 0.785398006439209
+      Yaw: 0.6803982853889465
     Saved: ~
 Window Geometry:
   Displays:

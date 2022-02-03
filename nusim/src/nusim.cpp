@@ -8,14 +8,18 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Twist.h>
 #include "nusim/Teleport.h"
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 #include <vector>
+// #include "nuturtlebot_msgs/WheelCommands.h"
+// #include "nuturtlebot_msgs/SensorData.h"
 
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
+// static double linear_velocity, angular_velocity;
 // static double x_m[], y_m[];
 std::vector <double> x_m;
 std::vector <double> y_m;
@@ -38,6 +42,15 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 }
 
 
+// void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
+//     /// \brief set wheel velocities of the robot
+//     ///
+//     /// \param msg - nuturtlebot_msgs/WheelCommands
+
+//     linear_velocity = msg -> linear.x;
+//     angular_velocity = msg -> angular.z;
+
+// }
 
 
 
@@ -50,6 +63,7 @@ int main(int argc, char ** argv){
 
     ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 100);
     ros::Publisher pub2 = nh2.advertise<sensor_msgs::JointState>("red/joint_states", 100);
+    // ros::Publisher pub3 = nh.advertise<nusim::SensorData("red/sensor_data", 1000);
 
 
     ros::ServiceServer reset_service = nh.advertiseService("reset", reset_fn);
@@ -58,6 +72,10 @@ int main(int argc, char ** argv){
     sensor_msgs::JointState red_joint_state;
 
     ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 100, true);
+
+
+    //subsribe to red/wheel_cmd
+    // ros::Subscriber sub = nh.subscribe<nusim::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
 
     //get parameters
     nh.param("x", x, 0.0);

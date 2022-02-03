@@ -167,6 +167,10 @@ namespace turtlelib
 
 
 
+   
+
+
+
 
     std::istream & operator>>(std::istream & is, Transform2D & tf){
         std::string s1, s2, s3;
@@ -218,6 +222,51 @@ namespace turtlelib
 
     return os;
     }
+
+
+    // Transform2D integrate_twist(Twist2D V){
+        // double theta;
+
+
+        // v.x = V.y_dot/V.theta_dot;
+        // v.y = -V.x_dot/V.theta_dot;
+        // theta = V.theta_dot;
+        
+        // Transform2D Tbb_;
+        // Tsb(v), Tss_(theta), Tbs(v);
+
+        // Tbb_ = Tbs*Tss_*Tsb;
+
+        //translation
+
+    //     if (V.theta_dot == 0){
+    //         return Transform2D{Vector2D{V.x_dot, V.y_dot}};
+    //     }
+    //     else if{
+    //         return Transform2D{Vector2D{V.theta}};
+
+    //     }
+    //     else if{
+    //         Vector2D v;
+    //         v.x = V.y_dot/V.theta_dot;
+    //         v.y = -V.x_dot/V.theta_dot;
+    //         theta = V.theta_dot;
+
+    //         Transform2D Tsb{v.x, v.y, theta};
+    //         Transform2D Tss_{0, 0, theta};
+    //         Transform2D Tbs;
+    //         Tbs = Tsb.inv();
+
+    //         Transform2D Tbb_;
+
+    //         Tbb_ = Tbs*Tss_*Tsb;
+
+    //         return Tbb_;
+            
+
+    //     }
+
+    // }
 
     
 

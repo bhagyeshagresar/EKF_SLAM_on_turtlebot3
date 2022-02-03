@@ -7,6 +7,8 @@
   <xacro:property name="robot_param" value="${xacro.load_yaml(yaml_file)}"/>
   <xacro:property name="R" value="${robot_param['R']}" />
   <xacro:property name="W" value="${robot_param['W']}" />
+  <xacro:property name="C_R" value="${robot_param['C_R']}" />
+
 
 
   <xacro:arg name="color" default="black"/>
@@ -34,7 +36,7 @@
     <collision>
       <origin xyz="-0.032 0 0.070" rpy="0 0 0"/>
       <geometry>
-        <box size="0.140 0.140 0.143"/>
+        <cylinder length="0.24" radius="${C_R}"/>
       </geometry>
     </collision>
 

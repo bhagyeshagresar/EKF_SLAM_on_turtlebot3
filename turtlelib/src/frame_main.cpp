@@ -5,7 +5,7 @@
 
 int main(){
     
-    turtlelib::Transform2D Tab, Tba, Tbc, Tcb, Tac, Tca;
+    turtlelib::Transform2D Tab, Tba, Tbc, Tcb, Tac, Tca, Tbb_;
     turtlelib::Vector2D vb, va, vc, v_bhat;
     turtlelib::Twist2D V_b, V_a, V_c;
     // turtlelib::Transform2D Tab_2(turtlelib::Vector2D v);
@@ -77,6 +77,9 @@ int main(){
     std::cout <<"V_b " << V_b << std::endl;
     std::cout <<"V_c " << V_c << std::endl;
 
+    // Tbb_ = integrate_twist(V_a);
+
+    
 
 
 
