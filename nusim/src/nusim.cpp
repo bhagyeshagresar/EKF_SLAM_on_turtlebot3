@@ -13,7 +13,7 @@
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 #include <vector>
-// #include "nuturtlebot_msgs/WheelCommands.h"
+#include "nuturtlebot_msgs/WheelCommands.h"
 // #include "nuturtlebot_msgs/SensorData.h"
 
 static std_msgs::UInt64 timestep;
@@ -42,15 +42,15 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 }
 
 
-// void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
-//     /// \brief set wheel velocities of the robot
-//     ///
-//     /// \param msg - nuturtlebot_msgs/WheelCommands
+void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
+    /// \brief set wheel velocities of the robot
+    ///
+    /// \param msg - nuturtlebot_msgs/WheelCommands
 
-//     linear_velocity = msg -> linear.x;
-//     angular_velocity = msg -> angular.z;
+    linear_velocity = msg -> linear.x;
+    angular_velocity = msg -> angular.z;
 
-// }
+}
 
 
 
@@ -75,7 +75,7 @@ int main(int argc, char ** argv){
 
 
     //subsribe to red/wheel_cmd
-    // ros::Subscriber sub = nh.subscribe<nusim::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
+    ros::Subscriber wheel_cmd_sub = nh.subscribe<nusim::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
 
     //get parameters
     nh.param("x", x, 0.0);

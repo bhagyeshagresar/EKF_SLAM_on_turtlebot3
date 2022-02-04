@@ -118,7 +118,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-include
+# include
 ${catkin_INCLUDE_DIRS}
 )
 
@@ -208,7 +208,7 @@ ${catkin_INCLUDE_DIRS}
 
 
 # create the turtlelib library 
-add_library(turtlelib src/rigid2d.cpp)
+add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
 # The add_library function just added turtlelib as a "target"
 # A "target" is a name that CMake uses to refer to some type of output
 # In this case it is a library but it could also be an executable or some other items
@@ -231,7 +231,7 @@ target_compile_options(turtlelib PUBLIC -Wall -Wextra)
 # into a single executable (as long as exactly one of these files includes a main() function).
 # However, by creating a library (as we are doing here) the library files
 # can be compiled once and used
-add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp)
+add_executable(frame_main src/frame_main.cpp src/rigid2d.cpp src/diff_drive.cpp)
 target_link_libraries(frame_main turtlelib)
 
 #Use the cmake testing functionality. A test is just an executable.

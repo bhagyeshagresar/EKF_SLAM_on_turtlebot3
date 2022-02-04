@@ -3,13 +3,13 @@
 
 namespace turtlelib{
 
-    struct Wheels
+    struct Wheels_pos
     {
         /// \brief right wheel pos
-        double wheel_right = 0.0;
+        double w_1 = 0.0;
 
         /// \brief left wheel pos
-        double wheel_left = 0.0;
+        double w_2 = 0.0;
     };
 
 
@@ -21,14 +21,29 @@ namespace turtlelib{
 
         double theta_config = 0.0;
 
-    }
+    };
+
+
+    struct Wheels_vel
+    {
+        double w1_vel = 0.0;
+        double w2_vel = 0.0;
+    };
 
 
     class DiffDrive
     {
         public:
 
-        Wheels forward_kinematics(Wheels w);
+        DiffDrive();
+
+        Twist2D forward_kinematics(Wheels_vel w);
+
+        Wheels_vel inverse_kinematics(Twist2D V);
+
+
+
+
 
     
 
@@ -36,11 +51,14 @@ namespace turtlelib{
 
         private:
 
-        Wheels w;
+        Wheels_pos w;
+        Wheels_vel w_vel;
         Configuration q;
+        double d;
+        double r;
 
 
-    }
+    };
 
 
-};
+}
