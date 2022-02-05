@@ -57,6 +57,8 @@
   <build_depend>nuturtlebot_msgs</build_depend>
   <build_depend>turtlelib</build_depend>
   <exec_depend>turtlelib</exec_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_depend>sensor_msgs</build_depend>
 
 
 

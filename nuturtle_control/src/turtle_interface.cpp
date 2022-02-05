@@ -3,8 +3,8 @@
 #include "nuturtlebot_msgs/WheelCommands.h"
 #include "nuturtlebot_msgs/SensorData.h"
 #include <sensor_msgs/JointState.h>
-#include "diff_drive.hpp"
-#include "rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
+#include "turtlelib/rigid2d.hpp"
 
 static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;

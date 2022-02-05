@@ -14,7 +14,7 @@
 #include "visualization_msgs/MarkerArray.h"
 #include <vector>
 #include "nuturtlebot_msgs/WheelCommands.h"
-// #include "nuturtlebot_msgs/SensorData.h"
+#include "nuturtlebot_msgs/SensorData.h"
 
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
@@ -24,6 +24,8 @@ static int num_markers;
 std::vector <double> x_m;
 std::vector <double> y_m;
 
+//sensor_data_message
+static nuturtlebot_msgs::SensorData sensor_data;
 
 
 bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
@@ -47,8 +49,16 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     ///
     /// \param msg - nuturtlebot_msgs/WheelCommands
 
-    linear_velocity = msg -> linear.x;
-    angular_velocity = msg -> angular.z;
+    left_wheel_velocity = msg.left_velocity;
+    right_wheel_velocity = msg.right_velocity;
+
+    // left_wheel_velocity_rad = left_wheel_velocity*motor_cmd_to_radsec;
+    // right_wheel_velocity_rad = right_wheel_velocity*motor_cmd_to_radsec;
+    sensor_data.left_encoder = ((left_wheel_velocity)/rate + left_angle)/encoder_ticks_to_rad;
+    sensor_data.right_encoder = ((right_wheel_velocity)rate + right_angle)/encoder_ticks_to_rad;
+
+
+
 
 }
 
@@ -76,6 +86,10 @@ int main(int argc, char ** argv){
 
     //subsribe to red/wheel_cmd
     ros::Subscriber wheel_cmd_sub = nh.subscribe<nusim::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
+    
+
+    //publish to red/sensor_data
+    ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 100);
 
     //get parameters
     nh.param("x", x, 0.0);
@@ -141,12 +155,12 @@ int main(int argc, char ** argv){
         // ROS_INFO("%ld", timestep.data);
         timestep.data++;
 
-        red_joint_state.name.push_back("wheel_joint_1");
-        red_joint_state.name.push_back("wheel_joint_2");
-        red_joint_state.position.push_back(0);
-        red_joint_state.position.push_back(0);
-        red_joint_state.velocity.push_back(0);
-        red_joint_state.velocity.push_back(0);
+        // red_joint_state.name.push_back("wheel_joint_1");
+        // red_joint_state.name.push_back("wheel_joint_2");
+        // red_joint_state.position.push_back(0);
+        // red_joint_state.position.push_back(0);
+        // red_joint_state.velocity.push_back(0);
+        // red_joint_state.velocity.push_back(0);
 
 
         static tf2_ros::StaticTransformBroadcaster static_broadcaster;
@@ -166,7 +180,7 @@ int main(int argc, char ** argv){
         static_broadcaster.sendTransform(static_transformStamped);
 
        
-
+        sensor_pub.publish(sensor_data);
 
 
 

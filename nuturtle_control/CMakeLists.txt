@@ -116,6 +116,9 @@ catkin_package(
 CATKIN_DEPENDS
 roscpp
 message_runtime
+nuturtlebot_msgs
+geometry_msgs
+turtlelib
 
 )
 
@@ -126,7 +129,7 @@ message_runtime
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+include
 ${catkin_INCLUDE_DIRS}
 )
 
@@ -153,13 +156,15 @@ add_executable(nuturtle_interface src/turtle_interface.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(nuturtle_interface
 ${catkin_LIBRARIES}
 turtlelib
 )
+
+add_dependencies(nuturtle_interface nuturtle_interface)
+
 
 #############
 ## Install ##
@@ -183,7 +188,7 @@ install(TARGETS nuturtle_interface
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
+# install(TARGETS nuturtle_interface
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
