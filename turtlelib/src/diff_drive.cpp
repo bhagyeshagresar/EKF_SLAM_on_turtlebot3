@@ -1,5 +1,5 @@
-#include "rigid2d.hpp"
-#include "diff_drive.hpp"
+#include "turtlelib/rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
 #include <ros/ros.h>
 // #include <ros/console.
 
@@ -13,19 +13,39 @@ namespace turtlelib
 
         }
 
-    Twist2D DiffDrive::forward_kinematics(Wheels_vel wheel){
+    Configuration DiffDrive::forward_kinematics(Wheel_angles new_wheel_ang){
         Twist2D V_fwd;
+        Wheels_vel w_vel;
+        Wheel_angles old_wheel_ang {0.0, 0.0};
+        Vector2D new_vector_config;
+        double new_theta_config {0.0};
+        
+        //update wheel velocities
+        w_vel.w1_vel = new_wheel_ang.w_ang1 - old_wheel_ang.w_ang1;
+        w_vel.w2_vel = new_wheel_ang.w_ang2 - old_wheel_ang.w_ang2;   
+
+        //update wheel angles
+        old_wheel_ang.w_ang1 = new_wheel_ang.w_ang1;
+        old_wheel_ang.w_ang2 = new_wheel_ang.w_ang2;
         
 
-        
-        V_fwd.x_dot = (r*(wheel.w1_vel + wheel.w2_vel))/2;
+        //Calculate vx and thetadot
+        V_fwd.x_dot = (r*(w_vel.w1_vel + w_vel.w2_vel))/2;
+        V_fwd.theta_dot = (r*(w_vel.w2_vel - w_vel.w1_vel))/(2*d);
 
-        V_fwd.theta_dot = (r*(wheel.w2_vel - wheel.w1_vel))/(2*d);
-        // ROS::ROS_INFO_STREAM("forward twist x_dot", V_fwd.x_dot);
-        // ROS::ROS_INFO_STREAM("forward twist theta_dot", V_fwd.theta_dot);
+        Transform2D T_world_robot(Vector2D{Configuration.x_config, Configuration.y_config}, Configuration.theta_config);
+        Transform2D T_old_new = integrate_twist(V_fwd);
 
-        return V_fwd;
+        new_vector_config = T_old_new.translation();
+        new_theta_config = T_old_new.rotation();
 
+        Configuration.x_config = new_vector_config.x;
+        Configuration.y_config = new_vector_config.y;
+        Configuration.theta_config = new_theta_config;
+
+
+
+        return Configuration;
 
     }
 

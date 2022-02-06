@@ -19,10 +19,11 @@
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
-// static double linear_velocity, angular_velocity;
 // static double x_m[], y_m[];
 std::vector <double> x_m;
 std::vector <double> y_m;
+static double left_wheel_velocity {0.0};
+static double right_wheel_velocity {0.0};
 
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;

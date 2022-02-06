@@ -2,9 +2,9 @@
 // #include "catch.hpp"
 // #include <cmath>
 // #include <iostream>
-#include "rigid2d.hpp"
+#include "turtlelib/rigid2d.hpp"
 #include <catch_ros/catch.hpp>
-#include "diff_drive.hpp"
+#include "turtlelib/diff_drive.hpp"
 
 
 

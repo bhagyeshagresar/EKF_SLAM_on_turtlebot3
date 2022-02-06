@@ -13,6 +13,9 @@ static double left_encoder_ticks, right_encoder_ticks, left_wheel_angle, right_w
 
 
 void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
+    //forward kinematics to get twist
+    
+    
     Twist2D V;
     
     V.x_dot = twist_msg.linear.x;
@@ -71,7 +74,7 @@ int main(int argc, char **argv){
 
     //subscriber
     ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 1000, cmd_vel_callback);
-    ros::Subscriber sensor_data_sub = nh.subscribe("sensor_data", 1000, sensor_data_callback)
+    ros::Subscriber sensor_data_sub = nh.subscribe("sensor_data", 1000, sensor_data_callback);
  
     //publisher
     ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("wheel_cmd", 100);

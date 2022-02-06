@@ -129,9 +129,8 @@ turtlelib
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-include
-${catkin_INCLUDE_DIRS}
-)
+include 
+${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -146,7 +145,9 @@ ${catkin_INCLUDE_DIRS}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(nuturtle_interface src/turtle_interface.cpp)
+# add_executable(turtle_interface src/turtle_interface.cpp)
+add_executable(${PROJECT_NAME}_node src/turtle_interface.cpp)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,12 +159,16 @@ add_executable(nuturtle_interface src/turtle_interface.cpp)
 ## same as for the library above
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(nuturtle_interface
-${catkin_LIBRARIES}
-turtlelib
-)
+# target_link_libraries(turtle_interface
+# ${catkin_LIBRARIES}
+# turtlelib
+# )
+target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+   turtlelib
+ )
 
-add_dependencies(nuturtle_interface nuturtle_interface)
+# add_dependencies(turtle_interface turtle_interface)
 
 
 #############
@@ -182,7 +187,7 @@ add_dependencies(nuturtle_interface nuturtle_interface)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS nuturtle_interface
+install(TARGETS ${PROJECT_NAME}_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

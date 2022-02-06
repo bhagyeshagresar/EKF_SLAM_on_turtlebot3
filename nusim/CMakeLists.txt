@@ -109,7 +109,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#    INCLUDE_DIRS include
+# INCLUDE_DIRS include
 #  LIBRARIES nusim
 #    INCLUDE_DIRS include
    CATKIN_DEPENDS
@@ -117,6 +117,7 @@ catkin_package(
    std_srvs
    roscpp
    message_runtime
+   turtlelib
 )
 
 ###########
@@ -126,8 +127,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
  include_directories(
-  include
-  ${catkin_INCLUDE_DIRS})
+   include 
+   ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(slam_ws

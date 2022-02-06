@@ -1,15 +1,15 @@
-#include "rigid2d.hpp"
+#include "turtlelib/rigid2d.hpp"
 
 
 namespace turtlelib{
 
-    struct Wheels_pos
+    struct Wheel_angles
     {
-        /// \brief right wheel pos
-        double w_1 = 0.0;
+        /// \brief right wheel angle
+        double w_ang1 = 0.0;
 
-        /// \brief left wheel pos
-        double w_2 = 0.0;
+        /// \brief left wheel angle
+        double w_ang2 = 0.0;
     };
 
 
@@ -37,7 +37,7 @@ namespace turtlelib{
 
         DiffDrive();
 
-        Twist2D forward_kinematics(Wheels_vel w);
+        Configuration forward_kinematics(Wheels_pos w_pos);
 
         Wheels_vel inverse_kinematics(Twist2D V);
 
