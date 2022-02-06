@@ -19,7 +19,8 @@ namespace turtlelib
         Wheel_angles old_wheel_ang {0.0, 0.0};
         Vector2D new_vector_config;
         double new_theta_config {0.0};
-        
+        Configuration config;
+
         //update wheel velocities
         w_vel.w1_vel = new_wheel_ang.w_ang1 - old_wheel_ang.w_ang1;
         w_vel.w2_vel = new_wheel_ang.w_ang2 - old_wheel_ang.w_ang2;   
@@ -33,19 +34,19 @@ namespace turtlelib
         V_fwd.x_dot = (r*(w_vel.w1_vel + w_vel.w2_vel))/2;
         V_fwd.theta_dot = (r*(w_vel.w2_vel - w_vel.w1_vel))/(2*d);
 
-        Transform2D T_world_robot(Vector2D{Configuration.x_config, Configuration.y_config}, Configuration.theta_config);
+        Transform2D T_world_robot{Vector2D{config.x_config, config.y_config}, config.theta_config};
         Transform2D T_old_new = integrate_twist(V_fwd);
 
         new_vector_config = T_old_new.translation();
         new_theta_config = T_old_new.rotation();
 
-        Configuration.x_config = new_vector_config.x;
-        Configuration.y_config = new_vector_config.y;
-        Configuration.theta_config = new_theta_config;
+        config.x_config = new_vector_config.x;
+        config.y_config = new_vector_config.y;
+        config.theta_config = new_theta_config;
 
 
 
-        return Configuration;
+        return config;
 
     }
 

@@ -15,15 +15,16 @@
 #include <vector>
 #include "nuturtlebot_msgs/WheelCommands.h"
 #include "nuturtlebot_msgs/SensorData.h"
+#include "turtlelib/diff_drive.hpp"
 
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
-// static double x_m[], y_m[];
 std::vector <double> x_m;
 std::vector <double> y_m;
 static double left_wheel_velocity {0.0};
 static double right_wheel_velocity {0.0};
+static double encoder_ticks_to_rad;
 
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
@@ -50,13 +51,15 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     ///
     /// \param msg - nuturtlebot_msgs/WheelCommands
 
-    left_wheel_velocity = msg.left_velocity;
-    right_wheel_velocity = msg.right_velocity;
+    left_wheel_velocity = msg->left_velocity;
+    right_wheel_velocity = msg->right_velocity;
+
+    turtlelib::Wheel_angles wheel_angle;
 
     // left_wheel_velocity_rad = left_wheel_velocity*motor_cmd_to_radsec;
     // right_wheel_velocity_rad = right_wheel_velocity*motor_cmd_to_radsec;
-    sensor_data.left_encoder = ((left_wheel_velocity)/rate + left_angle)/encoder_ticks_to_rad;
-    sensor_data.right_encoder = ((right_wheel_velocity)rate + right_angle)/encoder_ticks_to_rad;
+    sensor_data.left_encoder = ((left_wheel_velocity)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad;
+    sensor_data.right_encoder = ((right_wheel_velocity)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
 
 
@@ -86,7 +89,7 @@ int main(int argc, char ** argv){
 
 
     //subsribe to red/wheel_cmd
-    ros::Subscriber wheel_cmd_sub = nh.subscribe<nusim::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
+    ros::Subscriber wheel_cmd_sub = nh.subscribe<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
     
 
     //publish to red/sensor_data
@@ -101,6 +104,7 @@ int main(int argc, char ** argv){
     nh.getParam("x_s", x_m);
     nh.getParam("y_s", y_m);
     nh.getParam("radius", radius);
+    nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
 
 
 

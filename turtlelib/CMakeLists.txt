@@ -104,7 +104,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES turtlelib
 #  CATKIN_DEPENDS
 #  CATKIN_DEPENDS other_catkin_pkg
@@ -118,7 +118,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-include
+# include
 ${catkin_INCLUDE_DIRS}
 )
 
@@ -179,11 +179,11 @@ ${catkin_INCLUDE_DIRS}
 # )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -217,7 +217,7 @@ add_library(turtlelib src/rigid2d.cpp src/diff_drive.cpp)
 # Public include directories can be used by other targets that link against turtlelib
 # By adding include/ to the include path, this means that files in e.g., include/turtlelib
 # can be included with #include"turtlelib/file.hpp"
-# target_include_directories(turtlelib PUBLIC include/)
+target_include_directories(turtlelib PUBLIC include/)
 
 # enable C++ 17
 target_compile_features(turtlelib PUBLIC cxx_std_17) 

@@ -226,6 +226,9 @@ namespace turtlelib
 
     std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
+    Transform2D integrate_twist(Twist2D V);
+
+
 }
 
 

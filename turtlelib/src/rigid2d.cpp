@@ -222,49 +222,35 @@ namespace turtlelib
     }
 
 
-    // Transform2D integrate_twist(Twist2D V){
-        // double theta;
+    Transform2D integrate_twist(Twist2D V){
+        double theta {0.0};
 
 
-        // v.x = V.y_dot/V.theta_dot;
-        // v.y = -V.x_dot/V.theta_dot;
-        // theta = V.theta_dot;
-        
-        // Transform2D Tbb_;
-        // Tsb(v), Tss_(theta), Tbs(v);
+        if (V.theta_dot == 0.0){
+            return Transform2D{Vector2D{V.x_dot, V.y_dot}};
+        }
+        else if (V.x_dot == 0.0 && V.y_dot == 0.0){
+            return Transform2D{Vector2D{V.theta_dot}};
 
-        // Tbb_ = Tbs*Tss_*Tsb;
+        }
+        else{
+            Vector2D v;
+            v.x = V.y_dot/V.theta_dot;
+            v.y = -V.x_dot/V.theta_dot;
+            theta = V.theta_dot;
 
-        //translation
+            Transform2D Tsb{{v.x, v.y}, theta};
+            Transform2D Tss_{{0.0, 0.0}, theta};
+            Transform2D Tbs = Tsb.inv();
 
-    //     if (V.theta_dot == 0){
-    //         return Transform2D{Vector2D{V.x_dot, V.y_dot}};
-    //     }
-    //     else if{
-    //         return Transform2D{Vector2D{V.theta}};
+            Transform2D Tbb_= Tbs*Tss_*Tsb;
 
-    //     }
-    //     else if{
-    //         Vector2D v;
-    //         v.x = V.y_dot/V.theta_dot;
-    //         v.y = -V.x_dot/V.theta_dot;
-    //         theta = V.theta_dot;
-
-    //         Transform2D Tsb{v.x, v.y, theta};
-    //         Transform2D Tss_{0, 0, theta};
-    //         Transform2D Tbs;
-    //         Tbs = Tsb.inv();
-
-    //         Transform2D Tbb_;
-
-    //         Tbb_ = Tbs*Tss_*Tsb;
-
-    //         return Tbb_;
+            return Tbb_;
             
 
-    //     }
+         }
 
-    // }
+    }
 
     
 

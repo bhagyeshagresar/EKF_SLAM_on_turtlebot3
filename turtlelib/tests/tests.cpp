@@ -104,85 +104,85 @@ TEST_CASE("Check translation function"){
 // }
 
 
-TEST_CASE("test forward kinematics - forward"){
-	turtlelib::DiffDrive D;
-	turtlelib::Wheels_vel wheel;
-	turtlelib::Twist2D V_fwd;
-	// double r = 1.0;
-	wheel.w1_vel = 3.0;
-	wheel.w2_vel = 3.0;
+// TEST_CASE("test forward kinematics - forward"){
+// 	turtlelib::DiffDrive D;
+// 	turtlelib::Wheels_vel wheel;
+// 	turtlelib::Twist2D V_fwd;
+// 	// double r = 1.0;
+// 	wheel.w1_vel = 3.0;
+// 	wheel.w2_vel = 3.0;
 
 
-	V_fwd = D.forward_kinematics(wheel);
+// 	V_fwd = D.forward_kinematics(wheel);
 
-	REQUIRE(V_fwd.x_dot == 3);
-	REQUIRE(V_fwd.theta_dot == 0);
-
-
-
-
-}
+// 	REQUIRE(V_fwd.x_dot == 3);
+// 	REQUIRE(V_fwd.theta_dot == 0);
 
 
 
 
-
-
-
-TEST_CASE("test forward kinematics - rotation"){
-	turtlelib::DiffDrive D;
-	turtlelib::Wheels_vel wheel;
-	turtlelib::Twist2D V_fwd;
-	// double r = 1.0;
-	wheel.w1_vel = 3.0;
-	wheel.w2_vel = -3.0;
-
-
-	V_fwd = D.forward_kinematics(wheel);
-
-	REQUIRE(V_fwd.x_dot == 0);
-	REQUIRE(V_fwd.theta_dot == -1.5);
-
-
-
-
-}
+// }
 
 
 
 
 
-TEST_CASE("test inverse kinematics - forward"){
-	turtlelib::DiffDrive D;
-	turtlelib::Twist2D V_inv;
-	turtlelib::Wheels_vel w_vel_test;
-	V_inv.x_dot = 3.0;
-	V_inv.theta_dot = 0.0;
-
-	w_vel_test = D.inverse_kinematics(V_inv);
-
-	REQUIRE(w_vel_test.w1_vel == 3);
-	REQUIRE(w_vel_test.w2_vel == 3);
 
 
+// TEST_CASE("test forward kinematics - rotation"){
+// 	turtlelib::DiffDrive D;
+// 	turtlelib::Wheels_vel wheel;
+// 	turtlelib::Twist2D V_fwd;
+// 	// double r = 1.0;
+// 	wheel.w1_vel = 3.0;
+// 	wheel.w2_vel = -3.0;
 
 
-}
+// 	V_fwd = D.forward_kinematics(wheel);
 
-
-TEST_CASE("test inverse kinematics - rotation"){
-	turtlelib::DiffDrive D;
-	turtlelib::Twist2D V_inv;
-	turtlelib::Wheels_vel w_vel_test;
-	V_inv.x_dot = 0.0;
-	V_inv.theta_dot = -1.5;
-
-	w_vel_test = D.inverse_kinematics(V_inv);
-
-	REQUIRE(w_vel_test.w1_vel == 3);
-	REQUIRE(w_vel_test.w2_vel == -3);
+// 	REQUIRE(V_fwd.x_dot == 0);
+// 	REQUIRE(V_fwd.theta_dot == -1.5);
 
 
 
 
-}
+// }
+
+
+
+
+
+// TEST_CASE("test inverse kinematics - forward"){
+// 	turtlelib::DiffDrive D;
+// 	turtlelib::Twist2D V_inv;
+// 	turtlelib::Wheels_vel w_vel_test;
+// 	V_inv.x_dot = 3.0;
+// 	V_inv.theta_dot = 0.0;
+
+// 	w_vel_test = D.inverse_kinematics(V_inv);
+
+// 	REQUIRE(w_vel_test.w1_vel == 3);
+// 	REQUIRE(w_vel_test.w2_vel == 3);
+
+
+
+
+// }
+
+
+// TEST_CASE("test inverse kinematics - rotation"){
+// 	turtlelib::DiffDrive D;
+// 	turtlelib::Twist2D V_inv;
+// 	turtlelib::Wheels_vel w_vel_test;
+// 	V_inv.x_dot = 0.0;
+// 	V_inv.theta_dot = -1.5;
+
+// 	w_vel_test = D.inverse_kinematics(V_inv);
+
+// 	REQUIRE(w_vel_test.w1_vel == 3);
+// 	REQUIRE(w_vel_test.w2_vel == -3);
+
+
+
+
+// }

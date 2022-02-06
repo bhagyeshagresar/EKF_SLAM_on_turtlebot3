@@ -37,7 +37,7 @@ namespace turtlelib{
 
         DiffDrive();
 
-        Configuration forward_kinematics(Wheels_pos w_pos);
+        Configuration forward_kinematics(Wheel_angles w_pos);
 
         Wheels_vel inverse_kinematics(Twist2D V);
 
@@ -51,7 +51,7 @@ namespace turtlelib{
 
         private:
 
-        Wheels_pos w;
+        Wheel_angles w_ang;
         Wheels_vel w_vel;
         Configuration q;
         double d;

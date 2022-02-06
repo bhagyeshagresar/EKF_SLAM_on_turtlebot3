@@ -8,18 +8,18 @@
 
 static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;
-static double motor_cmd_to_rad_sec_1, encoder_ticks_to_rad_1, motor_cmd_to_rad_sec_2, encoder_ticks_to_rad_2;
-static double left_encoder_ticks, right_encoder_ticks, left_wheel_angle, right_wheel_angle, left_wheel_velocity, right_wheel_velocity;
+static double motor_cmd_to_rad_sec, encoder_ticks_to_rad;
+static double left_encoder_ticks{0.0}, right_encoder_ticks{0.0}, left_wheel_angle, right_wheel_angle, left_wheel_velocity, right_wheel_velocity;
 
 
 void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     //forward kinematics to get twist
     
     
-    Twist2D V;
+    turtlelib::Twist2D V;
     
-    V.x_dot = twist_msg.linear.x;
-    V.theta_dot = twist_msg.angular.z;
+    V.x_dot = twist_msg->linear;
+    V.theta_dot = twist_msg->angular;
 
     w_vel = inverse_kinematics(V);
 
