@@ -9,7 +9,7 @@ namespace turtlelib
 {
 
     DiffDrive::DiffDrive()
-        :w{0.0, 0.0}, w_vel{0.0, 0.0}, q{0.0, 0.0, 0.0}, d{2.0}, r{1.0}{
+        :w_ang{0.0, 0.0}, w_vel{0.0, 0.0}, q{0.0, 0.0, 0.0}, d{2.0}, r{1.0}{
 
         }
 
