@@ -26,7 +26,7 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
 }
 
 
-bool set_pose(nuturtle_control::Set_Pose::Request &req, std_srvs::Empty::Response &res){
+bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Pose::Response &res){
     
 
     odom.pose.pose.position.x = req.x_config;
@@ -88,7 +88,7 @@ int main(int argc, char **argv){
 	current_time = ros::Time::now();
 	last_time = ros::Time::now();
 
-    ros::Rate r(1);
+    ros::Rate r(500);
 
     
     
@@ -128,8 +128,8 @@ int main(int argc, char **argv){
         //publish transform over tf
         geometry_msgs::TransformStamped odom_trans;
         odom_trans.header.stamp = current_time;
-        odom_trans.header.frame_id = "odom_id";
-        odom_trans.child_frame_id = "body_id";
+        odom_trans.header.frame_id = "odom";
+        odom_trans.child_frame_id = "blue-base_footprint";
 
     
         odom_trans.transform.translation.x = current_config.x_config;
@@ -148,7 +148,7 @@ int main(int argc, char **argv){
         //publish odometry message over ros
         nav_msgs::Odometry odom;
         odom.header.stamp = current_time;
-        odom.header.frame_id = "odom_id";
+        odom.header.frame_id = "odom";
 
         //set the position
         odom.pose.pose.position.x = current_config.x_config;
@@ -161,7 +161,7 @@ int main(int argc, char **argv){
 
 
         //set the velocity
-        odom.child_frame_id = "body_id";
+        odom.child_frame_id = "blue-base_footprint";
         odom.twist.twist.linear.x = V_twist.x_dot;
         odom.twist.twist.linear.y = 0;
         odom.twist.twist.angular.z = V_twist.theta_dot;

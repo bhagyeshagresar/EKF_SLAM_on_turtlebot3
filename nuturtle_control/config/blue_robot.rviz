@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
-        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -64,58 +63,50 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        red:base_footprint:
+        blue-base_footprint:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        red:base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        red:base_scan:
+        blue-base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        red:caster_back_link:
+        blue-base_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        red:imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        red:wheel_left_link:
+        blue-caster_back_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        red:wheel_right_link:
+        blue-imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        blue-wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        blue-wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: red/robot_description
+      Robot Description: blue/robot_description
       TF Prefix: ""
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /nusim_node/obstacles
-      Name: MarkerArray
-      Namespaces:
-        obstacles: true
-      Queue Size: 100
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: blue-base_footprint
     Frame Rate: 30
   Name: root
   Tools:
@@ -139,7 +130,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10
+      Distance: 1.1378520727157593
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -155,9 +146,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4503982961177826
+      Pitch: 0.6903979778289795
       Target Frame: <Fixed Frame>
-      Yaw: 0.7454006671905518
+      Yaw: 0.690398097038269
     Saved: ~
 Window Geometry:
   Displays:
