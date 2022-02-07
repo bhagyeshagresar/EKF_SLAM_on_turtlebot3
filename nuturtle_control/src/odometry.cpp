@@ -2,7 +2,7 @@
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include "nuturtle_control/set_pose.h"
+#include "nuturtle_control/Set_Pose.h"
 #include <std_srvs/Empty.h>
 #include "turtlelib/diff_drive.hpp"
 #include <geometry_msgs/TransformStamped.h>
@@ -26,7 +26,7 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
 }
 
 
-bool set_pose(nuturtle_control::set_pose::Request &req, std_srvs::Empty::Response &res){
+bool set_pose(nuturtle_control::Set_Pose::Request &req, std_srvs::Empty::Response &res){
     
 
     odom.pose.pose.position.x = req.x_config;

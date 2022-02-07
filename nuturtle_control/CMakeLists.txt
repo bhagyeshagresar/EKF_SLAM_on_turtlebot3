@@ -63,7 +63,8 @@ message_runtime
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  set_pose.srv
+  Set_Pose.srv
+  Control.srv
   # Service2.srv
 )
 
@@ -78,6 +79,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_srvs
+  std_msgs
 
   # nuturtlebot_msgs
 
@@ -159,7 +161,7 @@ ${catkin_INCLUDE_DIRS})
 # add_executable(turtle_interface src/turtle_interface.cpp)
 add_executable(turtle_interface_node src/turtle_interface.cpp)
 add_executable(odometry_node src/odometry.cpp)
-# add_executable(circle_node src/circle.cpp)
+add_executable(circle_node src/circle.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -188,11 +190,11 @@ target_link_libraries(
   turtlelib
  )
 
-#  target_link_libraries( 
-#   circle_node
-#   ${catkin_LIBRARIES}
-#   turtlelib
-#  )
+ target_link_libraries( 
+  circle_node
+  ${catkin_LIBRARIES}
+  turtlelib
+ )
 
 # add_dependencies(turtle_interface turtle_interface)
 
@@ -213,7 +215,7 @@ target_link_libraries(
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS turtle_interface_node odometry_node
+install(TARGETS turtle_interface_node odometry_node circle_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

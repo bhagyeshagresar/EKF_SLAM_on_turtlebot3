@@ -1,18 +1,40 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include "nuturtle_control/Control.h"
+#include <std_srvs/Empty.h>
 
 
 
 static geometry_msgs::Twist twist;
+static double angular_velocity{3.0};
+static double turning_radius{1.0};
+
+static bool stop = false;
+ros::Publisher cmd_vel_pub;
 
 
+bool control_fn(nuturtle_control::Control::Request &req, std_srvs::Empty::Response &res){
+    angular_velocity = req.velocity; // velocity in rad/s, positive means counter-clockwise, negative_clockwise
+    turning_radius = req.radius;
 
 
+    return true;
+}
+
+bool reverse_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+    angular_velocity = -(angular_velocity);
+    return true;
+}
 
 
+bool stop_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+    twist.linear.x = 0.0;
+    twist.angular.z = 0.0;
+    cmd_vel_pub.publish(twist);
+    stop == true;
 
-
-
+    return true;
+}
 
 
 int main(int argc, char **argv){
@@ -23,7 +45,7 @@ int main(int argc, char **argv){
 
 
     //Publish cmd_vel
-    ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 100);
+    cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 100);
     
     ros::ServiceServer control_service = nh.advertiseService("control", control_fn);
 
@@ -44,20 +66,15 @@ int main(int argc, char **argv){
         ros::spinOnce();
 
         
-
-
-
+         
         
-        
-        twist.linear = r*w;
-        twist.angular = 0;
+        twist.linear.x = turning_radius*angular_velocity;
+        twist.angular.z = 0.0;
+        if(stop == false){
+            cmd_vel_pub.publish(twist);
 
-
-
-
-        
-
-
+        }
+    
 
 
         r.sleep();

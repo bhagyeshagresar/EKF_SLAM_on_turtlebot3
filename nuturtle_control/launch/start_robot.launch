@@ -8,4 +8,9 @@
   </node>
 
 
+  <node name="odometry" type="odometry" pkg="nuturtle_control" output="screen"/>
+
+  <node name="circle" type="circle" pkg="nuturtle_control" output="screen"/>
+
+
 </launch>
