@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -16,13 +17,16 @@ static turtlelib::Wheels_vel wheel_vel;
 
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     
-    
+    ROS_INFO_STREAM("JOINT STATES RECEIVED");
     wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
     wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
     
+    ROS_INFO_STREAM("JOINT POS RECEIVED");
+
     wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
     wheel_vel.w2_vel = js_msg->velocity[1]; //wheel velocity 2
-    
+    ROS_INFO_STREAM("JOINT VELS RECEIVED");
+
 }
 
 
@@ -41,17 +45,12 @@ bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Po
 
 
 int main(int argc, char **argv){
-    
+    ROS_INFO_STREAM("Hello world");
     ros::init(argc, argv, "odometry");
     ros::NodeHandle nh;
 
 
-    //get the parameters
-    // nh.getParam("body_id", body_id);
-    // nh.getParam("odom_id", odom_id);
-    // nh.getParam("wheel_left", wheel_left);
-    // nh.getParam("wheel_right", wheel_right);
-
+    
 
     //subscribe to jointStates
     ros::Subscriber js_sub = nh.subscribe("joint_states", 1000, joint_state_callback);
@@ -69,18 +68,6 @@ int main(int argc, char **argv){
 
 
 
-
-    // initial position of robot at origin of odom coordinate frame
-	// double x = 0.0; 
-	// double y = 0.0;
-	// double th = 0;
-
-
-
-    // // velocity - base_link moves in the odom_frame 
-	// double vx = 0.1;
-	// double vy = -0.1;
-	// double vth = 0.1;
 
 
     ros::Time current_time;
@@ -113,16 +100,6 @@ int main(int argc, char **argv){
 
 
         
-        // double dt = 0.01;
-        // double delta_x = (vx * cos(th) - vy * sin(th)) * dt; // use forward_kinematics to
-        // double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
-        // double delta_th = vth * dt;
-   
-        // current_config.x += delta_x;
-        // current_config.y += delta_y;
-        // current_config.th += delta_th;
-
-    
 
       
         //publish transform over tf

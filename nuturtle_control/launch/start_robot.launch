@@ -8,7 +8,7 @@
 
 
 
-  <!-- <node name="turtle_interface" type="turtle_interface" pkg="nuturtle_control" output="screen"/> -->
+  <node name="turtle_interface" type="turtle_interface" pkg="nuturtle_control" output="screen"/>
 
 
   <node name="odometry" type="odometry" pkg="nuturtle_control" output="screen"/>
@@ -23,17 +23,23 @@
 
 
   <!-- <include file="$(find nusim)/launch/nusim.launch"/>     -->
-  
+  <!-- <node name="nusim_node" type="nusim_node" pkg="nusim" output="screen"
+      <rosparam file="$(find nusim)/config/basic_world.yaml"/>
+      <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
+      if="$(eval arg('robot') == 'nusim')"/>  -->
+
 
 
   <param name="blue/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=blue"/>
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "blue"/>
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "red"
+      if="$(eval arg('robot') == 'nusim')"/> 
+
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "blue"/>
 
-
-  
   
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/blue_robot.rviz -f blue-base_footprint"/>
 

@@ -79,8 +79,14 @@ int main(int argc, char **argv){
     nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
 
 
+  
+    js.position.push_back(1);
+    js.position.push_back(2);
+    js.velocity.push_back(2);
+    js.velocity.push_back(3);
 
-    ros::Rate r(100);
+
+    ros::Rate r(500);
 
 
     //Twist forward_kinematics
