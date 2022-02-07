@@ -50,10 +50,10 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <depend>roscpp</depend>
-  <build_depend>message_runtime</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <exec_depend>nuturtlebot_msgs</exec_depend>
-  <build_export_depend>message_runtime</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
   <build_depend>nuturtlebot_msgs</build_depend>
   <build_depend>turtlelib</build_depend>
   <exec_depend>turtlelib</exec_depend>
@@ -62,6 +62,16 @@
   <build_export_depend>turtlelib</build_export_depend>
   <build_export_depend>nuturtlebot_msgs</build_export_depend>
   <exec_depend>nuturtle_description</exec_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_depend>message_runtime</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
+  <build_export_depend>std_srvs</build_export_depend>
+  <build_depend>std_srvs</build_depend>
+
+
 
 
 

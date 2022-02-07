@@ -16,7 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
  sensor_msgs
  std_srvs
  tf2_ros
- turtlelib)
+ turtlelib
+ )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -127,7 +128,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
  include_directories(
-   include 
+  #  include 
    ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library

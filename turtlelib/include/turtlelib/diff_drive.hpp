@@ -33,6 +33,30 @@ namespace turtlelib{
 
     class DiffDrive
     {
+        private:
+        
+        Wheel_angles w_ang;
+        Wheels_vel w_vel;
+        Configuration q;
+        double d;
+        double r;
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         public:
 
         DiffDrive();
@@ -40,7 +64,10 @@ namespace turtlelib{
         Configuration forward_kinematics(Wheel_angles w_pos);
 
         Wheels_vel inverse_kinematics(Twist2D V);
+        
+        double get_radius();
 
+        double get_length_d();
 
 
 
@@ -49,16 +76,12 @@ namespace turtlelib{
 
 
 
-        private:
-
-        Wheel_angles w_ang;
-        Wheels_vel w_vel;
-        Configuration q;
-        double d;
-        double r;
+       
 
 
     };
+
+    
 
 
 }

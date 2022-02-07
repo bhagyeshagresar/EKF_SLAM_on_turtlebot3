@@ -1,4 +1,4 @@
-double x_config
-double y_config
-double theta_config
+float64 x_config
+float64 y_config
+float64 theta_config
 ---

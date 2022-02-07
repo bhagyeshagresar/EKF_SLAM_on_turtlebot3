@@ -11,9 +11,13 @@ find_package(catkin REQUIRED COMPONENTS
 roscpp
 sensor_msgs
 geometry_msgs
-message_runtime
+message_generation
 nuturtlebot_msgs
 turtlelib
+std_msgs
+std_srvs
+tf2_ros
+message_runtime
 )
 
 ## System dependencies are found with CMake's conventions
@@ -57,11 +61,11 @@ turtlelib
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  set_pose.srv
+  # Service2.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -71,13 +75,16 @@ turtlelib
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   nuturtlebot_msgs
+generate_messages(
+  DEPENDENCIES
+  std_srvs
+
+  # nuturtlebot_msgs
+
+
 
 #     # Or other packages containing msgs
-# )
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -115,10 +122,14 @@ catkin_package(
 #  DEPENDS system_lib
 CATKIN_DEPENDS
 roscpp
-message_runtime
+message_generation
 nuturtlebot_msgs
 geometry_msgs
 turtlelib
+std_msgs
+message_runtime
+tf2_ros
+std_srvs
 
 )
 
@@ -146,7 +157,9 @@ ${catkin_INCLUDE_DIRS})
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(turtle_interface src/turtle_interface.cpp)
-add_executable(${PROJECT_NAME}_node src/turtle_interface.cpp)
+add_executable(turtle_interface_node src/turtle_interface.cpp)
+add_executable(odometry_node src/odometry.cpp)
+# add_executable(circle_node src/circle.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -163,10 +176,23 @@ add_executable(${PROJECT_NAME}_node src/turtle_interface.cpp)
 # ${catkin_LIBRARIES}
 # turtlelib
 # )
-target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES}
-   turtlelib
+target_link_libraries(
+  turtle_interface_node 
+  ${catkin_LIBRARIES}
+  turtlelib
  )
+
+ target_link_libraries(
+  odometry_node 
+  ${catkin_LIBRARIES}
+  turtlelib
+ )
+
+#  target_link_libraries( 
+#   circle_node
+#   ${catkin_LIBRARIES}
+#   turtlelib
+#  )
 
 # add_dependencies(turtle_interface turtle_interface)
 
@@ -187,7 +213,7 @@ target_link_libraries(${PROJECT_NAME}_node
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_node
+install(TARGETS turtle_interface_node odometry_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -199,12 +225,12 @@ install(TARGETS ${PROJECT_NAME}_node
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 # )
 
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+# Mark cpp header files for installation
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

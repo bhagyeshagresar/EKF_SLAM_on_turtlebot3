@@ -60,7 +60,14 @@ namespace turtlelib
 
 
     }
+
+    double DiffDrive::get_radius(){
+        return r;
+    }
     
+    double DiffDrive::get_length_d(){
+        return d;
+    }
 
 }
 

@@ -2,22 +2,26 @@
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Odometry.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <nuturtle_control/set_pose.h>
+#include "nuturtle_control/set_pose.h"
 #include <std_srvs/Empty.h>
 #include "turtlelib/diff_drive.hpp"
+#include <geometry_msgs/TransformStamped.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 nav_msgs::Odometry odom;
+static turtlelib::Configuration current_config;
+static turtlelib::Wheel_angles wheel_angle;
+static turtlelib::Wheels_vel wheel_vel;   
+    
 
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
-    Wheel_angles wheel_angle;
-    Wheels_vel wheel_vel;   
     
     
-    wheel_angle.w_ang1 = js_msg.position[0]; //wheel angle1
-    wheel_angle.w_ang2 = js_msg.position[1]; // wheel angle2
+    wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
+    wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
     
-    wheel_vel.w1_vel = js_msg.velocity[0]; //wheel velocity 1
-    wheel_vel.w2_vel = js.msg.velocity[1]; //wheel velocity 2
+    wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
+    wheel_vel.w2_vel = js_msg->velocity[1]; //wheel velocity 2
     
 }
 
@@ -28,7 +32,7 @@ bool set_pose(nuturtle_control::set_pose::Request &req, std_srvs::Empty::Respons
     odom.pose.pose.position.x = req.x_config;
     odom.pose.pose.position.y = req.y_config;
     odom.pose.pose.position.z = req.theta_config;
-    odom.pose.pose.orientation = odom_quat;
+    // odom.pose.pose.orientation = odom_quat;
 
     return true;
 
@@ -43,10 +47,10 @@ int main(int argc, char **argv){
 
 
     //get the parameters
-    nh.getParam("body_id", body_id);
-    nh.getParam("odom_id", odom_id);
-    nh.getParam("wheel_left", wheel_left);
-    nh.getParam("wheel_right", wheel_right);
+    // nh.getParam("body_id", body_id);
+    // nh.getParam("odom_id", odom_id);
+    // nh.getParam("wheel_left", wheel_left);
+    // nh.getParam("wheel_right", wheel_right);
 
 
     //subscribe to jointStates
@@ -60,7 +64,7 @@ int main(int argc, char **argv){
     ros::ServiceServer service = nh.advertiseService("set_pose", set_pose);
 
 
-    tf::TransformBroadcaster odom_broadcaster;
+    tf2_ros::TransformBroadcaster odom_broadcaster;
 
 
 
@@ -94,14 +98,18 @@ int main(int argc, char **argv){
         
 
         //get the wheel angles
-        current_config = forward_kinematics(wheel_ang);
+        turtlelib::DiffDrive fwd_diff_drive;
+
+        current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
 
         //get the twist
-        Twist2D V_twist;
+        turtlelib::Twist2D V_twist;
 
 
-        V_twist.x_dot = (r*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
-        V_twist.theta_dot = (r*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*d);
+    
+
+        V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
+        V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
 
 
         
@@ -116,7 +124,6 @@ int main(int argc, char **argv){
 
     
 
-        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
       
         //publish transform over tf
         geometry_msgs::TransformStamped odom_trans;
@@ -128,22 +135,30 @@ int main(int argc, char **argv){
         odom_trans.transform.translation.x = current_config.x_config;
         odom_trans.transform.translation.y = current_config.y_config;
         odom_trans.transform.translation.z = 0.0;
-        odom_trans.transform.rotation = odom_quat;
-
+        tf2::Quaternion quat;
+        quat.setRPY(0, 0, current_config.theta_config);
+        odom_trans.transform.rotation.x = quat.x();
+        odom_trans.transform.rotation.y = quat.y();
+        odom_trans.transform.rotation.z = quat.z();
+        odom_trans.transform.rotation.w = quat.w();
         //send the transform
         odom_broadcaster.sendTransform(odom_trans);
 
+       
         //publish odometry message over ros
         nav_msgs::Odometry odom;
         odom.header.stamp = current_time;
         odom.header.frame_id = "odom_id";
-        odom.header.child_frame_id = "body_id";
 
         //set the position
         odom.pose.pose.position.x = current_config.x_config;
         odom.pose.pose.position.y = current_config.y_config;
         odom.pose.pose.position.z = current_config.theta_config;
-        odom.pose.pose.orientation = odom_quat;
+        odom.pose.pose.orientation.x = quat.x();
+        odom.pose.pose.orientation.y = quat.y();
+        odom.pose.pose.orientation.z = quat.z();
+        odom.pose.pose.orientation.w = quat.w();
+
 
         //set the velocity
         odom.child_frame_id = "body_id";
@@ -153,6 +168,8 @@ int main(int argc, char **argv){
 
         odom_pub.publish(odom);
 
+
+        
         last_time = current_time;
         r.sleep();    
     

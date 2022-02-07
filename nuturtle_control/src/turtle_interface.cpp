@@ -9,7 +9,7 @@
 static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;
 static double motor_cmd_to_rad_sec, encoder_ticks_to_rad;
-static double left_encoder_ticks{0.0}, right_encoder_ticks{0.0}, left_wheel_angle, right_wheel_angle, left_wheel_velocity, right_wheel_velocity;
+static double left_encoder_ticks{0.0}, right_encoder_ticks{0.0}, left_wheel_angle{0.0}, right_wheel_angle{0.0}, left_wheel_velocity{0.0}, right_wheel_velocity{0.0};
 
 
 void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
@@ -17,11 +17,13 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     
     
     turtlelib::Twist2D V;
+    turtlelib::Wheels_vel w_vel;
     
-    V.x_dot = twist_msg->linear;
-    V.theta_dot = twist_msg->angular;
+    V.x_dot = twist_msg->linear.x;
+    V.theta_dot = twist_msg->angular.z;
 
-    w_vel = inverse_kinematics(V);
+    turtlelib::DiffDrive diff_drive;
+    w_vel = diff_drive.inverse_kinematics(V);
 
     wheel_cmd.left_velocity = w_vel.w1_vel;
     wheel_cmd.right_velocity = w_vel.w2_vel;
@@ -35,26 +37,18 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_encoder_ticks  = sensor_msg.left_encoder; // encoder data in ticks
     right_encoder_ticks = sensor_msg.right_encoder;
 
-    //access motor_cmd_to_rad_sec1 and put left_encoder value (rad/sec angular velocity)
-    //access motor_cmd_to_rad_sec2 and put right_encoder value
+    
 
-    //encoder ticks to rad (rad) angle
+    left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;
+    right_wheel_angle = (encoder_ticks_to_rad)*right_encoder_ticks;
 
-    // js1.position = encoder ticks
-    // js1.velocity = motor_cmd_to_rad
+    left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder_ticks;
+    right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder_ticks;
 
-    // js2.position = encoder ticks
-    // js2.velocity = motor_cmd_to_rad
-
-    left_wheel_angle = (encoder_ticks_to_rad)*left_encoder;
-    right_wheel_angle = (encoder_ticks_to_rad)*right_encoder;
-
-    left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder;
-    right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder;
-
-    js.name{left_wheel, right_wheel};
-    js.position{left_wheel_angle, right_wheel_angle};
-    js.velocity{left_wheel_velocity, right_wheel_velocity};
+    js.position.push_back(left_wheel_angle);
+    js.position.push_back(right_wheel_angle);
+    js.velocity.push_back(left_wheel_velocity); 
+    js.velocity.push_back(right_wheel_velocity);
 
 
 }
@@ -86,6 +80,7 @@ int main(int argc, char **argv){
 
 
 
+    ros::Rate r(100);
 
 
     //Twist forward_kinematics
@@ -95,11 +90,11 @@ int main(int argc, char **argv){
 
 
         wheel_cmd_pub.publish(wheel_cmd);
-        joint_state_pub.publish(joint_state_pub);
+        joint_state_pub.publish(js);
 
 
 
-
+        r.sleep();
 
     }
     
