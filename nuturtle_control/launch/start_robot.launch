@@ -1,6 +1,12 @@
 <launch>
 
-    <!-- <rosparam command = "load"  file="$(find nuturtle_description)/config/diff_params.yaml"/> -->
+
+  <arg name="cmd_src" value="none"/>
+  <arg name="robot" value="none"/>
+  <arg name="use_rviz" default="false"/>
+  <arg name="use_jsp" default="false"/>
+
+
 
   <node name="turtle_interface" type="turtle_interface" pkg="nuturtle_control" output="screen">
         <rosparam file="$(find nuturtle_description)/config/diff_params.yaml"/>
@@ -8,9 +14,33 @@
   </node>
 
 
-  <node name="odometry" type="odometry" pkg="nuturtle_control" output="screen"/>
+  <!-- <node name="odometry" type="odometry" pkg="nuturtle_control" output="screen"/> -->
 
-  <node name="circle" type="circle" pkg="nuturtle_control" output="screen"/>
 
+  <!-- <node name="circle" type="circle" pkg="nuturtle_control" output="screen"
+    if="$(eval arg('cmd_src') == 'circle')"/>
+
+  <node name="turtlebot_teleop_keyboard" type="turtlebot_teleop_keyboard" pkg="turtlebot_teleop_key" output="screen"
+    if="$(eval arg('cmd_src') == 'teleop')"/>
+
+  
+  <node name="nusim" type="nusim" pkg="nusim" output="screen"
+    if="$(eval arg('robot') == 'nusim')"/>
+
+
+
+  <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "red"/>
+
+
+  
+  
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_description)/config/basic.rviz -f $(arg color):base_footprint" ns= "$(arg color)"
+    if="$(eval arg('use_rviz') == 'true')"/>
+
+  <rosparam command = "load" file = "$(find nuturtle_description)/config/diff_params.yaml" /> 
+ -->
+  
 
 </launch>

@@ -15,6 +15,9 @@
         <arg name="color" value="red"/>
     </include>
 
+    <group if="$(arg use_jsp)">
+      <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "$(arg color)"/>
+    </group>    
 
     <!-- <rosparam file="$(find nusim)/config/basic_world.yaml"/> -->
 

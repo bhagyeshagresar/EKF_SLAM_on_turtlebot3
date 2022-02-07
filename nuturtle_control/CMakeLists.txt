@@ -159,9 +159,9 @@ ${catkin_INCLUDE_DIRS})
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(turtle_interface src/turtle_interface.cpp)
-add_executable(turtle_interface_node src/turtle_interface.cpp)
-add_executable(odometry_node src/odometry.cpp)
-add_executable(circle_node src/circle.cpp)
+add_executable(turtle_interface src/turtle_interface.cpp)
+add_executable(odometry src/odometry.cpp)
+add_executable(circle src/circle.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -179,19 +179,19 @@ add_executable(circle_node src/circle.cpp)
 # turtlelib
 # )
 target_link_libraries(
-  turtle_interface_node 
+  turtle_interface
   ${catkin_LIBRARIES}
   turtlelib
  )
 
  target_link_libraries(
-  odometry_node 
+  odometry
   ${catkin_LIBRARIES}
   turtlelib
  )
 
  target_link_libraries( 
-  circle_node
+  circle
   ${catkin_LIBRARIES}
   turtlelib
  )
@@ -215,7 +215,7 @@ target_link_libraries(
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS turtle_interface_node odometry_node circle_node
+install(TARGETS turtle_interface odometry circle
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
