@@ -49,7 +49,7 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
 
     js.header.stamp = ros::Time::now();
     // ROS_INFO_STREAM("got header stamp");
-    js.name = {"js_name"};
+    js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
     // ROS_INFO_STREAM("got name");
     js.position = {left_wheel_angle, right_wheel_angle};
     // ROS_INFO_STREAM("got position");
