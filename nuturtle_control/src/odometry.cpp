@@ -17,15 +17,15 @@ static turtlelib::Wheels_vel wheel_vel;
 
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     
-    ROS_INFO_STREAM("JOINT STATES RECEIVED");
+    // ROS_INFO_STREAM("JOINT STATES RECEIVED");
     wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
     wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
     
-    ROS_INFO_STREAM("JOINT POS RECEIVED");
+    // ROS_INFO_STREAM("JOINT POS RECEIVED");
 
     wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
     wheel_vel.w2_vel = js_msg->velocity[1]; //wheel velocity 2
-    ROS_INFO_STREAM("JOINT VELS RECEIVED");
+    // ROS_INFO_STREAM("JOINT VELS RECEIVED");
 
 }
 
@@ -45,7 +45,7 @@ bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Po
 
 
 int main(int argc, char **argv){
-    ROS_INFO_STREAM("Hello world");
+    // ROS_INFO_STREAM("Hello world");
     ros::init(argc, argv, "odometry");
     ros::NodeHandle nh;
 

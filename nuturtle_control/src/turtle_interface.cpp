@@ -36,25 +36,25 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
 void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_encoder_ticks  = sensor_msg.left_encoder; // encoder data in ticks
     right_encoder_ticks = sensor_msg.right_encoder;
-    ROS_INFO_STREAM("got ticks");
+    // ROS_INFO_STREAM("got ticks");
     
 
     left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;
     right_wheel_angle = (encoder_ticks_to_rad)*right_encoder_ticks;
-    ROS_INFO_STREAM("got angles");
+    // ROS_INFO_STREAM("got angles");
 
     left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder_ticks;
     right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder_ticks;
-    ROS_INFO_STREAM("got velocity");
+    // ROS_INFO_STREAM("got velocity");
 
     js.header.stamp = ros::Time::now();
-    ROS_INFO_STREAM("got header stamp");
-    js.name = {"left_wheel", "right_wheel"};
-    ROS_INFO_STREAM("got name");
+    // ROS_INFO_STREAM("got header stamp");
+    js.name = {"js_name"};
+    // ROS_INFO_STREAM("got name");
     js.position = {left_wheel_angle, right_wheel_angle};
-    ROS_INFO_STREAM("got position");
+    // ROS_INFO_STREAM("got position");
     js.velocity = {left_wheel_velocity, right_wheel_velocity};
-    ROS_INFO_STREAM("got velocity");
+    // ROS_INFO_STREAM("got velocity");
 
 
 }

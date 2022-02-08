@@ -76,7 +76,7 @@ int main(int argc, char **argv){
 
         }
     
-        ROS_INFO_STREAM("twist %d, twist");
+        // ROS_INFO_STREAM("twist %d, twist");
 
         r.sleep();
 

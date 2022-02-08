@@ -55,7 +55,7 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
     left_wheel_velocity = msg->left_velocity;
     right_wheel_velocity = msg->right_velocity;
-    ROS_INFO_STREAM("got velocities");
+    // ROS_INFO_STREAM("got velocities");
 
     turtlelib::Wheel_angles wheel_angle;
 
@@ -64,7 +64,7 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     sensor_data.left_encoder = ((left_wheel_velocity)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad;
     sensor_data.right_encoder = ((right_wheel_velocity)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
-    ROS_INFO_STREAM("got encoder data");
+    // ROS_INFO_STREAM("got encoder data");
 
 
 
