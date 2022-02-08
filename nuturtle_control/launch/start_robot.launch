@@ -1,10 +1,12 @@
 <launch>
 
 
-  <arg name="cmd_src" value="none"/>
+  <arg name="cmd_src" default="none"/>
   <arg name="robot" default="none"/>
   <arg name="use_rviz" default="false"/>
   <arg name="use_jsp" default="false"/>
+  <!-- <remap from="/joint_states" to="red/joint_states"/>
+  <remap from="/sensor_data" to="red/sensor_data"/> -->
 
 
 
@@ -14,19 +16,31 @@
   <node name="odometry" type="odometry" pkg="nuturtle_control" output="screen"/>
 
 
-   <!-- <node name="circle" type="circle" pkg="nuturtle_control" output="screen"
-    if="$(eval arg('cmd_src') == 'circle')"/> --> 
+  <node name="circle" type="circle" pkg="nuturtle_control" output="screen"
+    if="$(eval arg('cmd_src') == 'circle')"/> 
 
-   <!-- <node name="turtlebot_teleop_keyboard" type="turtlebot_teleop_keyboard" pkg="turtlebot_teleop_key" output="screen"
-    if="$(eval arg('cmd_src') == 'teleop')"/> -->
+  
+  <node name="turtlebot_teleop_keyboard" type="turtlebot_teleop_keyboard" pkg="turtlebot_teleop_key" output="screen"
+    if="$(eval arg('cmd_src') == 'teleop')"/>
 
 
 
-  <!-- <include file="$(find nusim)/launch/nusim.launch"/>     -->
-  <!-- <node name="nusim_node" type="nusim_node" pkg="nusim" output="screen"
-      <rosparam file="$(find nusim)/config/basic_world.yaml"/>
-      <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
-      if="$(eval arg('robot') == 'nusim')"/>  -->
+  <node name="nusim" type="nusim" pkg="nusim" output="screen"
+    if="$(eval arg('robot') == 'nusim')"/>
+  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "red"
+    if="$(eval arg('robot') == 'nusim')"/>
+  
+ 
+
+  
+  <rosparam command = "load" file = "$(find nusim)/config/basic_world.yaml"
+     if="$(eval arg('robot') == 'nusim')"/>
+
+  
+  
+  <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"
+      if="$(eval arg('robot') == 'nusim')"/> 
 
 
 
@@ -34,17 +48,19 @@
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "blue"/>
   
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "red"
-      if="$(eval arg('robot') == 'nusim')"/> 
-
+ 
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "blue"/>
+    
 
   
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/blue_robot.rviz -f blue-base_footprint"/>
 
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args="1 0 0 0 0 0 1 world odom" />
+  <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/blue_robot.rviz -f blue-base_footprint"/> -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/start_robot.rviz -f world"/>
+
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args="0 0 0 1 world odom" />
 
 
 </launch>

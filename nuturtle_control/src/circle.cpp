@@ -2,6 +2,7 @@
 #include <geometry_msgs/Twist.h>
 #include "nuturtle_control/Control.h"
 #include <std_srvs/Empty.h>
+#include <ros/console.h>
 
 
 
@@ -13,7 +14,7 @@ static bool stop = false;
 ros::Publisher cmd_vel_pub;
 
 
-bool control_fn(nuturtle_control::Control::Request &req, std_srvs::Empty::Response &res){
+bool control_fn(nuturtle_control::Control::Request &req, nuturtle_control::Control::Response &res){
     angular_velocity = req.velocity; // velocity in rad/s, positive means counter-clockwise, negative_clockwise
     turning_radius = req.radius;
 
@@ -56,7 +57,7 @@ int main(int argc, char **argv){
 
 
 
-    ros::Rate r(100);
+    ros::Rate r(500);
 
 
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv){
 
         }
     
-
+        ROS_INFO_STREAM("twist %d, twist");
 
         r.sleep();
 

@@ -3,4 +3,4 @@ W : 0.08
 C_R: 0.11
 motor_cmd_to_radsec: 0.024
 motor_cmd_max: 265
-encoder_ticks_to_rad: 4096
+encoder_ticks_to_rad: 0.00153398079

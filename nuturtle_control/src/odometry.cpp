@@ -53,7 +53,7 @@ int main(int argc, char **argv){
     
 
     //subscribe to jointStates
-    ros::Subscriber js_sub = nh.subscribe("joint_states", 1000, joint_state_callback);
+    ros::Subscriber js_sub = nh.subscribe("red/joint_states", 1000, joint_state_callback);
 
 
     //publish on odom topic

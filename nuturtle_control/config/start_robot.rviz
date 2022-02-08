@@ -7,6 +7,9 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
+        - /RobotModel1/Status1
+        - /TF1
+        - /Odometry1
         - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 549
@@ -103,9 +106,95 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        blue-base_footprint:
+          Value: true
+        blue-base_link:
+          Value: true
+        blue-base_scan:
+          Value: true
+        blue-caster_back_link:
+          Value: true
+        blue-imu_link:
+          Value: true
+        blue-wheel_left_link:
+          Value: true
+        blue-wheel_right_link:
+          Value: true
+        odom:
+          Value: true
+        red-base_footprint:
+          Value: true
+        red-base_link:
+          Value: true
+        red-base_scan:
+          Value: true
+        red-caster_back_link:
+          Value: true
+        red-imu_link:
+          Value: true
+        world:
+          Value: true
+      Marker Alpha: 1
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          red-base_footprint:
+            red-base_link:
+              red-base_scan:
+                {}
+              red-caster_back_link:
+                {}
+              red-imu_link:
+                {}
+      Update Interval: 0
+      Value: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.10000000149011612
+      Queue Size: 10
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /odom
+      Unreliable: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /nusim/obstacles
+      Marker Topic: /obstacles
       Name: MarkerArray
       Namespaces:
         obstacles: true
@@ -139,7 +228,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 9.946135520935059
+      Distance: 6.302416801452637
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -155,9 +244,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4503982961177826
+      Pitch: 0.4703981280326843
       Target Frame: <Fixed Frame>
-      Yaw: 0.7454006671905518
+      Yaw: 0.5353987812995911
     Saved: ~
 Window Geometry:
   Displays:

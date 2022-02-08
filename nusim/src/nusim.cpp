@@ -4,7 +4,7 @@
 #include <iostream>
 #include <std_srvs/Empty.h>
 #include <sensor_msgs/JointState.h>
-#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <geometry_msgs/Pose.h>
@@ -20,11 +20,13 @@
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
-std::vector <double> x_m;
-std::vector <double> y_m;
+std::vector <double> x_s;
+std::vector <double> y_s;
 static double left_wheel_velocity {0.0};
 static double right_wheel_velocity {0.0};
 static double encoder_ticks_to_rad;
+
+
 
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
@@ -53,6 +55,7 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
     left_wheel_velocity = msg->left_velocity;
     right_wheel_velocity = msg->right_velocity;
+    ROS_INFO_STREAM("got velocities");
 
     turtlelib::Wheel_angles wheel_angle;
 
@@ -61,6 +64,7 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     sensor_data.left_encoder = ((left_wheel_velocity)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad;
     sensor_data.right_encoder = ((right_wheel_velocity)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
+    ROS_INFO_STREAM("got encoder data");
 
 
 
@@ -72,11 +76,11 @@ int main(int argc, char ** argv){
     
     
     ros::init(argc, argv, "nusim");
-    ros::NodeHandle nh("~");
+    ros::NodeHandle nh;
     ros::NodeHandle nh2;
 
     ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 100);
-    ros::Publisher pub2 = nh2.advertise<sensor_msgs::JointState>("red/joint_states", 100);
+    // ros::Publisher pub2 = nh2.advertise<sensor_msgs::JointState>("red/joint_states", 100);
     // ros::Publisher pub3 = nh.advertise<nusim::SensorData("red/sensor_data", 1000);
 
 
@@ -95,14 +99,18 @@ int main(int argc, char ** argv){
     //publish to red/sensor_data
     ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 100);
 
+    static tf2_ros::TransformBroadcaster broadcaster;
+
+
+
     //get parameters
     nh.param("x", x, 0.0);
     nh.param("y", y, 0.0);
     nh.param("theta", theta, 0.0);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
-    nh.getParam("x_s", x_m);
-    nh.getParam("y_s", y_m);
+    nh.getParam("x_s", x_s);
+    nh.getParam("y_s", y_s);
     nh.getParam("radius", radius);
     nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
 
@@ -122,8 +130,8 @@ int main(int argc, char ** argv){
             marker.id = i;
             marker.type = visualization_msgs::Marker:: CYLINDER;
             marker.action = visualization_msgs::Marker::ADD;
-            marker.pose.position.x = x_m.at(i);
-            marker.pose.position.y = y_m.at(i);
+            marker.pose.position.x = x_s.at(i);
+            marker.pose.position.y = y_s.at(i);
             marker.pose.position.z = 0;
             marker.pose.orientation.x = 0.0;
             marker.pose.orientation.y = 0.0;
@@ -148,6 +156,7 @@ int main(int argc, char ** argv){
 
         }
     vis_pub.publish(marker_array);
+    ROS_INFO_STREAM("publishing markers");
 
 
 
@@ -168,23 +177,21 @@ int main(int argc, char ** argv){
         // red_joint_state.velocity.push_back(0);
 
 
-        static tf2_ros::StaticTransformBroadcaster static_broadcaster;
-        geometry_msgs::TransformStamped static_transformStamped;
-        static_transformStamped.header.stamp = ros::Time::now();
-        static_transformStamped.header.frame_id = "world";
-        static_transformStamped.child_frame_id = "red:base_footprint";
-        static_transformStamped.transform.translation.x = x;
-        static_transformStamped.transform.translation.y = y;
-        static_transformStamped.transform.translation.z = 0;
+        geometry_msgs::TransformStamped transformStamped;
+        transformStamped.header.stamp = ros::Time::now();
+        transformStamped.header.frame_id = "world";
+        transformStamped.child_frame_id = "red-base_footprint";
+        transformStamped.transform.translation.x = x;
+        transformStamped.transform.translation.y = y;
+        transformStamped.transform.translation.z = 0;
         tf2::Quaternion q;
         q.setRPY(0, 0, theta);
-        static_transformStamped.transform.rotation.x = q.x();
-        static_transformStamped.transform.rotation.y = q.y();
-        static_transformStamped.transform.rotation.z = q.z();
-        static_transformStamped.transform.rotation.w = q.w();
-        static_broadcaster.sendTransform(static_transformStamped);
+        transformStamped.transform.rotation.x = q.x();
+        transformStamped.transform.rotation.y = q.y();
+        transformStamped.transform.rotation.z = q.z();
+        transformStamped.transform.rotation.w = q.w();
+        broadcaster.sendTransform(transformStamped);
 
-       
         sensor_pub.publish(sensor_data);
 
 

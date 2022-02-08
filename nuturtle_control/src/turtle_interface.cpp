@@ -36,19 +36,25 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
 void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_encoder_ticks  = sensor_msg.left_encoder; // encoder data in ticks
     right_encoder_ticks = sensor_msg.right_encoder;
-
+    ROS_INFO_STREAM("got ticks");
     
 
     left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;
     right_wheel_angle = (encoder_ticks_to_rad)*right_encoder_ticks;
+    ROS_INFO_STREAM("got angles");
 
     left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder_ticks;
     right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder_ticks;
+    ROS_INFO_STREAM("got velocity");
 
-    js.position.push_back(left_wheel_angle);
-    js.position.push_back(right_wheel_angle);
-    js.velocity.push_back(left_wheel_velocity); 
-    js.velocity.push_back(right_wheel_velocity);
+    js.header.stamp = ros::Time::now();
+    ROS_INFO_STREAM("got header stamp");
+    js.name = {"left_wheel", "right_wheel"};
+    ROS_INFO_STREAM("got name");
+    js.position = {left_wheel_angle, right_wheel_angle};
+    ROS_INFO_STREAM("got position");
+    js.velocity = {left_wheel_velocity, right_wheel_velocity};
+    ROS_INFO_STREAM("got velocity");
 
 
 }
@@ -68,11 +74,11 @@ int main(int argc, char **argv){
 
     //subscriber
     ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 1000, cmd_vel_callback);
-    ros::Subscriber sensor_data_sub = nh.subscribe("sensor_data", 1000, sensor_data_callback);
+    ros::Subscriber sensor_data_sub = nh.subscribe("red/sensor_data", 1000, sensor_data_callback);
  
     //publisher
-    ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("wheel_cmd", 100);
-    ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 100);
+    ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 100);
+    ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("red/joint_states", 100);
 
     nh.getParam("motor_cmd_to_radsec", motor_cmd_to_rad_sec);
 
@@ -80,10 +86,8 @@ int main(int argc, char **argv){
 
 
   
-    js.position.push_back(1);
-    js.position.push_back(2);
-    js.velocity.push_back(2);
-    js.velocity.push_back(3);
+    js.position = {1, 2};
+    js.velocity = {2, 3};
 
 
     ros::Rate r(500);
