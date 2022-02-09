@@ -229,10 +229,10 @@ namespace turtlelib
         if (V.theta_dot == 0.0){
             return Transform2D{Vector2D{V.x_dot, V.y_dot}};
         }
-        else if (V.x_dot == 0.0 && V.y_dot == 0.0){
-            return Transform2D{Vector2D{V.theta_dot}};
+        // else if (V.x_dot == 0.0 && V.y_dot == 0.0){
+        //     return Transform2D{Vector2D{V.theta_dot}};
 
-        }
+        
         else{
             Vector2D v;
             v.x = V.y_dot/V.theta_dot;

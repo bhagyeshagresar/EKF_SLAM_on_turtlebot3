@@ -18,13 +18,13 @@
 #include "turtlelib/diff_drive.hpp"
 
 static std_msgs::UInt64 timestep;
-static double x, y, theta, rate, radius;
+static double x{0.0}, y{0.0}, theta{0.0}, rate, radius;
 static int num_markers;
 std::vector <double> x_s;
 std::vector <double> y_s;
 static double left_wheel_velocity {0.0};
 static double right_wheel_velocity {0.0};
-static double encoder_ticks_to_rad;
+static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
 
 
 
@@ -52,22 +52,72 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     /// \brief set wheel velocities of the robot
     ///
     /// \param msg - nuturtlebot_msgs/WheelCommands
-
-    left_wheel_velocity = msg->left_velocity;
-    right_wheel_velocity = msg->right_velocity;
-    // ROS_INFO_STREAM("got velocities");
-
+    
+    turtlelib::Wheels_vel wheel_velocities;
     turtlelib::Wheel_angles wheel_angle;
+    turtlelib::Configuration current_config;
+    
+    
+    // wheel_velocities.w1_vel = msg->left_velocity*motor_cmd_to_radsec; //motor cmd to rad/sec
+    // wheel_velocities.w2_vel = msg->right_velocity*motor_cmd_to_radsec;
+    
+    wheel_velocities.w1_vel = msg->left_velocity; //motor cmd to rad/sec
+    wheel_velocities.w2_vel = msg->right_velocity;
 
-    // left_wheel_velocity_rad = left_wheel_velocity*motor_cmd_to_radsec;
-    // right_wheel_velocity_rad = right_wheel_velocity*motor_cmd_to_radsec;
-    sensor_data.left_encoder = ((left_wheel_velocity)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad;
-    sensor_data.right_encoder = ((right_wheel_velocity)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
+    if(wheel_velocities.w1_vel < -256.0){
+        wheel_velocities.w1_vel = -256.0;
+    }
 
-    // ROS_INFO_STREAM("got encoder data");
+    else if(wheel_velocities.w1_vel > 256.0){
+        wheel_velocities.w1_vel = 256.0;
+    }
+
+    else if(wheel_velocities.w2_vel > 256.0){
+        wheel_velocities.w2_vel = 256.0;
+    }
+    
+    else if(wheel_velocities.w2_vel < -256.0){
+        wheel_velocities.w2_vel = -256.0;
+    }
+
+    wheel_velocities.w1_vel = (wheel_velocities.w1_vel*0.024);
+    wheel_velocities.w2_vel = (wheel_velocities.w2_vel*0.024);
 
 
 
+
+    ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
+    ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
+
+    wheel_angle.w_ang1 = wheel_velocities.w1_vel;
+    wheel_angle.w_ang2 = wheel_velocities.w2_vel;
+    
+
+   
+    sensor_data.left_encoder = ((wheel_velocities.w1_vel)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad; //ticks
+    sensor_data.right_encoder = ((wheel_velocities.w2_vel)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
+
+    ROS_WARN("angle_1: %f", wheel_angle.w_ang1);
+    ROS_WARN("angle_2: %f", wheel_angle.w_ang2);
+
+
+
+
+    turtlelib::DiffDrive update_config;
+    current_config = update_config.forward_kinematics(wheel_angle);
+
+    ROS_WARN("x: %f", x);
+    ROS_WARN("y: %f", y);
+    ROS_WARN("theta: %f", theta);
+    ROS_WARN("x_config: %f", current_config.x_config);
+    ROS_WARN("y_config: %f", current_config.y_config);
+    ROS_WARN("theta_config: %f", current_config.theta_config);
+
+
+    x = current_config.x_config;
+    y = current_config.y_config;
+    theta = current_config.theta_config;
+    
 }
 
 
@@ -104,15 +154,16 @@ int main(int argc, char ** argv){
 
 
     //get parameters
-    nh.param("x", x, 0.0);
-    nh.param("y", y, 0.0);
-    nh.param("theta", theta, 0.0);
+    // nh.getParam("x0", x);
+    // nh.getParam("y0", y);
+    // nh.param("theta0", theta);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
     nh.getParam("x_s", x_s);
     nh.getParam("y_s", y_s);
     nh.getParam("radius", radius);
     nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
+    nh.getParam("motor_cmd_to_rad_sec", motor_cmd_to_radsec);
 
 
 

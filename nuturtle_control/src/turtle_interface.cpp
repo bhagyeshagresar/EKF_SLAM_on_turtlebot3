@@ -5,6 +5,7 @@
 #include <sensor_msgs/JointState.h>
 #include "turtlelib/diff_drive.hpp"
 #include "turtlelib/rigid2d.hpp"
+#include <ros/console.h>
 
 static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;
@@ -27,6 +28,8 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
 
     wheel_cmd.left_velocity = w_vel.w1_vel;
     wheel_cmd.right_velocity = w_vel.w2_vel;
+    ROS_WARN("wheel_cmd left velocity: %f", wheel_cmd.left_velocity);
+    ROS_WARN("wheel_cmd right velocity: %f", wheel_cmd.right_velocity);
 
 
 
@@ -36,7 +39,7 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
 void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_encoder_ticks  = sensor_msg.left_encoder; // encoder data in ticks
     right_encoder_ticks = sensor_msg.right_encoder;
-    // ROS_INFO_STREAM("got ticks");
+    
     
 
     left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;

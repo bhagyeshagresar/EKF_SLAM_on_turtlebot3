@@ -1,7 +1,7 @@
 #include "turtlelib/rigid2d.hpp"
 #include "turtlelib/diff_drive.hpp"
 #include <ros/ros.h>
-// #include <ros/console.
+#include <ros/console.h>
 
 
 
@@ -37,8 +37,10 @@ namespace turtlelib
         Transform2D T_world_robot{Vector2D{config.x_config, config.y_config}, config.theta_config};
         Transform2D T_old_new = integrate_twist(V_fwd);
 
-        new_vector_config = T_old_new.translation();
-        new_theta_config = T_old_new.rotation();
+        Transform2D Twnew = T_world_robot*T_old_new;
+
+        new_vector_config = Twnew.translation();
+        new_theta_config = Twnew.rotation();
 
         config.x_config = new_vector_config.x;
         config.y_config = new_vector_config.y;
@@ -55,7 +57,7 @@ namespace turtlelib
 
         w_vel.w1_vel = (1/r)*((-d*V.theta_dot) + V.x_dot);
         w_vel.w2_vel = (1/r)*((d*V.theta_dot)+ V.x_dot);
-
+        
         return w_vel;
 
 

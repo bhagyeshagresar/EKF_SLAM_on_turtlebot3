@@ -7,7 +7,7 @@
 
 
 static geometry_msgs::Twist twist;
-static double angular_velocity{3.0};
+static double angular_velocity{2.0};
 static double turning_radius{1.0};
 
 static bool stop = false;
@@ -70,7 +70,7 @@ int main(int argc, char **argv){
          
         
         twist.linear.x = turning_radius*angular_velocity;
-        twist.angular.z = 0.0;
+        twist.angular.z = angular_velocity;
         if(stop == false){
             cmd_vel_pub.publish(twist);
 
