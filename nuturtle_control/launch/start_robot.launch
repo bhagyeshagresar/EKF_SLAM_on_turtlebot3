@@ -37,6 +37,10 @@
   <rosparam command = "load" file = "$(find nusim)/config/basic_world.yaml"
      if="$(eval arg('robot') == 'nusim')"/>
 
+
+  <rosparam command = "load" file = "$(find nuturtle_description)/config/diff_params.yaml"
+     if="$(eval arg('robot') == 'nusim')"/>
+
   
   
   <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"

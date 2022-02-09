@@ -86,19 +86,30 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
 
 
-    ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
-    ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
-
+   
     wheel_angle.w_ang1 = wheel_velocities.w1_vel;
     wheel_angle.w_ang2 = wheel_velocities.w2_vel;
     
-
-   
-    sensor_data.left_encoder = ((wheel_velocities.w1_vel)/rate + wheel_angle.w_ang1)/encoder_ticks_to_rad; //ticks
-    sensor_data.right_encoder = ((wheel_velocities.w2_vel)/rate + wheel_angle.w_ang2)/encoder_ticks_to_rad;
+    ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
+    ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
 
     ROS_WARN("angle_1: %f", wheel_angle.w_ang1);
     ROS_WARN("angle_2: %f", wheel_angle.w_ang2);
+
+    sensor_data.left_encoder = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad; //ticks
+    sensor_data.right_encoder = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
+
+    ROS_WARN("Rate: %f", rate);
+    ROS_WARN("left_encoder %d", sensor_data.left_encoder);
+    ROS_WARN("right_encoder %d", sensor_data.right_encoder);
+
+    ROS_WARN("2vel_1: %f", wheel_velocities.w1_vel);
+    ROS_WARN("2vel_2: %f", wheel_velocities.w2_vel);
+
+    ROS_WARN("2angle_1: %f", wheel_angle.w_ang1);
+    ROS_WARN("2angle_2: %f", wheel_angle.w_ang2);
+    ROS_WARN("parameter %f", encoder_ticks_to_rad);
+
 
 
 
