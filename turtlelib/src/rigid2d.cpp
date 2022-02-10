@@ -224,41 +224,61 @@ namespace turtlelib
 
 
     Transform2D integrate_twist(Twist2D V){
-        double theta {0.0};
+        Vector2D v;
 
+        // if (V.theta_dot == 0.0){
+        //     return Transform2D{Vector2D{V.x_dot, V.y_dot}};
+        // }
+        
+        // else if (V.x_dot == 0.0 && V.y_dot == 0.0){
+        //     return Transform2D{Vector2D{V.theta_dot}};
 
-        if (V.theta_dot == 0.0){
-            return Transform2D{Vector2D{V.x_dot, V.y_dot}};
+        
+        // }
+
+        //pure translation
+        if (almost_equal(V.theta_dot, 0.0)){
+            v.x = V.x_dot;
+            v.y = V.y_dot;
+            Transform2D T_trans{{v.x, v.y}, 0.0};
+            return T_trans;
         }
         
-        else if (V.x_dot == 0.0 && V.y_dot == 0.0){
-            return Transform2D{Vector2D{V.theta_dot}};
-
-        
-        }
-
         else{
-            Vector2D v;
             v.x = V.y_dot/V.theta_dot;
             v.y = -V.x_dot/V.theta_dot;
-            theta = V.theta_dot;
+            double theta = V.theta_dot;
 
+            
+            if(almost_equal(v.x, 0.0)){
+                v.x = 0.0;
+
+            }
+
+            if(almost_equal(v.y, 0.0)){
+                v.y = 0.0;
+
+            }
             Transform2D Tsb{{v.x, v.y}, theta};
             Transform2D Tss_{{0.0, 0.0}, theta};
             Transform2D Tbs = Tsb.inv();
 
-            Transform2D Tbb_= Tbs*Tss_*Tsb;
-
+            Transform2D Tbb_= Tbs*Tss_*Tsb; 
             return Tbb_;
+           
+           
+           
             
 
          }
+
+       
 
     }
 
     
 
-    
+ 
 
 
 }

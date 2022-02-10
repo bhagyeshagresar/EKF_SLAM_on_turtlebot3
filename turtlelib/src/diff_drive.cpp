@@ -61,10 +61,13 @@ namespace turtlelib
         //Calculate vx and thetadot
         V_fwd.x_dot = (r*(w_vel.w1_vel + w_vel.w2_vel))/2;
         V_fwd.theta_dot = (r*(w_vel.w2_vel - w_vel.w1_vel))/(2*d);
+        std::cout << "r: " << r << std::endl;
+        std::cout << "d: " << d << std::endl;
         
+
         
-        // std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
-        // std::cout << "V_fwd.theta_dot " << V_fwd.theta_dot << std::endl;
+        std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
+        std::cout << "V_fwd.theta_dot " << V_fwd.theta_dot << std::endl;
 
 
         Transform2D T_world_robot{Vector2D{q.x_config, q.y_config}, q.theta_config};
@@ -72,9 +75,9 @@ namespace turtlelib
 
         Transform2D Twnew = T_world_robot*T_old_new;
 
-        // std::cout << "T_world_robot " << T_world_robot << std::endl;
-        // std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
-        // std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
+        std::cout << "T_world_robot " << T_world_robot << std::endl;
+        std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
+        std::cout << "V_fwd.x_dot " << V_fwd.x_dot << std::endl;
 
 
 
@@ -82,9 +85,9 @@ namespace turtlelib
         Vector2D new_vector_config = Twnew.translation();
         double new_theta_config = Twnew.rotation();
 
-        // std::cout << "new_vector_config.x" << new_vector_config.x << std::endl;
-        // std::cout << "new_vector_config.y " << new_vector_config.y << std::endl;
-        // std::cout << "new_vector_config.theta_config " << new_theta_config << std::endl;
+        std::cout << "new_vector_config.x" << new_vector_config.x << std::endl;
+        std::cout << "new_vector_config.y " << new_vector_config.y << std::endl;
+        std::cout << "new_vector_config.theta_config " << new_theta_config << std::endl;
 
 
 
@@ -107,7 +110,11 @@ namespace turtlelib
         Wheels_vel w_vel;
 
         w_vel.w1_vel = (1/r)*((-d*V.theta_dot) + V.x_dot);
-        w_vel.w2_vel = (1/r)*((d*V.theta_dot)+ V.x_dot);
+        w_vel.w2_vel = (1/r)*((d*V.theta_dot) + V.x_dot);
+        
+        std::cout << "w_vel.w1_vel " << w_vel.w1_vel << std::endl;
+        std::cout << "w_vel.w2_vel " << w_vel.w2_vel << std::endl;
+
         
         return w_vel;
 

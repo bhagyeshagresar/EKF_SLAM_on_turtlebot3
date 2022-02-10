@@ -11,43 +11,63 @@ static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;
 static double motor_cmd_to_rad_sec, encoder_ticks_to_rad;
 static double left_encoder_ticks{0.0}, right_encoder_ticks{0.0}, left_wheel_angle{0.0}, right_wheel_angle{0.0}, left_wheel_velocity{0.0}, right_wheel_velocity{0.0};
+static turtlelib::Twist2D V;
+static turtlelib::Wheels_vel w_vel;
+static turtlelib::DiffDrive diff_drive;
 
 
 void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     //forward kinematics to get twist
     
     
-    turtlelib::Twist2D V;
-    turtlelib::Wheels_vel w_vel;
+    // turtlelib::Twist2D V;
+    // turtlelib::Wheels_vel w_vel;
+    ROS_WARN("turtle_interface:twist_msg->linear.x %f",twist_msg->linear.x);
+    ROS_WARN("turtle_interface:twist_msg->angular.z %f",twist_msg->angular.z);
+
     
     V.x_dot = twist_msg->linear.x;
     V.theta_dot = twist_msg->angular.z;
 
-    turtlelib::DiffDrive diff_drive;
+    ROS_WARN("turtle_interface:V.x_dot %f", V.x_dot);
+    ROS_WARN("turtle_interface:V.theta_dot %f",V.theta_dot);
+
+
     w_vel = diff_drive.inverse_kinematics(V);
 
-    wheel_cmd.left_velocity = w_vel.w1_vel/motor_cmd_to_rad_sec;
-    wheel_cmd.right_velocity = w_vel.w2_vel/motor_cmd_to_rad_sec;
+    ROS_WARN("turtle_interface:w_vel.w1_vel %f", w_vel.w1_vel);
+    ROS_WARN("turtle_interface:w_vel.w2_vel %f", w_vel.w2_vel);
 
-    if(wheel_cmd.left_velocity < -256.0){
-        wheel_cmd.left_velocity = -256.0;
+
+    wheel_cmd.left_velocity = (int)(w_vel.w1_vel/motor_cmd_to_rad_sec);
+    wheel_cmd.right_velocity = (int)(w_vel.w2_vel/motor_cmd_to_rad_sec);
+
+
+    ROS_WARN("turtle_interface:wheel_cmd left velocity before condition: %d", wheel_cmd.left_velocity);
+    ROS_WARN("turtle_interface:wheel_cmd right velocity before condition: %d", wheel_cmd.right_velocity);
+
+
+
+
+    if(wheel_cmd.left_velocity < -256){
+        wheel_cmd.left_velocity = -256;
     }
 
-    else if(wheel_cmd.left_velocity > 256.0){
-        wheel_cmd.left_velocity = 256.0;
+    if(wheel_cmd.left_velocity > 256){
+        wheel_cmd.left_velocity = 256;
     }
 
-    else if(wheel_cmd.right_velocity > 256.0){
-        wheel_cmd.right_velocity = 256.0;
+    if(wheel_cmd.right_velocity > 256){
+        wheel_cmd.right_velocity = 256;
     }
     
-    else if(wheel_cmd.right_velocity < -256.0){
-        wheel_cmd.right_velocity = -256.0;
+    if(wheel_cmd.right_velocity < -256){
+        wheel_cmd.right_velocity = -256;
     }
 
 
-    ROS_WARN("wheel_cmd left velocity: %f", wheel_cmd.left_velocity);
-    ROS_WARN("wheel_cmd right velocity: %f", wheel_cmd.right_velocity);
+    ROS_WARN("turtle_interface:wheel_cmd left velocity after condition: %d", wheel_cmd.left_velocity);
+    ROS_WARN("turtle_interface:wheel_cmd right velocity after condition: %d", wheel_cmd.right_velocity);
 
 
 

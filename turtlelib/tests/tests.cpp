@@ -189,83 +189,81 @@
 
 // }
 
-//FWD Kinematics - Marco Morales
+// FWD Kinematics - Marco Morales
 
-// TEST_CASE("Forward kinematics Robot driving forward", "[DiffDrive]") {
-//     turtlelib::Configuration config;
-//     turtlelib::Configuration new_config;
-//     turtlelib::Wheel_angles phi;
-//     turtlelib::Wheel_angles phi_new;
-//     turtlelib::Wheel_angles phiold;
-//     turtlelib::Wheels_vel phidot;
-//     config.x_config = 0.0;
-//     config.y_config = 0.0;
-//     config.theta_config = 0.0;
-//     phi.w_ang1 = 0.0;
-//     phi.w_ang2 = 0.0;
-//     phidot.w1_vel = 0.0;
-//     phidot.w2_vel = 0.0;
+TEST_CASE("Forward kinematics Robot driving forward", "[DiffDrive]") {
+    turtlelib::Configuration config;
+    turtlelib::Configuration new_config;
+    turtlelib::Wheel_angles phi;
+    turtlelib::Wheel_angles phi_new;
+    turtlelib::Wheel_angles phiold;
+    turtlelib::Wheels_vel phidot;
+    config.x_config = 0.0;
+    config.y_config = 0.0;
+    config.theta_config = 0.0;
+    phi.w_ang1 = 0.0;
+    phi.w_ang2 = 0.0;
+    phidot.w1_vel = 0.0;
+    phidot.w2_vel = 0.0;
    
     
-//     turtlelib::DiffDrive D{phi, phidot, config};
+    turtlelib::DiffDrive D;
 
 
 
-//     phi_new.w_ang1 = M_PI/4;
-//     phi_new.w_ang2 = M_PI/4;
+    phi_new.w_ang1 = M_PI/4;
+    phi_new.w_ang2 = M_PI/4;
 
-//     new_config = D.forward_kinematics(phi_new);
-//     CHECK(new_config.x_config == Approx(0.033*(M_PI/4))); 
-//     CHECK(new_config.y_config == Approx(0));
-//     CHECK(new_config.theta_config == Approx(0)); 
-// }
+    new_config = D.forward_kinematics(phi_new);
+    CHECK(new_config.x_config == Approx(0.033*(M_PI/4))); 
+    CHECK(new_config.y_config == Approx(0));
+    CHECK(new_config.theta_config == Approx(0)); 
+}
 
-// TEST_CASE("Forward kinematics Robot driving rotation", "[DiffDrive]") {
-//     turtlelib::Configuration config,new_config;
-//     turtlelib::Wheel_angles phi,phi_new,phiold;
-//     turtlelib::Wheels_vel phidot;
-//     config.x_config = 0.0;
-//     config.y_config = 0.0;
-//     config.theta_config = 0.0;
-//     phi.w_ang1 = 0.0;
-//     phi.w_ang2 = 0.0;
-//     phidot.w1_vel = 0.0;
-//     phidot.w2_vel = 0.0;
-//     double d = 2.0;
-//     double r = 1.0;
-//     turtlelib::DiffDrive D{phi, phidot, config};
+TEST_CASE("Forward kinematics Robot driving rotation", "[DiffDrive]") {
+    turtlelib::Configuration config,new_config;
+    turtlelib::Wheel_angles phi,phi_new,phiold;
+    turtlelib::Wheels_vel phidot;
+    config.x_config = 0.0;
+    config.y_config = 0.0;
+    config.theta_config = 0.0;
+    phi.w_ang1 = 0.0;
+    phi.w_ang2 = 0.0;
+    phidot.w1_vel = 0.0;
+    phidot.w2_vel = 0.0;
+   
+    turtlelib::DiffDrive D;
 
-//     phi_new.w_ang1 = M_PI/4;
-//     phi_new.w_ang2 = -M_PI/4;
+    phi_new.w_ang1 = M_PI/4;
+    phi_new.w_ang2 = -M_PI/4;
 
-//     new_config = D.forward_kinematics(phi_new);
-//     CHECK(new_config.x_config == Approx(0.0)); 
-//     CHECK(new_config.y_config == Approx(0));
-//     CHECK(new_config.theta_config == Approx(-0.3239767424)); 
-// }
+    new_config = D.forward_kinematics(phi_new);
+    CHECK(new_config.x_config == Approx(0.0)); 
+    CHECK(new_config.y_config == Approx(0));
+    CHECK(new_config.theta_config == Approx(-0.3239767424)); 
+}
 
 
-// TEST_CASE("Forward kinematics Robot driving arc", "[DiffDrive]"){
-//     turtlelib::Configuration config,new_config;
-//     turtlelib::Wheel_angles phi,phi_new,phiold;
-//     turtlelib::Wheels_vel phidot;
-//     config.x_config = 0.0;
-//     config.y_config = 0.0;
-//     config.theta_config = 0.0;
-//     phi.w_ang1 = 0.0;
-//     phi.w_ang2 = 0.0;
-//     phidot.w1_vel = 0.0;
-//     phidot.w2_vel = 0.0;
-//     double d = 2.0;
-//     double r = 1.0;
-//     turtlelib::DiffDrive D{phi, phidot, config};
+TEST_CASE("Forward kinematics Robot driving arc", "[DiffDrive]"){
+    turtlelib::Configuration config,new_config;
+    turtlelib::Wheel_angles phi,phi_new,phiold;
+    turtlelib::Wheels_vel phidot;
+    config.x_config = 0.0;
+    config.y_config = 0.0;
+    config.theta_config = 0.0;
+    phi.w_ang1 = 0.0;
+    phi.w_ang2 = 0.0;
+    phidot.w1_vel = 0.0;
+    phidot.w2_vel = 0.0;
+   
+    turtlelib::DiffDrive D;
 
-//     phi_new.w_ang1 = 19.992;
-//     phi_new.w_ang2 = 27.6079;
+    phi_new.w_ang1 = 19.992;
+    phi_new.w_ang2 = 27.6079;
 
-//     new_config = D.forward_kinematics(phi_new);
-//     CHECK(new_config.x_config == Approx(0.5)); 
-//     CHECK(new_config.y_config == Approx(0.5));
-//     CHECK(new_config.theta_config == Approx(M_PI/2)); 
+    new_config = D.forward_kinematics(phi_new);
+    CHECK(new_config.x_config == Approx(0.5)); 
+    CHECK(new_config.y_config == Approx(0.5));
+    CHECK(new_config.theta_config == Approx(M_PI/2)); 
 
-// }
+}

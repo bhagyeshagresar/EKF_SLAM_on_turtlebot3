@@ -25,8 +25,8 @@ std::vector <double> y_s;
 static double left_wheel_velocity {0.0};
 static double right_wheel_velocity {0.0};
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
-static double wheel_velocity_left {0.0};
-static double wheel_velocity_right {0.0};
+static int wheel_velocity_left {0};
+static int wheel_velocity_right {0};
 
 static turtlelib::DiffDrive update_config;
 static turtlelib::Wheels_vel wheel_velocities;
@@ -68,9 +68,17 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     
     // wheel_velocities.w1_vel = msg->left_velocity*motor_cmd_to_radsec; //motor cmd to rad/sec
     // wheel_velocities.w2_vel = msg->right_velocity*motor_cmd_to_radsec;
+
+    ROS_WARN("nusim:msg->left_velocity %d", msg->left_velocity);
+    ROS_WARN("nusim:msg->left_velocity %d", msg->right_velocity);
+
     
     wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
     wheel_velocity_right = msg->right_velocity;
+
+
+    ROS_WARN("nusim:wheel_velocity_left %d", wheel_velocity_left);
+    ROS_WARN("nusim:wheel_velocity_right %d", wheel_velocity_right);
 
     // if(wheel_velocities.w1_vel < -256.0){
     //     wheel_velocities.w1_vel = -256.0;
@@ -88,13 +96,24 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     //     wheel_velocities.w2_vel = -256.0;
     // }
 
+    ROS_WARN("nusim:wheel_velocity.w1_vel before %f", wheel_velocities.w1_vel);
+    ROS_WARN("nusim:wheel_velocity.w2_vel before %f", wheel_velocities.w2_vel);
+
+
+
     wheel_velocities.w1_vel = (wheel_velocity_left*0.024);//ticks
     wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
+
+    ROS_WARN("nusim:wheel_velocity.w1_vel after %f", wheel_velocities.w1_vel);
+    ROS_WARN("nusim:wheel_velocity.w2_vel after %f", wheel_velocities.w2_vel);
+
 
 
     sensor_data.left_encoder = (int)((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad;
     sensor_data.right_encoder = (int)((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
+    ROS_WARN("nusim:left_encoder %d", sensor_data.left_encoder);
+    ROS_WARN("nusim:right_encoder %d", sensor_data.right_encoder);
 
    
     // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
@@ -110,9 +129,7 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     
     // //ROS_WARN
     // ROS_WARN("Rate: %f", rate);
-    // ROS_WARN("left_encoder %d", sensor_data.left_encoder);
-    // ROS_WARN("right_encoder %d", sensor_data.right_encoder);
-
+  
     // ROS_WARN("2vel_1: %f", wheel_velocities.w1_vel);
     // ROS_WARN("2vel_2: %f", wheel_velocities.w2_vel);
 
@@ -122,10 +139,10 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
 
 
-    wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
-    wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
+    // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
+    // wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
 
-    current_config = update_config.forward_kinematics(wheel_angle);
+    // current_config = update_config.forward_kinematics(wheel_angle);
 
     ROS_WARN("x: %f", x);
     ROS_WARN("y: %f", y);
@@ -135,9 +152,9 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     ROS_WARN("theta_config: %f", current_config.theta_config);
 
 
-    x = current_config.x_config;
-    y = current_config.y_config;
-    theta = current_config.theta_config;
+    // x = current_config.x_config;
+    // y = current_config.y_config;
+    // theta = current_config.theta_config;
     
 }
 
@@ -175,9 +192,9 @@ int main(int argc, char ** argv){
 
 
     //get parameters
-    nh.getParam("x0", x);
-    nh.getParam("y0", y);
-    nh.param("theta0", theta);
+    // nh.getParam("x0", x);
+    // nh.getParam("y0", y);
+    // nh.param("theta0", theta);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
     nh.getParam("x_s", x_s);
@@ -247,6 +264,26 @@ int main(int argc, char ** argv){
         // red_joint_state.position.push_back(0);
         // red_joint_state.velocity.push_back(0);
         // red_joint_state.velocity.push_back(0);
+        wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
+        wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
+
+        ROS_WARN("wheel_velocity before fk fn 1: %f", wheel_angle.w_ang1);
+        ROS_WARN("wheel_velocity before fk fn 2: %f", wheel_angle.w_ang2);
+        current_config = update_config.forward_kinematics(wheel_angle);
+        
+        ROS_WARN("x_config: %f", current_config.x_config);
+        ROS_WARN("y_config: %f", current_config.y_config);
+        ROS_WARN("theta_config: %f", current_config.theta_config);
+
+
+        x = current_config.x_config;
+        y = current_config.y_config;
+        theta = current_config.theta_config;
+
+        ROS_WARN("x: %f", x);
+        ROS_WARN("y: %f", y);
+        ROS_WARN("theta: %f", theta);
+    
 
 
         geometry_msgs::TransformStamped transformStamped;
@@ -263,6 +300,10 @@ int main(int argc, char ** argv){
         transformStamped.transform.rotation.z = q.z();
         transformStamped.transform.rotation.w = q.w();
         broadcaster.sendTransform(transformStamped);
+
+       
+       
+
 
         sensor_pub.publish(sensor_data);
 
