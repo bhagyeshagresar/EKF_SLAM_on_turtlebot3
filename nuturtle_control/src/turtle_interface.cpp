@@ -26,8 +26,26 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     turtlelib::DiffDrive diff_drive;
     w_vel = diff_drive.inverse_kinematics(V);
 
-    wheel_cmd.left_velocity = w_vel.w1_vel;
-    wheel_cmd.right_velocity = w_vel.w2_vel;
+    wheel_cmd.left_velocity = w_vel.w1_vel/motor_cmd_to_rad_sec;
+    wheel_cmd.right_velocity = w_vel.w2_vel/motor_cmd_to_rad_sec;
+
+    if(wheel_cmd.left_velocity < -256.0){
+        wheel_cmd.left_velocity = -256.0;
+    }
+
+    else if(wheel_cmd.left_velocity > 256.0){
+        wheel_cmd.left_velocity = 256.0;
+    }
+
+    else if(wheel_cmd.right_velocity > 256.0){
+        wheel_cmd.right_velocity = 256.0;
+    }
+    
+    else if(wheel_cmd.right_velocity < -256.0){
+        wheel_cmd.right_velocity = -256.0;
+    }
+
+
     ROS_WARN("wheel_cmd left velocity: %f", wheel_cmd.left_velocity);
     ROS_WARN("wheel_cmd right velocity: %f", wheel_cmd.right_velocity);
 

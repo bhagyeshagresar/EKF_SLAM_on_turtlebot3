@@ -7,8 +7,8 @@
 
 
 static geometry_msgs::Twist twist;
-static double angular_velocity{2.0};
-static double turning_radius{1.0};
+static double angular_velocity{6.0};
+static double turning_radius{4.0};
 
 static bool stop = false;
 ros::Publisher cmd_vel_pub;

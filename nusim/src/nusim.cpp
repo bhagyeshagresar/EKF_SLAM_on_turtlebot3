@@ -25,6 +25,14 @@ std::vector <double> y_s;
 static double left_wheel_velocity {0.0};
 static double right_wheel_velocity {0.0};
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
+static double wheel_velocity_left {0.0};
+static double wheel_velocity_right {0.0};
+
+static turtlelib::DiffDrive update_config;
+static turtlelib::Wheels_vel wheel_velocities;
+static turtlelib::Wheel_angles wheel_angle;
+static turtlelib::Configuration current_config;
+
 
 
 
@@ -53,68 +61,70 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     ///
     /// \param msg - nuturtlebot_msgs/WheelCommands
     
-    turtlelib::Wheels_vel wheel_velocities;
-    turtlelib::Wheel_angles wheel_angle;
-    turtlelib::Configuration current_config;
+    // turtlelib::Wheels_vel wheel_velocities;
+    // turtlelib::Wheel_angles wheel_angle;
+    // turtlelib::Configuration current_config;
     
     
     // wheel_velocities.w1_vel = msg->left_velocity*motor_cmd_to_radsec; //motor cmd to rad/sec
     // wheel_velocities.w2_vel = msg->right_velocity*motor_cmd_to_radsec;
     
-    wheel_velocities.w1_vel = msg->left_velocity; //motor cmd to rad/sec
-    wheel_velocities.w2_vel = msg->right_velocity;
+    wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
+    wheel_velocity_right = msg->right_velocity;
 
-    if(wheel_velocities.w1_vel < -256.0){
-        wheel_velocities.w1_vel = -256.0;
-    }
+    // if(wheel_velocities.w1_vel < -256.0){
+    //     wheel_velocities.w1_vel = -256.0;
+    // }
 
-    else if(wheel_velocities.w1_vel > 256.0){
-        wheel_velocities.w1_vel = 256.0;
-    }
+    // else if(wheel_velocities.w1_vel > 256.0){
+    //     wheel_velocities.w1_vel = 256.0;
+    // }
 
-    else if(wheel_velocities.w2_vel > 256.0){
-        wheel_velocities.w2_vel = 256.0;
-    }
+    // else if(wheel_velocities.w2_vel > 256.0){
+    //     wheel_velocities.w2_vel = 256.0;
+    // }
     
-    else if(wheel_velocities.w2_vel < -256.0){
-        wheel_velocities.w2_vel = -256.0;
-    }
+    // else if(wheel_velocities.w2_vel < -256.0){
+    //     wheel_velocities.w2_vel = -256.0;
+    // }
 
-    wheel_velocities.w1_vel = (wheel_velocities.w1_vel*0.024);
-    wheel_velocities.w2_vel = (wheel_velocities.w2_vel*0.024);
+    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);//ticks
+    wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
 
 
+    sensor_data.left_encoder = (int)((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad;
+    sensor_data.right_encoder = (int)((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
 
    
-    wheel_angle.w_ang1 = wheel_velocities.w1_vel;
-    wheel_angle.w_ang2 = wheel_velocities.w2_vel;
+    // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
+    // wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
     
-    ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
-    ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
+    //ROS WARN
+    // ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
+    // ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
 
-    ROS_WARN("angle_1: %f", wheel_angle.w_ang1);
-    ROS_WARN("angle_2: %f", wheel_angle.w_ang2);
+    // ROS_WARN("angle_1: %f", wheel_angle.w_ang1);
+    // ROS_WARN("angle_2: %f", wheel_angle.w_ang2);
 
-    sensor_data.left_encoder = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad; //ticks
-    sensor_data.right_encoder = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
+    
+    // //ROS_WARN
+    // ROS_WARN("Rate: %f", rate);
+    // ROS_WARN("left_encoder %d", sensor_data.left_encoder);
+    // ROS_WARN("right_encoder %d", sensor_data.right_encoder);
 
-    ROS_WARN("Rate: %f", rate);
-    ROS_WARN("left_encoder %d", sensor_data.left_encoder);
-    ROS_WARN("right_encoder %d", sensor_data.right_encoder);
+    // ROS_WARN("2vel_1: %f", wheel_velocities.w1_vel);
+    // ROS_WARN("2vel_2: %f", wheel_velocities.w2_vel);
 
-    ROS_WARN("2vel_1: %f", wheel_velocities.w1_vel);
-    ROS_WARN("2vel_2: %f", wheel_velocities.w2_vel);
-
-    ROS_WARN("2angle_1: %f", wheel_angle.w_ang1);
-    ROS_WARN("2angle_2: %f", wheel_angle.w_ang2);
-    ROS_WARN("parameter %f", encoder_ticks_to_rad);
-
-
+    // ROS_WARN("2angle_1: %f", wheel_angle.w_ang1);
+    // ROS_WARN("2angle_2: %f", wheel_angle.w_ang2);
+    // ROS_WARN("parameter %f", encoder_ticks_to_rad);
 
 
 
-    turtlelib::DiffDrive update_config;
+    wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
+    wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
+
     current_config = update_config.forward_kinematics(wheel_angle);
 
     ROS_WARN("x: %f", x);
@@ -165,9 +175,9 @@ int main(int argc, char ** argv){
 
 
     //get parameters
-    // nh.getParam("x0", x);
-    // nh.getParam("y0", y);
-    // nh.param("theta0", theta);
+    nh.getParam("x0", x);
+    nh.getParam("y0", y);
+    nh.param("theta0", theta);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
     nh.getParam("x_s", x_s);

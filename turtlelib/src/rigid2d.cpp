@@ -93,26 +93,27 @@ namespace turtlelib
     
     Transform2D Transform2D::inv() const{   
         
+        double theta_inv {0.0};
+
+        Vector2D invT;
+
+        invT.x = -(v2.x*cos(theta))-(v2.y*sin(theta));
+        invT.y = -(v2.y*cos(theta))+(v2.x*sin(theta));
+        theta_inv = -theta;
        
+        Transform2D T_inv{{invT.x, invT.y}, theta_inv};
 
-        Transform2D invT;
-
-        invT.v2.x = -(v2.x*cos(theta))-(v2.y*sin(theta));
-        invT.v2.y = -(v2.y*cos(theta))+(v2.x*sin(theta));
-        invT.theta = -theta;
-       
-        return invT;
-
+        return T_inv;
    }
 
     Transform2D & Transform2D::operator*=(const Transform2D & rhs){
-        Transform2D rhs_v;
-        rhs_v.v2.x = rhs.v2.x;
-        rhs_v.v2.y = rhs.v2.y;
+        Vector2D rhs_v;
+        rhs_v.x = rhs.v2.x;
+        rhs_v.y = rhs.v2.y;
 
         // theta = theta+rhs.theta;
-        v2.x = v2.x + rhs_v.v2.x*cos(theta)-sin(theta)*rhs_v.v2.y;
-        v2.y = v2.y + rhs_v.v2.x*sin(theta)+cos(theta)*rhs_v.v2.y;
+        v2.x = v2.x + rhs_v.x*cos(theta)-sin(theta)*rhs_v.y;
+        v2.y = v2.y + rhs_v.x*sin(theta)+cos(theta)*rhs_v.y;
         theta = theta+rhs.theta;
 
         return *this;
@@ -229,10 +230,13 @@ namespace turtlelib
         if (V.theta_dot == 0.0){
             return Transform2D{Vector2D{V.x_dot, V.y_dot}};
         }
-        // else if (V.x_dot == 0.0 && V.y_dot == 0.0){
-        //     return Transform2D{Vector2D{V.theta_dot}};
+        
+        else if (V.x_dot == 0.0 && V.y_dot == 0.0){
+            return Transform2D{Vector2D{V.theta_dot}};
 
         
+        }
+
         else{
             Vector2D v;
             v.x = V.y_dot/V.theta_dot;

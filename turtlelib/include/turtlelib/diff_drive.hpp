@@ -38,8 +38,8 @@ namespace turtlelib{
         Wheel_angles w_ang;
         Wheels_vel w_vel;
         Configuration q;
-        double d;
-        double r;
+        double d = 0.08;
+        double r = 0.033;
         
         
         
@@ -60,6 +60,11 @@ namespace turtlelib{
         public:
 
         DiffDrive();
+
+        // DiffDrive(Wheel_angles w_ang, Wheels_vel w_vel, Configuration q);
+
+        DiffDrive(Configuration q);
+
 
         Configuration forward_kinematics(Wheel_angles w_pos);
 
