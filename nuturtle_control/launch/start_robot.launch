@@ -47,7 +47,7 @@
       if="$(eval arg('robot') == 'nusim')"/> 
 
 
-<!-- 
+
   <param name="blue/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=blue"/>
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "blue"/>
@@ -57,14 +57,14 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "blue"/>
     
 
-   -->
+  
 
 
   <!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/blue_robot.rviz -f blue-base_footprint"/> -->
   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/start_robot.rviz -f world"/>
 
 
-  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args=" 0 0 0 0 0 0 1  world odom" /> -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args=" 0 0 0 0 0 0 1  world odom" />
 
 
 </launch>

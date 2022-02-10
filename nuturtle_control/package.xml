@@ -70,6 +70,13 @@
   <build_export_depend>tf2_ros</build_export_depend>
   <build_export_depend>std_srvs</build_export_depend>
   <build_depend>std_srvs</build_depend>
+  <exec_depend>nusim</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>rviz</exec_depend>
+
 
 
 

@@ -15,9 +15,11 @@ ros::Publisher cmd_vel_pub;
 
 
 bool control_fn(nuturtle_control::Control::Request &req, nuturtle_control::Control::Response &res){
+    angular_velocity = 0.0;
+    turning_radius = 0.0;
     angular_velocity = req.velocity; // velocity in rad/s, positive means counter-clockwise, negative_clockwise
     turning_radius = req.radius;
-
+    stop = false;
 
     return true;
 }
@@ -29,10 +31,10 @@ bool reverse_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
 
 
 bool stop_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+    stop = true;
     twist.linear.x = 0.0;
     twist.angular.z = 0.0;
     cmd_vel_pub.publish(twist);
-    stop == true;
 
     return true;
 }
@@ -67,10 +69,15 @@ int main(int argc, char **argv){
         ros::spinOnce();
 
         
-         
+        ROS_WARN("angular_velocity: %f", angular_velocity); 
         
         twist.linear.x = turning_radius*angular_velocity;
         twist.angular.z = angular_velocity;
+        // twist.angular.z = 0.0;
+
+
+        ROS_WARN("twist: %f", twist.linear.x); 
+
         if(stop == false){
             cmd_vel_pub.publish(twist);
 
