@@ -108,10 +108,42 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        blue-base_footprint:
+          Value: true
+        blue-base_link:
+          Value: true
+        blue-base_scan:
+          Value: true
+        blue-caster_back_link:
+          Value: true
+        blue-imu_link:
+          Value: true
+        blue-wheel_left_link:
+          Value: true
+        blue-wheel_right_link:
+          Value: true
+        odom:
+          Value: true
+        red-base_footprint:
+          Value: true
+        red-base_link:
+          Value: true
+        red-base_scan:
+          Value: true
+        red-caster_back_link:
+          Value: true
+        red-imu_link:
+          Value: true
+        red-wheel_left_link:
+          Value: true
+        red-wheel_right_link:
+          Value: true
+        world:
+          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -119,9 +151,34 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        world:
+          odom:
+            blue-base_footprint:
+              blue-base_link:
+                blue-base_scan:
+                  {}
+                blue-caster_back_link:
+                  {}
+                blue-imu_link:
+                  {}
+                blue-wheel_left_link:
+                  {}
+                blue-wheel_right_link:
+                  {}
+          red-base_footprint:
+            red-base_link:
+              red-base_scan:
+                {}
+              red-caster_back_link:
+                {}
+              red-imu_link:
+                {}
+              red-wheel_left_link:
+                {}
+              red-wheel_right_link:
+                {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -242,7 +299,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.2932881116867065
+      Distance: 1.2773641347885132
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -258,9 +315,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3953976035118103
+      Pitch: 1.0203970670700073
       Target Frame: <Fixed Frame>
-      Yaw: 1.7453975677490234
+      Yaw: 2.910399913787842
     Saved: ~
 Window Geometry:
   Displays:
