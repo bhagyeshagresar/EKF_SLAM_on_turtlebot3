@@ -2,10 +2,11 @@
 // #include "catch.hpp"
 // #include <cmath>
 // #include <iostream>
-#include "turtlelib/rigid2d.hpp"
-#include <catch_ros/catch.hpp>
-#include "turtlelib/diff_drive.hpp"
-#include <cmath>
+
+// #include "turtlelib/rigid2d.hpp"
+// #include <catch_ros/catch.hpp>
+// #include "turtlelib/diff_drive.hpp"
+// #include <cmath>
 
 
 
@@ -269,80 +270,80 @@
 // }
 
 
-TEST_CASE("Integrating a Twist", "[rigid2d]") { // Marco Morales & RKS
-    turtlelib::Twist2D twist;
-    turtlelib::Transform2D TbbPrime(0);
-    turtlelib::Vector2D trans;
-    double rot;
-    SECTION( "Testing Both Rotational and Translational components v2" ) {
-        twist.x_dot = 1.0;
-        twist.y_dot = 2.0;
-        twist.theta_dot = M_PI;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(-1.27324));
-        CHECK( trans.y ==  Approx(0.63662));
-        CHECK( rot ==  Approx(M_PI));
-    }
+// TEST_CASE("Integrating a Twist", "[rigid2d]") { // Marco Morales & RKS
+//     turtlelib::Twist2D twist;
+//     turtlelib::Transform2D TbbPrime(0);
+//     turtlelib::Vector2D trans;
+//     double rot;
+//     SECTION( "Testing Both Rotational and Translational components v2" ) {
+//         twist.x_dot = 1.0;
+//         twist.y_dot = 2.0;
+//         twist.theta_dot = M_PI;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(-1.27324));
+//         CHECK( trans.y ==  Approx(0.63662));
+//         CHECK( rot ==  Approx(M_PI));
+//     }
 
-    SECTION( "Testing Both Rotational and Translational components v3" ) {
-        twist.x_dot = 2.0;
-        twist.y_dot = 4.0;
-        twist.theta_dot = M_PI;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(-2.54).margin(0.01));
-        CHECK( trans.y ==  Approx(1.272).margin(0.01));
-        CHECK( rot ==  Approx(M_PI));
-    }
+//     SECTION( "Testing Both Rotational and Translational components v3" ) {
+//         twist.x_dot = 2.0;
+//         twist.y_dot = 4.0;
+//         twist.theta_dot = M_PI;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(-2.54).margin(0.01));
+//         CHECK( trans.y ==  Approx(1.272).margin(0.01));
+//         CHECK( rot ==  Approx(M_PI));
+//     }
 
-    SECTION( "Testing Both Rotational and Translational components v4" ) {
-        twist.x_dot = 0.0;
-        twist.y_dot = 0.0;
-        twist.theta_dot = 0;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(0.0).margin(0.01));
-        CHECK( trans.y ==  Approx(0.0).margin(0.01));
-        CHECK( rot ==  Approx(0.0).margin(0.01));
-    }
+//     SECTION( "Testing Both Rotational and Translational components v4" ) {
+//         twist.x_dot = 0.0;
+//         twist.y_dot = 0.0;
+//         twist.theta_dot = 0;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(0.0).margin(0.01));
+//         CHECK( trans.y ==  Approx(0.0).margin(0.01));
+//         CHECK( rot ==  Approx(0.0).margin(0.01));
+//     }
 
-    SECTION( "Testing Both Rotational and Translational components v5" ) {
-        twist.x_dot = 5.0;
-        twist.y_dot = 2.0;
-        twist.theta_dot = 0.0;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(5.0).margin(0.01));
-        CHECK( trans.y ==  Approx(2.0).margin(0.01));
-        CHECK( rot ==  Approx(0).margin(0.01));
-    }
+//     SECTION( "Testing Both Rotational and Translational components v5" ) {
+//         twist.x_dot = 5.0;
+//         twist.y_dot = 2.0;
+//         twist.theta_dot = 0.0;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(5.0).margin(0.01));
+//         CHECK( trans.y ==  Approx(2.0).margin(0.01));
+//         CHECK( rot ==  Approx(0).margin(0.01));
+//     }
 
-    SECTION( "Testing Both Rotational and Translational components v6" ) {
-        twist.x_dot = 0.0;
-        twist.y_dot = 0.0;
-        twist.theta_dot = M_PI/4;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(0.0).margin(0.01));
-        CHECK( trans.y ==  Approx(0.0).margin(0.01));
-        CHECK( rot ==  Approx(M_PI/4));
-    }
+//     SECTION( "Testing Both Rotational and Translational components v6" ) {
+//         twist.x_dot = 0.0;
+//         twist.y_dot = 0.0;
+//         twist.theta_dot = M_PI/4;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(0.0).margin(0.01));
+//         CHECK( trans.y ==  Approx(0.0).margin(0.01));
+//         CHECK( rot ==  Approx(M_PI/4));
+//     }
 
-    SECTION( "Testing Both Rotational and Translational components v7" ) {
-        twist.x_dot = 5.0;
-        twist.y_dot = 2.0;
-        twist.theta_dot = M_PI/4;
-        TbbPrime = integrate_twist(twist);
-        trans = TbbPrime.translation();
-        rot = TbbPrime.rotation();
-        CHECK( trans.x == Approx(3.75574).margin(0.01));
-        CHECK( trans.y ==  Approx(3.66525).margin(0.01));
-        CHECK( rot ==  Approx(M_PI/4));
-    }
-}
+//     SECTION( "Testing Both Rotational and Translational components v7" ) {
+//         twist.x_dot = 5.0;
+//         twist.y_dot = 2.0;
+//         twist.theta_dot = M_PI/4;
+//         TbbPrime = integrate_twist(twist);
+//         trans = TbbPrime.translation();
+//         rot = TbbPrime.rotation();
+//         CHECK( trans.x == Approx(3.75574).margin(0.01));
+//         CHECK( trans.y ==  Approx(3.66525).margin(0.01));
+//         CHECK( rot ==  Approx(M_PI/4));
+//     }
+// }
