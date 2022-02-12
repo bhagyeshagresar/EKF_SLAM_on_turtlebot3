@@ -18,12 +18,21 @@
 #include "turtlelib/diff_drive.hpp"
 
 static std_msgs::UInt64 timestep;
-static double x{0.0}, y{0.0}, theta{0.0}, rate, radius;
+static double x, y, theta, rate, radius;
 static int num_markers;
-std::vector <double> x_s;
-std::vector <double> y_s;
-static double left_wheel_velocity {0.0};
-static double right_wheel_velocity {0.0};
+std::vector <double> x_m;
+std::vector <double> y_m;
+std::vector <double> wall_xpos{3.0, -3.0, 0.0, 0.0};
+std::vector <double> wall_ypos{0.0, 0.0, 3.0, -3.0};
+std::vector <double> x_length;
+std::vector <double> y_length;
+
+
+
+
+
+// static double left_wheel_velocity {0.0}; //unused
+// static double right_wheel_velocity {0.0};
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
 static int wheel_velocity_left {0};
 static int wheel_velocity_right {0};
@@ -177,7 +186,12 @@ int main(int argc, char ** argv){
     ros::ServiceServer teleport_service = nh.advertiseService("teleport", teleport_fn);
     sensor_msgs::JointState red_joint_state;
 
+    //marker publisher
     ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 500, true);
+
+    //walls publisher
+    ros::Publisher wall_pub = nh.advertise<visualization_msgs::MarkerArray>("walls", 500, true);
+
 
 
     //subsribe to red/wheel_cmd
@@ -192,20 +206,57 @@ int main(int argc, char ** argv){
 
 
     //get parameters
-    // nh.getParam("x0", x);
-    // nh.getParam("y0", y);
-    // nh.param("theta0", theta);
+    nh.getParam("x0", x);
+    nh.getParam("y0", y);
+    nh.param("theta0", theta);
     nh.param("rate", rate, 500.0);
     nh.getParam("num_markers", num_markers);
-    nh.getParam("x_s", x_s);
-    nh.getParam("y_s", y_s);
+    nh.getParam("x_m", x_m);
+    nh.getParam("y_m", y_m);
     nh.getParam("radius", radius);
     nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
     nh.getParam("motor_cmd_to_rad_sec", motor_cmd_to_radsec);
+    nh.getParam("x_length", x_length);
+    nh.getParam("y_length", y_length);
+
 
 
 
     // nh.param("x_m", x_m, 1);
+    visualization_msgs::MarkerArray wall_array;
+        for(int j = 0; j < 4; j++){
+            visualization_msgs::Marker wall_marker;
+            wall_marker.header.frame_id = "world";
+            wall_marker.header.stamp = ros::Time::now();
+            wall_marker.id = j;
+            wall_marker.type = visualization_msgs::Marker::CUBE;
+            wall_marker.action = visualization_msgs::Marker::ADD;
+            wall_marker.pose.position.x = wall_xpos.at(j);
+            wall_marker.pose.position.y = wall_ypos.at(j);
+            wall_marker.pose.position.z = 0;
+            wall_marker.pose.orientation.x = 0.0;
+            wall_marker.pose.orientation.y = 0.0;
+            wall_marker.pose.orientation.z = 0.0;
+            wall_marker.pose.orientation.w = 1.0;
+            wall_marker.scale.x = x_length.at(j);
+            wall_marker.scale.y = y_length.at(j);
+            wall_marker.scale.z = 0.25;
+            wall_marker.color.a = 1.0;
+            wall_marker.color.r = 1.0;
+            wall_marker.color.g = 0.0;
+            wall_marker.color.b = 0.0;
+            wall_marker.lifetime = ros::Duration();
+            
+            wall_array.markers.push_back(wall_marker);
+
+
+
+
+        }
+    wall_pub.publish(wall_array);
+
+
+        
 
 
 
@@ -219,8 +270,8 @@ int main(int argc, char ** argv){
             marker.id = i;
             marker.type = visualization_msgs::Marker:: CYLINDER;
             marker.action = visualization_msgs::Marker::ADD;
-            marker.pose.position.x = x_s.at(i);
-            marker.pose.position.y = y_s.at(i);
+            marker.pose.position.x = x_m.at(i);
+            marker.pose.position.y = y_m.at(i);
             marker.pose.position.z = 0;
             marker.pose.orientation.x = 0.0;
             marker.pose.orientation.y = 0.0;
@@ -258,12 +309,7 @@ int main(int argc, char ** argv){
         // ROS_INFO("%ld", timestep.data);
         timestep.data++;
 
-        // red_joint_state.name.push_back("wheel_joint_1");
-        // red_joint_state.name.push_back("wheel_joint_2");
-        // red_joint_state.position.push_back(0);
-        // red_joint_state.position.push_back(0);
-        // red_joint_state.velocity.push_back(0);
-        // red_joint_state.velocity.push_back(0);
+        
         wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
         wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
 
