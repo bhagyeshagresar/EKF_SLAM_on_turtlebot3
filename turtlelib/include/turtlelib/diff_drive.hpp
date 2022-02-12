@@ -65,6 +65,8 @@ namespace turtlelib{
 
         DiffDrive(Configuration q);
 
+       
+
 
         Configuration forward_kinematics(Wheel_angles w_pos);
 
@@ -73,6 +75,10 @@ namespace turtlelib{
         double get_radius();
 
         double get_length_d();
+
+        Configuration get_config();
+
+        void set_config(Configuration new_q);
 
 
 

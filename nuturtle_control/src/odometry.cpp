@@ -13,14 +13,21 @@ nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
 static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   
-    
+static turtlelib::Twist2D V_twist;
+static turtlelib::DiffDrive fwd_diff_drive;
+
+
 
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     
     // ROS_INFO_STREAM("JOINT STATES RECEIVED");
     wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
     wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
+
+
+    current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
     
+
     // ROS_INFO_STREAM("JOINT POS RECEIVED");
 
     wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
@@ -31,12 +38,22 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
 
 
 bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Pose::Response &res){
-    
+    // current_config.x_config = 0.0;
+    // current_config.y_config = 0.0;
+    // current_config.theta_config = 0.0;
 
-    odom.pose.pose.position.x = req.x_config;
-    odom.pose.pose.position.y = req.y_config;
-    odom.pose.pose.position.z = req.theta_config;
-    // odom.pose.pose.orientation = odom_quat;
+
+    current_config.x_config = req.x_config;
+    current_config.y_config = req.y_config;
+    current_config.theta_config = req.theta_config;
+
+    fwd_diff_drive.set_config(current_config);
+
+
+
+
+
+
 
     return true;
 
@@ -53,11 +70,11 @@ int main(int argc, char **argv){
     
 
     //subscribe to jointStates
-    ros::Subscriber js_sub = nh.subscribe("red/joint_states", 1000, joint_state_callback);
+    ros::Subscriber js_sub = nh.subscribe("red/joint_states", 10, joint_state_callback);
 
 
     //publish on odom topic
-    ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 100);
+    ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 500);
     
     //provide service
     ros::ServiceServer service = nh.advertiseService("set_pose", set_pose);
@@ -75,7 +92,11 @@ int main(int argc, char **argv){
 	current_time = ros::Time::now();
 	last_time = ros::Time::now();
 
+    geometry_msgs::TransformStamped odom_trans;
+
+
     ros::Rate r(500);
+
 
     
     
@@ -85,12 +106,11 @@ int main(int argc, char **argv){
         
 
         //get the wheel angles
-        turtlelib::DiffDrive fwd_diff_drive;
+        // turtlelib::DiffDrive fwd_diff_drive;
 
-        current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
+        // current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
 
         //get the twist
-        turtlelib::Twist2D V_twist;
 
 
     
@@ -100,10 +120,9 @@ int main(int argc, char **argv){
 
 
         
-
+        current_config = fwd_diff_drive.get_config();
       
         //publish transform over tf
-        geometry_msgs::TransformStamped odom_trans;
         odom_trans.header.stamp = current_time;
         odom_trans.header.frame_id = "odom";
         odom_trans.child_frame_id = "blue-base_footprint";

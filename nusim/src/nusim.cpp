@@ -167,7 +167,7 @@ int main(int argc, char ** argv){
     ros::NodeHandle nh;
     ros::NodeHandle nh2;
 
-    ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 100);
+    ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 500);
     // ros::Publisher pub2 = nh2.advertise<sensor_msgs::JointState>("red/joint_states", 100);
     // ros::Publisher pub3 = nh.advertise<nusim::SensorData("red/sensor_data", 1000);
 
@@ -177,15 +177,15 @@ int main(int argc, char ** argv){
     ros::ServiceServer teleport_service = nh.advertiseService("teleport", teleport_fn);
     sensor_msgs::JointState red_joint_state;
 
-    ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 100, true);
+    ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 500, true);
 
 
     //subsribe to red/wheel_cmd
-    ros::Subscriber wheel_cmd_sub = nh.subscribe<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 1000, wheel_cmd_callback);
+    ros::Subscriber wheel_cmd_sub = nh.subscribe<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 10, wheel_cmd_callback);
     
 
     //publish to red/sensor_data
-    ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 100);
+    ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 500);
 
     static tf2_ros::TransformBroadcaster broadcaster;
 

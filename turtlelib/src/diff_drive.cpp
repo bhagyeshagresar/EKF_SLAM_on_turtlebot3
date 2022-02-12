@@ -129,5 +129,17 @@ namespace turtlelib
         return d;
     }
 
+    Configuration DiffDrive::get_config(){
+        return q;
+
+    }
+
+    void DiffDrive::set_config(Configuration new_q){
+        q.x_config = new_q.x_config;
+        q.y_config = new_q.y_config;
+        q.theta_config = new_q.theta_config;
+
+    }
+
 }
 

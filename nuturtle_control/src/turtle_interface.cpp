@@ -114,12 +114,12 @@ int main(int argc, char **argv){
 
 
     //subscriber
-    ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 1000, cmd_vel_callback);
-    ros::Subscriber sensor_data_sub = nh.subscribe("red/sensor_data", 1000, sensor_data_callback);
+    ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 10, cmd_vel_callback);
+    ros::Subscriber sensor_data_sub = nh.subscribe("red/sensor_data", 10, sensor_data_callback);
  
     //publisher
-    ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 100);
-    ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("red/joint_states", 100);
+    ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 500);
+    ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("red/joint_states", 500);
 
     nh.getParam("motor_cmd_to_radsec", motor_cmd_to_rad_sec);
 

@@ -7,7 +7,7 @@
 
 
 static geometry_msgs::Twist twist;
-static double angular_velocity{0.15};
+static double angular_velocity{0.6};
 static double turning_radius{0.2};
 
 static bool stop = false;
@@ -48,7 +48,7 @@ int main(int argc, char **argv){
 
 
     //Publish cmd_vel
-    cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 100);
+    cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 500);
     
     ros::ServiceServer control_service = nh.advertiseService("control", control_fn);
 
@@ -66,7 +66,6 @@ int main(int argc, char **argv){
     while(ros::ok()){
         
         
-        ros::spinOnce();
 
         
         ROS_WARN("angular_velocity: %f", angular_velocity); 
@@ -82,7 +81,8 @@ int main(int argc, char **argv){
             cmd_vel_pub.publish(twist);
 
         }
-    
+        ros::spinOnce();
+
         // ROS_INFO_STREAM("twist %d, twist");
 
         r.sleep();
