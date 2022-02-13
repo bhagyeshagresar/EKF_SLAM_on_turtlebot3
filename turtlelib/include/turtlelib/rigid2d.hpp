@@ -175,6 +175,10 @@ namespace turtlelib
         /// \return the angular displacement, in radians
         double rotation() const;
 
+        double normalize_angle(double theta);
+
+        
+
 
         /// \brief \see operator<<(...) (declared outside this class)
         /// for a description

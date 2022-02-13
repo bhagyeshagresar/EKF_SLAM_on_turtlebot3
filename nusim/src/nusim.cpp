@@ -305,7 +305,6 @@ int main(int argc, char ** argv){
     while(ros::ok){
 
         pub.publish(timestep);
-        ros::spinOnce();
         // ROS_INFO("%ld", timestep.data);
         timestep.data++;
 
@@ -354,6 +353,7 @@ int main(int argc, char ** argv){
         sensor_pub.publish(sensor_data);
 
 
+        ros::spinOnce();
 
 
         r.sleep();

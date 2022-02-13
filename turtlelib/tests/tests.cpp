@@ -101,10 +101,7 @@
 //     REQUIRE(turtlelib::almost_equal(v0.y, v.y,0.01));
 // }
 
-// TEST_CASE("test_case", "[some tag]")
-// {
-// 	REQUIRE (false);
-// }
+
 
 
 // TEST_CASE("test forward kinematics - forward"){
@@ -346,4 +343,76 @@
 //         CHECK( trans.y ==  Approx(3.66525).margin(0.01));
 //         CHECK( rot ==  Approx(M_PI/4));
 //     }
+// }
+
+
+// TEST_CASE("Check normalize function, theta = M_PI"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta {M_PI};
+
+
+//     theta = T_test.normalize_angle(theta);
+
+
+//     REQUIRE(theta == M_PI);
+// }
+
+
+
+
+// TEST_CASE("Check normalize function, theta = -M_PI"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta_test {-M_PI};
+
+//     theta_test = T_test.normalize_angle(theta_test);
+
+
+//     REQUIRE(theta_test == -M_PI);
+// }
+
+// TEST_CASE("Check normalize function, theta = 0.0"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta_test {0.0};
+
+//     theta_test = T_test.normalize_angle(theta_test);
+
+
+//     REQUIRE(theta_test == 0.0);
+// }
+
+// TEST_CASE("Check normalize function, theta = -M_PI/4.0"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta_test {-M_PI/4.0};
+
+//     theta_test = T_test.normalize_angle(theta_test);
+
+
+//     REQUIRE(theta_test == -M_PI/4.0);
+// }
+
+// TEST_CASE("Check normalize function, theta = -3M_PI/2"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta_test {(3*M_PI)/2.0};
+
+//     theta_test = T_test.normalize_angle(theta_test);
+
+
+//     REQUIRE(theta_test == (3*M_PI)/2.0);
+// }
+
+
+// TEST_CASE("Check normalize function, theta = -5*M_PI/2.0"){
+
+//     turtlelib::Transform2D T_test;
+//     double theta_test {-(5*M_PI)/2.0};
+
+//     theta_test = T_test.normalize_angle(theta_test);
+
+
+//     REQUIRE(theta_test == -(5*M_PI)/2.0);
 // }

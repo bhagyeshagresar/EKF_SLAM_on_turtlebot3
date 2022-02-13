@@ -101,7 +101,6 @@ int main(int argc, char **argv){
     
     
     while(ros::ok()){
-        ros::spinOnce();
         current_time = ros::Time::now();
         
 
@@ -167,6 +166,8 @@ int main(int argc, char **argv){
 
         
         last_time = current_time;
+        ros::spinOnce();
+
         r.sleep();    
     
     

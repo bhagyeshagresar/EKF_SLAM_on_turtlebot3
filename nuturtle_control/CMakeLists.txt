@@ -18,6 +18,7 @@ std_msgs
 std_srvs
 tf2_ros
 message_runtime
+catch_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -269,3 +270,15 @@ install(PROGRAMS
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
+if(CATKIN_ENABLE_TESTING)
+
+find_package(rostest REQUIRED)
+
+catch_add_rostest_node(turtle_interface_test tests/turtle_interface_test.cpp)
+target_link_libraries(turtle_interface_test ${catkin_LIBRARIES})
+add_rostest(launch/turtle_interface.test DEPENDENCIES turtle_interface_test)
+
+
+endif()

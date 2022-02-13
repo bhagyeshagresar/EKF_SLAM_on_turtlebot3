@@ -137,12 +137,12 @@ int main(int argc, char **argv){
     //Twist forward_kinematics
 
     while(ros::ok()){
-        ros::spinOnce();
 
 
         wheel_cmd_pub.publish(wheel_cmd);
         joint_state_pub.publish(js);
 
+        ros::spinOnce();
 
 
         r.sleep();
