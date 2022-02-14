@@ -67,13 +67,13 @@ namespace turtlelib
 
     // 4 more static_assertions
 
-    // static_assert(almost_equal(2.5, 8.0), "values are not equal");
+    static_assert(almost_equal(2.5, 8.0), "values are not equal");
 
-    // static_assert(almost_equal(deg2rad(30.0), 0.5236), "deg2rad failed");
+    static_assert(almost_equal(deg2rad(30.0), 0.5236), "deg2rad failed");
 
-    // static_assert(almost_equal(rad2deg(1.22), 70), "rad2deg failed");
+    static_assert(almost_equal(rad2deg(1.22), 70), "rad2deg failed");
 
-    // static_assert(almost_equal(deg2rad(rad2deg(2.61)), 2.0), "deg2rad failed");
+    static_assert(almost_equal(deg2rad(rad2deg(2.61)), 2.0), "deg2rad failed");
 
     
 

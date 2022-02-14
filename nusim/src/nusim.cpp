@@ -1,4 +1,12 @@
-#include <ros/ros.h>
+/// \file
+/// \brief nusim node subscribes to wheel_cmd topic and published sensor_data message. The nusim node 
+/// provides a simulation for the robot and other objects in the environment. The node provides a reset service
+/// and teleport service to reset the simulation to initial state and to teleport the turtlebot to a specific location
+/// subscriber topic: red/wheel_cmd
+/// publisher topics: red/sensor_data, /obstacles, /walls
+
+
+#include <ros/ros.h> 
 #include <std_msgs/UInt64.h>
 #include <ros/console.h>
 #include <iostream>
@@ -17,6 +25,8 @@
 #include "nuturtlebot_msgs/SensorData.h"
 #include "turtlelib/diff_drive.hpp"
 
+
+/// Define the variables
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
@@ -28,11 +38,6 @@ std::vector <double> x_length;
 std::vector <double> y_length;
 
 
-
-
-
-// static double left_wheel_velocity {0.0}; //unused
-// static double right_wheel_velocity {0.0};
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
 static int wheel_velocity_left {0};
 static int wheel_velocity_right {0};
@@ -43,12 +48,13 @@ static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Configuration current_config;
 
 
-
-
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
 
 
+/// \brief function to reset to the initial state of the simulation
+/// \param req - empty request message
+/// \param res - empty response message 
 bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     timestep.data = 0;
     x = 0;
@@ -56,6 +62,11 @@ bool reset_fn(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     return true;
 }
 
+
+
+/// \brief function to teleport the robot to a specific location
+/// \param req - the request message takes float64 x, y and theta
+/// \param res - the response message is an empty response
 bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
     x = req.x;
     y = req.y;
@@ -64,106 +75,22 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 
 }
 
-
+/// \brief nusim node subscribes to red/wheel_cmd topic. The callback function set wheel velocities of the robot
+/// and also calculates encoder ticks for left and right wheels
+/// \param msg - nuturtlebot_msgs/WheelCommands 
 void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
-    /// \brief set wheel velocities of the robot
-    ///
-    /// \param msg - nuturtlebot_msgs/WheelCommands
-    
-    // turtlelib::Wheels_vel wheel_velocities;
-    // turtlelib::Wheel_angles wheel_angle;
-    // turtlelib::Configuration current_config;
-    
-    
-    // wheel_velocities.w1_vel = msg->left_velocity*motor_cmd_to_radsec; //motor cmd to rad/sec
-    // wheel_velocities.w2_vel = msg->right_velocity*motor_cmd_to_radsec;
+   
 
-    ROS_WARN("nusim:msg->left_velocity %d", msg->left_velocity);
-    ROS_WARN("nusim:msg->left_velocity %d", msg->right_velocity);
-
-    
-    wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
-    wheel_velocity_right = msg->right_velocity;
-
-
-    ROS_WARN("nusim:wheel_velocity_left %d", wheel_velocity_left);
-    ROS_WARN("nusim:wheel_velocity_right %d", wheel_velocity_right);
-
-    // if(wheel_velocities.w1_vel < -256.0){
-    //     wheel_velocities.w1_vel = -256.0;
-    // }
-
-    // else if(wheel_velocities.w1_vel > 256.0){
-    //     wheel_velocities.w1_vel = 256.0;
-    // }
-
-    // else if(wheel_velocities.w2_vel > 256.0){
-    //     wheel_velocities.w2_vel = 256.0;
-    // }
-    
-    // else if(wheel_velocities.w2_vel < -256.0){
-    //     wheel_velocities.w2_vel = -256.0;
-    // }
-
-    ROS_WARN("nusim:wheel_velocity.w1_vel before %f", wheel_velocities.w1_vel);
-    ROS_WARN("nusim:wheel_velocity.w2_vel before %f", wheel_velocities.w2_vel);
-
-
-
-    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);//ticks
+    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
     wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
 
-    ROS_WARN("nusim:wheel_velocity.w1_vel after %f", wheel_velocities.w1_vel);
-    ROS_WARN("nusim:wheel_velocity.w2_vel after %f", wheel_velocities.w2_vel);
-
-
+   
 
     sensor_data.left_encoder = (int)((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad;
     sensor_data.right_encoder = (int)((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
-    ROS_WARN("nusim:left_encoder %d", sensor_data.left_encoder);
-    ROS_WARN("nusim:right_encoder %d", sensor_data.right_encoder);
-
    
-    // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
-    // wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
-    
-    //ROS WARN
-    // ROS_WARN("vel_1: %f", wheel_velocities.w1_vel);
-    // ROS_WARN("vel_2: %f", wheel_velocities.w2_vel);
-
-    // ROS_WARN("angle_1: %f", wheel_angle.w_ang1);
-    // ROS_WARN("angle_2: %f", wheel_angle.w_ang2);
-
-    
-    // //ROS_WARN
-    // ROS_WARN("Rate: %f", rate);
-  
-    // ROS_WARN("2vel_1: %f", wheel_velocities.w1_vel);
-    // ROS_WARN("2vel_2: %f", wheel_velocities.w2_vel);
-
-    // ROS_WARN("2angle_1: %f", wheel_angle.w_ang1);
-    // ROS_WARN("2angle_2: %f", wheel_angle.w_ang2);
-    // ROS_WARN("parameter %f", encoder_ticks_to_rad);
-
-
-
-    // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
-    // wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
-
-    // current_config = update_config.forward_kinematics(wheel_angle);
-
-    ROS_WARN("x: %f", x);
-    ROS_WARN("y: %f", y);
-    ROS_WARN("theta: %f", theta);
-    ROS_WARN("x_config: %f", current_config.x_config);
-    ROS_WARN("y_config: %f", current_config.y_config);
-    ROS_WARN("theta_config: %f", current_config.theta_config);
-
-
-    // x = current_config.x_config;
-    // y = current_config.y_config;
-    // theta = current_config.theta_config;
+   
     
 }
 
@@ -171,22 +98,24 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
 int main(int argc, char ** argv){
     
-    
+    //initialise rosnode nusim
     ros::init(argc, argv, "nusim");
+
+    //create nodehandle objects
     ros::NodeHandle nh;
     ros::NodeHandle nh2;
 
+    //publish to timestep topic
     ros::Publisher pub = nh.advertise<std_msgs::UInt64>("timestep_topic", 500);
-    // ros::Publisher pub2 = nh2.advertise<sensor_msgs::JointState>("red/joint_states", 100);
-    // ros::Publisher pub3 = nh.advertise<nusim::SensorData("red/sensor_data", 1000);
-
-
+   
+    //advertise the reset service
     ros::ServiceServer reset_service = nh.advertiseService("reset", reset_fn);
-    // ros::Subscriber sub = nh.subscribe("geometry_msgs/Pose", 1000, pose_callback)
+    
+    //advertise the teleport service
     ros::ServiceServer teleport_service = nh.advertiseService("teleport", teleport_fn);
     sensor_msgs::JointState red_joint_state;
 
-    //marker publisher
+    //publisher for cylindrical obstacles
     ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>("obstacles", 500, true);
 
     //walls publisher
@@ -205,7 +134,7 @@ int main(int argc, char ** argv){
 
 
 
-    //get parameters
+    //get parameters from basic_world.yaml
     nh.getParam("x0", x);
     nh.getParam("y0", y);
     nh.param("theta0", theta);
@@ -221,8 +150,7 @@ int main(int argc, char ** argv){
 
 
 
-
-    // nh.param("x_m", x_m, 1);
+    //visualize the walls
     visualization_msgs::MarkerArray wall_array;
         for(int j = 0; j < 4; j++){
             visualization_msgs::Marker wall_marker;
@@ -259,7 +187,7 @@ int main(int argc, char ** argv){
         
 
 
-
+    //visualize the cylindrical obstacles
     timestep.data = 0;
     visualization_msgs::MarkerArray marker_array;
         for (int i = 0; i < 3; i++){
@@ -305,32 +233,23 @@ int main(int argc, char ** argv){
     while(ros::ok){
 
         pub.publish(timestep);
-        // ROS_INFO("%ld", timestep.data);
         timestep.data++;
 
-        
+        //calculate the wheel angles using wheel velocities
         wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
         wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
 
-        ROS_WARN("wheel_velocity before fk fn 1: %f", wheel_angle.w_ang1);
-        ROS_WARN("wheel_velocity before fk fn 2: %f", wheel_angle.w_ang2);
+       //Get the current_configuration of the robot using forward kinematics function
         current_config = update_config.forward_kinematics(wheel_angle);
         
-        ROS_WARN("x_config: %f", current_config.x_config);
-        ROS_WARN("y_config: %f", current_config.y_config);
-        ROS_WARN("theta_config: %f", current_config.theta_config);
-
+        
 
         x = current_config.x_config;
         y = current_config.y_config;
         theta = current_config.theta_config;
 
-        ROS_WARN("x: %f", x);
-        ROS_WARN("y: %f", y);
-        ROS_WARN("theta: %f", theta);
-    
-
-
+       
+        //broadcast the transform between nusim and red-base_footprint
         geometry_msgs::TransformStamped transformStamped;
         transformStamped.header.stamp = ros::Time::now();
         transformStamped.header.frame_id = "world";
@@ -349,7 +268,7 @@ int main(int argc, char ** argv){
        
        
 
-
+        //publish sensor_data on red/sensor_data topic
         sensor_pub.publish(sensor_data);
 
 

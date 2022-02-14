@@ -1,3 +1,14 @@
+/// \file the turtle_interface node subscribes to cmd_vel topic. The turtle_interface node controls the turtlebot 
+/// with the help of the geometry_msgs/Twist messagw which it subscribes to. The turtle_interface also publishes wheel_cmd
+/// left and right wheel velocities in ticks. The turle_interface node also publishes joint_states to red/joint_states topic.
+/// Publisher : topics : red/wheel_cmd, red/joint_states
+/// Subscriber : topics : cmd_vel, red/sensor_data
+
+
+
+
+
+
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include "nuturtlebot_msgs/WheelCommands.h"
@@ -16,37 +27,19 @@ static turtlelib::Wheels_vel w_vel;
 static turtlelib::DiffDrive diff_drive;
 
 
+/// \brief function to calculate left and right wheel velocites and keep it in range between -256 and 256
+/// \param twist_msg - linear and angular velocity
 void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
-    //forward kinematics to get twist
     
     
-    // turtlelib::Twist2D V;
-    // turtlelib::Wheels_vel w_vel;
-    ROS_WARN("turtle_interface:twist_msg->linear.x %f",twist_msg->linear.x);
-    ROS_WARN("turtle_interface:twist_msg->angular.z %f",twist_msg->angular.z);
-
     
     V.x_dot = twist_msg->linear.x;
     V.theta_dot = twist_msg->angular.z;
 
-    ROS_WARN("turtle_interface:V.x_dot %f", V.x_dot);
-    ROS_WARN("turtle_interface:V.theta_dot %f",V.theta_dot);
-
-
     w_vel = diff_drive.inverse_kinematics(V);
-
-    ROS_WARN("turtle_interface:w_vel.w1_vel %f", w_vel.w1_vel);
-    ROS_WARN("turtle_interface:w_vel.w2_vel %f", w_vel.w2_vel);
-
 
     wheel_cmd.left_velocity = (int)(w_vel.w1_vel/motor_cmd_to_rad_sec);
     wheel_cmd.right_velocity = (int)(w_vel.w2_vel/motor_cmd_to_rad_sec);
-
-
-    ROS_WARN("turtle_interface:wheel_cmd left velocity before condition: %d", wheel_cmd.left_velocity);
-    ROS_WARN("turtle_interface:wheel_cmd right velocity before condition: %d", wheel_cmd.right_velocity);
-
-
 
 
     if(wheel_cmd.left_velocity < -256){
@@ -66,14 +59,12 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     }
 
 
-    ROS_WARN("turtle_interface:wheel_cmd left velocity after condition: %d", wheel_cmd.left_velocity);
-    ROS_WARN("turtle_interface:wheel_cmd right velocity after condition: %d", wheel_cmd.right_velocity);
-
-
-
 
 }
 
+/// \brief function to get joint states for left and right wheels. Function calculates the left and right encoder ticks
+/// and from that left and right wheel angles and velocities are calculated using the parameters defined in the diff_drive.yaml file
+/// \param sensor_msg - left and right encoder ticks message from nusim
 void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_encoder_ticks  = sensor_msg.left_encoder; // encoder data in ticks
     right_encoder_ticks = sensor_msg.right_encoder;
@@ -82,20 +73,14 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
 
     left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;
     right_wheel_angle = (encoder_ticks_to_rad)*right_encoder_ticks;
-    // ROS_INFO_STREAM("got angles");
 
     left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder_ticks;
     right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder_ticks;
-    // ROS_INFO_STREAM("got velocity");
 
     js.header.stamp = ros::Time::now();
-    // ROS_INFO_STREAM("got header stamp");
     js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
-    // ROS_INFO_STREAM("got name");
     js.position = {left_wheel_angle, right_wheel_angle};
-    // ROS_INFO_STREAM("got position");
     js.velocity = {left_wheel_velocity, right_wheel_velocity};
-    // ROS_INFO_STREAM("got velocity");
 
 
 }
@@ -103,26 +88,31 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
 
 
 
-
-
-
 int main(int argc, char **argv){
 
+    //initialise rosnode turtle_interface
     ros::init(argc, argv, "turtle_interface");
+    
+    //create rosnode handle object
     ros::NodeHandle nh;
 
 
 
-    //subscriber
+    //subscribe to cmd_vel topic
     ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 10, cmd_vel_callback);
+    
+    //subscribe to red/sensor_data topic
     ros::Subscriber sensor_data_sub = nh.subscribe("red/sensor_data", 10, sensor_data_callback);
  
-    //publisher
+    //advertise nuturtlebot_msgs/WheelCommands message on red/wheel_cmd topic
     ros::Publisher wheel_cmd_pub = nh.advertise<nuturtlebot_msgs::WheelCommands>("red/wheel_cmd", 500);
+    
+    //advertise sensor_msgs/JointState message on red/joint_states
     ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("red/joint_states", 500);
 
+    
+    //get the parameters from diff_drive.yaml
     nh.getParam("motor_cmd_to_radsec", motor_cmd_to_rad_sec);
-
     nh.getParam("encoder_ticks_to_rad", encoder_ticks_to_rad);
 
 
@@ -134,17 +124,16 @@ int main(int argc, char **argv){
     ros::Rate r(500);
 
 
-    //Twist forward_kinematics
 
     while(ros::ok()){
 
-
+        //publish wheel_cmd(left and right velocities in ticks on the red/wheel_cmd topic)
         wheel_cmd_pub.publish(wheel_cmd);
+
+        //publish joint states on the red/joint_states topic
         joint_state_pub.publish(js);
 
         ros::spinOnce();
-
-
         r.sleep();
 
     }

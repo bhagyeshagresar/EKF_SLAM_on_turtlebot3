@@ -1,3 +1,11 @@
+/// \file the odometry node broadcasts the transform between odom and the blue-base footprint. The odometry node also 
+/// publishes odometry messages on the odom topic
+/// subscriber: topics - red/joint_states
+/// publisher: topics - /odom
+
+
+
+
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <sensor_msgs/JointState.h>
@@ -17,10 +25,10 @@ static turtlelib::Twist2D V_twist;
 static turtlelib::DiffDrive fwd_diff_drive;
 
 
-
+/// \brief function to compute the wheel_angles and wheel_velocities from joint_state message
+/// \param js_msg - joint state message
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     
-    // ROS_INFO_STREAM("JOINT STATES RECEIVED");
     wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
     wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
 
@@ -28,20 +36,17 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
     
 
-    // ROS_INFO_STREAM("JOINT POS RECEIVED");
 
     wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
     wheel_vel.w2_vel = js_msg->velocity[1]; //wheel velocity 2
-    // ROS_INFO_STREAM("JOINT VELS RECEIVED");
 
 }
 
-
+/// \brief function to set the pose of the blue robot
+/// \param req - x, y and theta configuration values of the robot
+/// \param res - empty response message 
 bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Pose::Response &res){
-    // current_config.x_config = 0.0;
-    // current_config.y_config = 0.0;
-    // current_config.theta_config = 0.0;
-
+    
 
     current_config.x_config = req.x_config;
     current_config.y_config = req.y_config;
@@ -62,24 +67,27 @@ bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Po
 
 
 int main(int argc, char **argv){
-    // ROS_INFO_STREAM("Hello world");
+
+    //initialize rosnode odometry
     ros::init(argc, argv, "odometry");
+
+    //create nodehandle object
     ros::NodeHandle nh;
 
 
     
 
-    //subscribe to jointStates
+    //subscribe to red/jointStates
     ros::Subscriber js_sub = nh.subscribe("red/joint_states", 10, joint_state_callback);
 
 
     //publish on odom topic
     ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 500);
     
-    //provide service
+    //provide service set_pose
     ros::ServiceServer service = nh.advertiseService("set_pose", set_pose);
 
-
+    //transform between odom and blue-base_footprint
     tf2_ros::TransformBroadcaster odom_broadcaster;
 
 
@@ -104,24 +112,18 @@ int main(int argc, char **argv){
         current_time = ros::Time::now();
         
 
-        //get the wheel angles
-        // turtlelib::DiffDrive fwd_diff_drive;
-
-        // current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
-
-        //get the twist
 
 
     
-
+        //calculate twist
         V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
         V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
 
 
-        
+        //get the current configuration of the blue robot
         current_config = fwd_diff_drive.get_config();
       
-        //publish transform over tf
+        //publish transform between odom and blue-base_footprint on tf
         odom_trans.header.stamp = current_time;
         odom_trans.header.frame_id = "odom";
         odom_trans.child_frame_id = "blue-base_footprint";
@@ -140,12 +142,12 @@ int main(int argc, char **argv){
         odom_broadcaster.sendTransform(odom_trans);
 
        
-        //publish odometry message over ros
+        //set the header.stamp and header.frame_id for the odometry message
         nav_msgs::Odometry odom;
         odom.header.stamp = current_time;
         odom.header.frame_id = "odom";
 
-        //set the position
+        //set the position for the robot
         odom.pose.pose.position.x = current_config.x_config;
         odom.pose.pose.position.y = current_config.y_config;
         odom.pose.pose.position.z = current_config.theta_config;
@@ -155,12 +157,12 @@ int main(int argc, char **argv){
         odom.pose.pose.orientation.w = quat.w();
 
 
-        //set the velocity
+        //set the velocity of the robot
         odom.child_frame_id = "blue-base_footprint";
         odom.twist.twist.linear.x = V_twist.x_dot;
         odom.twist.twist.linear.y = 0;
         odom.twist.twist.angular.z = V_twist.theta_dot;
-
+        //publish the odometry message
         odom_pub.publish(odom);
 
 
