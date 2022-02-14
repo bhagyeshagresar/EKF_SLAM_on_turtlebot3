@@ -190,7 +190,7 @@ int main(int argc, char ** argv){
     //visualize the cylindrical obstacles
     timestep.data = 0;
     visualization_msgs::MarkerArray marker_array;
-        for (int i = 0; i < 3; i++){
+        for (int i = 0; i < num_markers; i++){
             visualization_msgs::Marker marker;
             marker.header.frame_id = "world";
             marker.header.stamp = ros::Time::now();
@@ -215,9 +215,7 @@ int main(int argc, char ** argv){
             ROS_INFO("check for rviz");
             marker.lifetime = ros::Duration();
             
-            // vis_pub.publish(marker);
             marker_array.markers.push_back(marker);
-            // vis_pub.publish(marker_array);
 
 
 
