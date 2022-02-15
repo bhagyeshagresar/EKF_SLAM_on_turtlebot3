@@ -88,18 +88,23 @@ namespace turtlelib
         double y = 0.0;
     };
 
-
+    /// \brief A 2-D twist
     struct Twist2D
     {
-        
+        /// \brief angular velocity
         double theta_dot = 0.0;
 
+        /// \brief linear velocity in x-direction
         double x_dot = 0.0;
 
+        /// \brief linear velocity in y-direction
         double y_dot = 0.0;
 
     };
 
+    /// \brief function to calculate unit vector
+    /// \param v - vector which is transformed into unit vector
+    /// \return unit vector
     Vector2D unit_vector(Vector2D v);
 
 
@@ -186,21 +191,20 @@ namespace turtlelib
 
         friend std::istream & operator>>(std::istream & is, Transform2D & tf);
 
+        /// \brief calculate new twist from old twist
+        /// \param  V - Twist2D V
+        /// \return - new twist
         Twist2D new_twist(Twist2D V);
 
-        /// \brief integrate the twist
-        /// \return Transformation in the same body frame
-
+       
 
     
     private:
         Vector2D v2;
-        Twist2D V; //twist v3
+        Twist2D V; 
 
         double theta;
-         //vector v2
-        // Twist2D V; //twist v3
-       
+         
     };
 
 
@@ -224,12 +228,14 @@ namespace turtlelib
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
 
-    // std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
     std::istream &operator>>(std::istream &in, Twist2D &t);
 
     std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
+    
+    /// \brief Integrate the twist
+    /// \param V - Twist2D V
     Transform2D integrate_twist(Twist2D V);
 
 
@@ -237,6 +243,5 @@ namespace turtlelib
 
 
 
-    // Transform2D integrate_twist(Twist2D V);
 
 #endif
