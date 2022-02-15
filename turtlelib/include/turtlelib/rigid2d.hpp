@@ -234,8 +234,9 @@ namespace turtlelib
     std::ostream &operator<<(std::ostream &os, const Twist2D &t);
 
     
-    /// \brief Integrate the twist
+    /// \brief Integrate the body twist to find new transformation for the body frame of the robot
     /// \param V - Twist2D V
+    /// \return new transformation matrix Tbb_
     Transform2D integrate_twist(Twist2D V);
 
 
