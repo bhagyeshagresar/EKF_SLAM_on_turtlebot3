@@ -53,7 +53,9 @@ Final Pose:
 https://drive.google.com/file/d/1OGC24xq3axGb26Q2jAD1GEq0z8-RnGwH/view?usp=sharing
 
 
+3) Experiment 3:
 
+Robot wheels spin for an instant and stop. This happens randomly and my robot does not move in a circle continuously.
 
 
 
