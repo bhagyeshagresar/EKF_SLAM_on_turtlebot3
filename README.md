@@ -17,12 +17,12 @@ This repository consists of the following ROS Packages:
 
 
 
-#Kinematics Calculations
+# Kinematics Calculations
 
 https://drive.google.com/file/d/1rcvyuzr0tUmVKinjFVewD1EDhmv9mqnn/view?usp=sharing
 
 
-Task F:
+# Task F:
 
 1) Experiment 1 
 
