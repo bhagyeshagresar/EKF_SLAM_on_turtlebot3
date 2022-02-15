@@ -77,10 +77,8 @@ namespace turtlelib
 
     Vector2D Transform2D::operator()(Vector2D v) const{
        
-        // double theta = theta;
-        // Vector2D v2 = v;
+       
         Vector2D v_new;
-        // double theta;
 
 
         v_new.x = (cos(theta)*v.x) - (sin(theta)*v.y) + v2.x;
@@ -247,19 +245,7 @@ namespace turtlelib
             return Transform2D{Vector2D{V.x_dot, V.y_dot}};
         }
         
-        // else if (V.x_dot == 0.0 && V.y_dot == 0.0){
-        //     return Transform2D{Vector2D{V.theta_dot}};
-
-        
-        // }
-
-        //pure translation
-        // if (almost_equal(V.theta_dot, 0.0)){
-        //     v.x = V.x_dot;
-        //     v.y = V.y_dot;
-        //     Transform2D T_trans{{v.x, v.y}, 0.0};
-        //     return T_trans;
-        // }
+       
         
         else{
             v.x = V.y_dot/V.theta_dot;
@@ -267,15 +253,6 @@ namespace turtlelib
             double theta = V.theta_dot;
 
             
-            // if(almost_equal(v.x, 0.0)){
-            //     v.x = 0.0;
-
-            // }
-
-            // if(almost_equal(v.y, 0.0)){
-            //     v.y = 0.0;
-
-            // }
             Transform2D Tsb{{v.x, v.y}, 0.0};
             Transform2D Tss_{{0.0, 0.0}, theta};
             Transform2D Tbs = Tsb.inv();
