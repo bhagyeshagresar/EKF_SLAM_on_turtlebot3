@@ -24,6 +24,8 @@
 #include "nuturtlebot_msgs/WheelCommands.h"
 #include "nuturtlebot_msgs/SensorData.h"
 #include "turtlelib/diff_drive.hpp"
+#include <nav_msgs/Path.h>
+#include <geometry_msgs/PoseStamped.h>
 
 
 /// Define the variables
@@ -50,6 +52,14 @@ static turtlelib::Configuration current_config;
 
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
+
+//nav_msgs path variable
+nav_msgs::Path path;
+
+//PoseStamped variable
+geometry_msgs::PoseStamped pose;
+
+
 
 
 /// \brief function to reset to the initial state of the simulation
@@ -131,6 +141,10 @@ int main(int argc, char ** argv){
     ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 500);
 
     static tf2_ros::TransformBroadcaster broadcaster;
+
+    //publish to path topic
+    ros::Publisher path_pub = nh.advertise<nav_msgs::Path>("robot_path", 500);
+
 
 
 
@@ -226,6 +240,9 @@ int main(int argc, char ** argv){
 
 
 
+
+
+
     ros::Rate r(rate);
 
     while(ros::ok){
@@ -268,6 +285,21 @@ int main(int argc, char ** argv){
 
         //publish sensor_data on red/sensor_data topic
         sensor_pub.publish(sensor_data);
+
+        //publish robot path
+        pose.header.stamp = ros::Time::now();
+        pose.header.frame_id = red-base_footprint;
+        pose.pose.position.x = x;
+        pose.pose.position.y = x;
+        pose.pose.position.z = theta;
+
+        path.header.stamp = ...;
+        path.header.frame_id = ...;
+        path.poses.push_back(pose);
+
+
+
+
 
 
         ros::spinOnce();

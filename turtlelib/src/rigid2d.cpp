@@ -282,46 +282,6 @@ namespace turtlelib
 
 
 
-// output values in the twist2d object
-// std::ostream &operator<<(std::ostream &os, const Twist2D &t){
-//     os << t.twist_j;
-
-//     return os;
-// }
-
-// insert values in the twist2d object  j
-   
-
-
-// //function to return Twist vector in frame i
-// double Twist2d::twist_frame_i(double theta_dot, double dx, double dy){
-//     double twist_i[3] {theta_dot, dx, dy};
-
-//     return twist_i;
-// }
-
-// //function to return adjoint
-// double Twist2d::adjoint(double theta, double x, double y){
-//     const int rows {3};
-//     const int cols {3};
-    
-//     double adjoint[rows][cols]
-//     {
-//         {1, 0, 0},
-//         {y, cos(theta), -sin(theta)},
-//         {-x, sin(theta), cos(theta)}
-//     };
-
-//     return adjoint;
-    
-// }
-
-// //function to return twist in frame j
-// double twist_frame_j(double twist_i, double adjoint){
-//     double twist_j = twist_i*adjoint;
-
-//     return twist_j;
-// }
 
 
 
