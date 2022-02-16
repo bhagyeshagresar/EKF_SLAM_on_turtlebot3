@@ -288,7 +288,7 @@ int main(int argc, char ** argv){
 
         //publish robot path
         pose.header.stamp = ros::Time::now();
-        pose.header.frame_id = red-base_footprint;
+        pose.header.frame_id = "red-base_footprint";
         pose.pose.position.x = x;
         pose.pose.position.y = x;
         pose.pose.position.z = theta;
