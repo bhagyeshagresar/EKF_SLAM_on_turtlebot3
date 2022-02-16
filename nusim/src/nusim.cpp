@@ -79,6 +79,9 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 /// and also calculates encoder ticks for left and right wheels
 /// \param msg - nuturtlebot_msgs/WheelCommands 
 void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
+
+    wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
+    wheel_velocity_right = msg->right_velocity;
    
 
     wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
