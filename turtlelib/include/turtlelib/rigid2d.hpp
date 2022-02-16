@@ -23,7 +23,7 @@ namespace turtlelib
     /// if given a compile-time constant as input
     constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)   
     {
-        if (std::abs(d1 - d2) < epsilon){
+        if (std::fabs(d1 - d2) < epsilon){
             return true;
         }
         else{
@@ -38,8 +38,8 @@ namespace turtlelib
     /// \returns radians
     constexpr double deg2rad(double deg)
     {   
-        double rad {0};
-        rad = (deg*PI/180);
+        double rad {0.0};
+        rad = (deg*PI/180.0);
         return rad;
     }
 
@@ -48,8 +48,8 @@ namespace turtlelib
     /// \returns the angle in degrees
     constexpr double rad2deg(double rad)
     {
-        double deg {0};
-        deg = (rad*180/PI);
+        double deg {0.0};
+        deg = (rad*180.0/PI);
         return deg;
     }
 
@@ -67,13 +67,13 @@ namespace turtlelib
 
     // 4 more static_assertions
 
-    static_assert(almost_equal(2.5, 8.0), "values are not equal");
+    static_assert(almost_equal(8.0, 8.0), "values are not equal");
 
-    static_assert(almost_equal(deg2rad(30.0), 0.5236), "deg2rad failed");
+    static_assert(almost_equal(deg2rad(30.0), 0.523599,0.01), "deg2rad failed");
 
-    static_assert(almost_equal(rad2deg(1.22), 70), "rad2deg failed");
+    static_assert(almost_equal(rad2deg(1.22), 69.90085, 0.01), "rad2deg failed");
 
-    static_assert(almost_equal(deg2rad(rad2deg(2.61)), 2.0), "deg2rad failed");
+    static_assert(almost_equal(deg2rad(rad2deg(2.61)), 2.61,0.01), "deg2rad failed");
 
     
 
