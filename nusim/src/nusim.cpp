@@ -231,7 +231,7 @@ int main(int argc, char ** argv){
 
     ros::Rate r(rate);
 
-    while(ros::ok){
+    while(ros::ok()){
 
         pub.publish(timestep);
         timestep.data++;
