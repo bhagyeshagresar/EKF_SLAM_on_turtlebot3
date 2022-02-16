@@ -12,7 +12,6 @@ Panels:
         - /MarkerArray1
         - /RobotModel1
         - /MarkerArray2
-        - /RobotModel2
       Splitter Ratio: 0.5
     Tree Height: 746
   - Class: rviz/Selection
@@ -174,55 +173,6 @@ Visualization Manager:
         "": true
       Queue Size: 100
       Value: true
-    - Alpha: 1
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Joint Details: false
-        Expand Link Details: false
-        Expand Tree: false
-        Link Tree Style: Links in Alphabetic Order
-        red-base_footprint:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        red-base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        red-base_scan:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        red-caster_back_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        red-imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        red-wheel_left_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        red-wheel_right_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-      Name: RobotModel
-      Robot Description: red/robot_description
-      TF Prefix: ""
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -251,7 +201,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.996315956115723
+      Distance: 5.815159797668457
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -267,9 +217,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.49539676308631897
+      Pitch: 0.5053966641426086
       Target Frame: <Fixed Frame>
-      Yaw: 2.9204061031341553
+      Yaw: 2.485400915145874
     Saved: ~
 Window Geometry:
   Displays:

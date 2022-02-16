@@ -19,6 +19,7 @@ std_srvs
 tf2_ros
 message_runtime
 catch_ros
+rostest
 )
 
 ## System dependencies are found with CMake's conventions
