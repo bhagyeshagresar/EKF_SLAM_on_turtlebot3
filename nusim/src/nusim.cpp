@@ -24,6 +24,8 @@
 #include "nuturtlebot_msgs/WheelCommands.h"
 #include "nuturtlebot_msgs/SensorData.h"
 #include "turtlelib/diff_drive.hpp"
+#include <nav_msgs/Path.h>
+#include <sensor_msgs/LaserScan.h>
 
 
 /// Define the variables
@@ -50,6 +52,9 @@ static turtlelib::Configuration current_config;
 
 //sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
+
+//path
+static nav_msgs::Path path; 
 
 
 /// \brief function to reset to the initial state of the simulation
@@ -133,7 +138,22 @@ int main(int argc, char ** argv){
     //publish to red/sensor_data
     ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 500);
 
+    //publish path
+    ros::Publisher path_pub = nh.advertise<nav_msgs::Path>("nusim_path", 500);
+
+    //publish laser_scan
+    ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500);
+
+
     static tf2_ros::TransformBroadcaster broadcaster;
+
+    int num_readings = 100;
+    double laser_frequency = 40.0;
+    double ranges[num_readings];
+    double intensities[num_readings];
+
+
+
 
 
 
@@ -230,6 +250,7 @@ int main(int argc, char ** argv){
 
 
     ros::Rate r(rate);
+    int count = 0;
 
     while(ros::ok()){
 
@@ -266,11 +287,51 @@ int main(int argc, char ** argv){
         transformStamped.transform.rotation.w = q.w();
         broadcaster.sendTransform(transformStamped);
 
-       
-       
+        geometry_msgs::PoseStamped pose;
+        pose.header.stamp = ros::Time::now();
+        pose.header.frame_id = "red-base_footprint";
+        pose.pose.position.x = x;
+        pose.pose.position.y = y;
+        pose.pose.position.z = 0.0;
 
+        path.header.stamp = ros::Time::now();
+        path.header.frame_id = "world";
+        path.poses.push_back(pose);
+       
+        for(int i = 0; i < num_readings; ++i){
+           ranges[i] = count;
+           intensities[i] = 100 + count;
+           }
+        ros::Time scan_time = ros::Time::now();
+   
+        //populate the LaserScan message
+        sensor_msgs::LaserScan scan;
+        scan.header.stamp = scan_time;
+        scan.header.frame_id = "red-base_footprint";
+        scan.angle_min = -1.57;
+        scan.angle_max = 1.57;
+        scan.angle_increment = 3.14 / num_readings;
+        scan.time_increment = (1 / laser_frequency) / (num_readings);
+        scan.range_min = 0.0;
+        scan.range_max = 100.0;
+    
+        scan.ranges.resize(num_readings);
+        scan.intensities.resize(num_readings);
+        for(unsigned int i = 0; i < num_readings; ++i){
+            scan.ranges[i] = ranges[i];
+            scan.intensities[i] = intensities[i];
+        }
+    
+        laser_pub.publish(scan);
+        ++count;
+
+        
         //publish sensor_data on red/sensor_data topic
         sensor_pub.publish(sensor_data);
+        
+
+        //publish path
+        path_pub.publish(path);
 
 
         ros::spinOnce();

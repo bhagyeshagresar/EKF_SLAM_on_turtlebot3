@@ -150,7 +150,7 @@ int main(int argc, char **argv){
         //set the position for the robot
         odom.pose.pose.position.x = current_config.x_config;
         odom.pose.pose.position.y = current_config.y_config;
-        odom.pose.pose.position.z = current_config.theta_config;
+        odom.pose.pose.position.z = 0.0;
         odom.pose.pose.orientation.x = quat.x();
         odom.pose.pose.orientation.y = quat.y();
         odom.pose.pose.orientation.z = quat.z();
