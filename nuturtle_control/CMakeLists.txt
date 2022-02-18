@@ -273,13 +273,13 @@ install(PROGRAMS
 # catkin_add_nosetests(test)
 
 
-if(CATKIN_ENABLE_TESTING)
+# if(CATKIN_ENABLE_TESTING)
 
-find_package(rostest REQUIRED)
+# find_package(rostest REQUIRED)
 
-catch_add_rostest_node(turtle_interface_test tests/turtle_interface_test.cpp)
-target_link_libraries(turtle_interface_test ${catkin_LIBRARIES})
-add_rostest(launch/turtle_interface.test DEPENDENCIES turtle_interface_test)
+# catch_add_rostest_node(turtle_interface_test tests/turtle_interface_test.cpp)
+# target_link_libraries(turtle_interface_test ${catkin_LIBRARIES})
+# add_rostest(launch/turtle_interface.test DEPENDENCIES turtle_interface_test)
 
 
-endif()
+# endif()

@@ -239,14 +239,14 @@ target_link_libraries(frame_main turtlelib)
 # add_executable(turtlelib_test tests/tests.cpp)
 # target_link_libraries(turtlelib_test turtlelib)
 # add_test(NAME Test_of_Turtlelib COMMAND turtlelib_test)
-# catch_add_test(${PROJECT_NAME}_test
-# 	tests/tests.cpp
-# )
+catch_add_test(${PROJECT_NAME}_test
+	tests/tests.cpp
+)
 
 
-# target_link_libraries(${PROJECT_NAME}_test turtlelib
-# 	${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_test turtlelib
+	${catkin_LIBRARIES}
+)
 
 install(TARGETS frame_main
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

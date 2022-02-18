@@ -1,31 +1,71 @@
 // #define CATCH_CONFIG_MAIN
 // #include "catch.hpp"
-// #include <cmath>
-// #include <iostream>
+#include <iostream>
 
-// #include "turtlelib/rigid2d.hpp"
-// #include <catch_ros/catch.hpp>
-// #include "turtlelib/diff_drive.hpp"
-// #include <cmath>
-
+#include "turtlelib/rigid2d.hpp"
+#include <catch_ros/catch.hpp>
+#include "turtlelib/diff_drive.hpp"
+#include <cmath>
 
 
 
 
 
-// TEST_CASE("Check translation function"){
 
-//     turtlelib::Transform2D T;
-//     turtlelib::Vector2D v_test;
+TEST_CASE("Check translation function", "[zero translation]"){
 
-//     v_test = T.translation();
+    turtlelib::Transform2D T;
+    turtlelib::Vector2D v_test;
+
+    v_test = T.translation();
 
 
 
 
-//     REQUIRE(v_test.y == 0);
-//     REQUIRE(v_test.y == 0);
-// }
+    REQUIRE(v_test.x == 0);
+    REQUIRE(v_test.y == 0);
+}
+
+TEST_CASE("Check translation function2", "[translation both positive]"){
+    turtlelib::Vector2D v;
+    v.x = 0.2;
+    v.y = 0.3;
+    turtlelib::Transform2D T{{v.x, v.y}, 0.0};
+    turtlelib::Vector2D v_test;
+
+    v_test = T.translation();
+
+
+
+
+    REQUIRE(v_test.x == 0.2);
+    REQUIRE(v_test.y == 0.3);
+}
+
+
+
+TEST_CASE("Check rotation function", "[zero rotation]"){
+    turtlelib::Transform2D T;
+    double theta_test;
+
+    theta_test = T.rotation();
+
+    REQUIRE(theta_test == 45);
+
+}
+
+TEST_CASE("Check rotation function2", "[positive rotation]"){
+    double theta = turtlelib::deg2rad(45);
+    double theta_test;
+    turtlelib::Transform2D T{{0.0, 0.0}, theta};
+
+
+    theta_test = T.rotation();
+
+    REQUIRE(theta_test == turtlelib::deg2rad(45));
+
+}
+
 
 
 
@@ -184,6 +224,10 @@
 
 
 
+
+// }
+
+// TEST_CASE("Forward kinematics robot moving forward", "diffdrive"){
 
 // }
 
