@@ -1,3 +1,7 @@
+#ifndef DIFFDRIVE_INCLUDE_GUARD_HPP
+#define DIFFDRIVE_INCLUDE_GUARD_HPP
+
+
 #include "turtlelib/rigid2d.hpp"
 
 
@@ -96,3 +100,5 @@ namespace turtlelib{
 
 
 }
+
+#endif

@@ -26,6 +26,10 @@
 #include "turtlelib/diff_drive.hpp"
 #include <nav_msgs/Path.h>
 #include <sensor_msgs/LaserScan.h>
+#include <random>
+#include <math.h>
+#include "turtlelib/diff_drive.hpp"
+#include "turtlelib/rigid2d.hpp"
 
 
 /// Define the variables
@@ -43,17 +47,43 @@ std::vector <double> y_length;
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
 static int wheel_velocity_left {0};
 static int wheel_velocity_right {0};
-
 static turtlelib::DiffDrive update_config;
 static turtlelib::Wheels_vel wheel_velocities;
 static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Configuration current_config;
+static double left_wheel_noise{0.0};
+static double right_wheel_noise{0.0};
+static double slip_min{0.0};
+static double slip_max{0.5};
+static double mu_1{0.0};
+
+//define relative position variables
+static turtlelib::Vector2D V_rel;
+
+static double obstacle_noise{0.0};
 
 
-//sensor_data_message
+
+
+std::mt19937 & get_random()
+ {
+     // static variables inside a function are created once and persist for the remainder of the program
+     static std::random_device rd{}; 
+     static std::mt19937 mt{rd()};
+     // we return a reference to the pseudo-random number genrator object. This is always the
+     // same object every time get_random is called
+     return mt;
+ }
+
+
+
+
+
+
+//defin sensor_data_message
 static nuturtlebot_msgs::SensorData sensor_data;
 
-//path
+//define path
 static nav_msgs::Path path; 
 
 
@@ -85,12 +115,23 @@ bool teleport_fn(nusim::Teleport::Request &req, nusim::Teleport::Response &res){
 /// \param msg - nuturtlebot_msgs/WheelCommands 
 void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
-    wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
-    wheel_velocity_right = msg->right_velocity;
    
 
-    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
-    wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
+    wheel_velocity_left = msg->left_velocity; //motor cmd to rad/sec
+    wheel_velocity_right = msg->right_velocity;
+
+    
+    
+    std::normal_distribution<> d1(wheel_velocity_left, 0.01);
+    std::normal_distribution<> d2(wheel_velocity_right, 0.01);
+
+    //wheel velocities with noise 
+    left_wheel_noise = d1(get_random());
+    right_wheel_noise = d2(get_random());
+
+
+    wheel_velocities.w1_vel = (left_wheel_noise*0.024);
+    wheel_velocities.w2_vel = (right_wheel_noise*0.024);
 
    
 
@@ -144,6 +185,9 @@ int main(int argc, char ** argv){
     //publish laser_scan
     ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500);
 
+    //publish markerarray on te fake sensor topic
+    ros::Publisher fake_pub = nh.advertise<visualization_msgs::MarkerArray>("/fake_sensor", 5);
+
 
     static tf2_ros::TransformBroadcaster broadcaster;
 
@@ -151,8 +195,6 @@ int main(int argc, char ** argv){
     double laser_frequency = 40.0;
     double ranges[num_readings];
     double intensities[num_readings];
-
-
 
 
 
@@ -248,6 +290,67 @@ int main(int argc, char ** argv){
     ROS_INFO_STREAM("publishing markers");
 
 
+    
+    
+    std::normal_distribution<> m_n(0, 0.1);
+
+    obstacle_noise = m_n(get_random());
+
+
+
+
+    // marker arrays noise
+    visualization_msgs::MarkerArray marker_array_noise;
+
+
+    //publish obstacles with noise
+    for (int i = 0; i < num_markers; i++){
+        
+        //Transformation of robot wrt world
+        turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
+        turtlelib::Transform2D Trw = Twr.inv();
+        
+        //Transform of markers wrt world
+        turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(i), y_m.at(i)}, 0.0};
+
+        //Transform from markers wrt robot
+        turtlelib::Transform2D Tro = Trw*Two;
+
+        V_rel = Tro.translation(); 
+
+
+        visualization_msgs::Marker marker_noise;
+        marker_noise.header.frame_id = "world";
+        marker_noise.header.stamp = ros::Time::now();
+        marker_noise.ns = "obstacles_noise";
+        marker_noise.id = i;
+        marker_noise.type = visualization_msgs::Marker:: CYLINDER;
+        marker_noise.action = visualization_msgs::Marker::ADD;
+        marker_noise.pose.position.x = V_rel.x + obstacle_noise;
+        marker_noise.pose.position.y = V_rel.y + obstacle_noise;
+        marker_noise.pose.position.z = 0;
+        marker_noise.pose.orientation.x = 0.0;
+        marker_noise.pose.orientation.y = 0.0;
+        marker_noise.pose.orientation.z = 0.0;
+        marker_noise.pose.orientation.w = 1.0;
+        marker_noise.scale.x = radius*2;
+        marker_noise.scale.y = radius*2;
+        marker_noise.scale.z = 0.25;
+        marker_noise.color.a = 1.0;
+        marker_noise.color.r = 1.0;
+        marker_noise.color.g = 0.0;
+        marker_noise.color.b = 0.0;
+        marker_noise.lifetime = ros::Duration();
+        
+        marker_array_noise.markers.push_back(marker_noise);
+
+    }
+    
+    fake_pub.publish(marker_array_noise);
+
+  
+    
+
 
     ros::Rate r(rate);
     int count = 0;
@@ -256,10 +359,16 @@ int main(int argc, char ** argv){
 
         pub.publish(timestep);
         timestep.data++;
+        
+        
+
 
         //calculate the wheel angles using wheel velocities
         wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
         wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
+
+        wheel_angle.w_ang1 = wheel_angle.w_ang1 + (mu_1*wheel_velocities.w1_vel);
+        wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
 
        //Get the current_configuration of the robot using forward kinematics function
         current_config = update_config.forward_kinematics(wheel_angle);
@@ -287,6 +396,8 @@ int main(int argc, char ** argv){
         transformStamped.transform.rotation.w = q.w();
         broadcaster.sendTransform(transformStamped);
 
+
+        //specify path traced by robot
         geometry_msgs::PoseStamped pose;
         pose.header.stamp = ros::Time::now();
         pose.header.frame_id = "red-base_footprint";
