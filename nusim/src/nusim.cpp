@@ -61,6 +61,11 @@ static double mu_1{0.0};
 static turtlelib::Vector2D V_rel;
 
 static double obstacle_noise{0.0};
+//distance between obstacle and robot
+std::vector <double> distance;
+std::vector <double> x_m_noise;
+std::vector <double> y_m_noise;
+
 
 
 
@@ -128,6 +133,9 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     //wheel velocities with noise 
     left_wheel_noise = d1(get_random());
     right_wheel_noise = d2(get_random());
+
+  
+
 
 
     wheel_velocities.w1_vel = (left_wheel_noise*0.024);
@@ -251,7 +259,6 @@ int main(int argc, char ** argv){
 
         
 
-
     //visualize the cylindrical obstacles
     timestep.data = 0;
     visualization_msgs::MarkerArray marker_array;
@@ -288,21 +295,12 @@ int main(int argc, char ** argv){
         }
     vis_pub.publish(marker_array);
     ROS_INFO_STREAM("publishing markers");
-
-
-    
+  
     
     std::normal_distribution<> m_n(0, 0.01);
 
 
-
-
-
-   
-
   
-    
-
 
     ros::Rate r(rate);
     int count = 0;
@@ -324,12 +322,26 @@ int main(int argc, char ** argv){
 
        //Get the current_configuration of the robot using forward kinematics function
         current_config = update_config.forward_kinematics(wheel_angle);
-        
-        
 
+        // for (int i = 0; i < num_markers; i++){
+        //     //calculate noise markers location relative to robot
+        //     x_m_noise.at(i) = V_rel.x + obstacle_noise;
+        //     y_m_noise.at(i) = V_rel.y + obstacle_noise;
+        //     distance.at(i) = sqrt(pow(current_config.x_config - x_m_noise.at(i), 2) + pow(current_config.y_config - y_m_noise.at(i), 2));
+        //     if (distance.at(i) == 0.148){
+        //         x = current_config.x_config;
+        //         y = current_config.y_config;
+        //         theta = current_config.theta_config;
+                
+        //     }
+        // }
+        
+        
         x = current_config.x_config;
         y = current_config.y_config;
         theta = current_config.theta_config;
+
+        
 
        
         //broadcast the transform between nusim and red-base_footprint
@@ -433,9 +445,23 @@ int main(int argc, char ** argv){
             
             marker_array_noise.markers.push_back(marker_noise);
 
+            x_m_noise.at(i) = marker_noise.pose.position.x;
+            y_m_noise.at(i) = marker_noise.pose.position.y;
+            distance.at(i) = sqrt(pow(current_config.x_config - x_m_noise.at(i), 2) + pow(current_config.y_config - y_m_noise.at(i), 2));
+            if (distance.at(i) == 0.148){
+                x = current_config.x_config;
+                y = current_config.y_config;
+                theta = current_config.theta_config;
+                
+            }
+
+
     }
     
         fake_pub.publish(marker_array_noise);
+
+        
+        
         laser_pub.publish(scan);
         ++count;
 
