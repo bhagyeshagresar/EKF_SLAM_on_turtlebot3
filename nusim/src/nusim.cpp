@@ -186,7 +186,7 @@ int main(int argc, char ** argv){
     ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500);
 
     //publish markerarray on te fake sensor topic
-    ros::Publisher fake_pub = nh.advertise<visualization_msgs::MarkerArray>("/fake_sensor", 5);
+    ros::Publisher fake_pub = nh.advertise<visualization_msgs::MarkerArray>("/fake_sensor", 500, true);
 
 
     static tf2_ros::TransformBroadcaster broadcaster;
@@ -292,61 +292,13 @@ int main(int argc, char ** argv){
 
     
     
-    std::normal_distribution<> m_n(0, 0.1);
-
-    obstacle_noise = m_n(get_random());
+    std::normal_distribution<> m_n(0, 0.01);
 
 
 
 
-    // marker arrays noise
-    visualization_msgs::MarkerArray marker_array_noise;
 
-
-    //publish obstacles with noise
-    for (int i = 0; i < num_markers; i++){
-        
-        //Transformation of robot wrt world
-        turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
-        turtlelib::Transform2D Trw = Twr.inv();
-        
-        //Transform of markers wrt world
-        turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(i), y_m.at(i)}, 0.0};
-
-        //Transform from markers wrt robot
-        turtlelib::Transform2D Tro = Trw*Two;
-
-        V_rel = Tro.translation(); 
-
-
-        visualization_msgs::Marker marker_noise;
-        marker_noise.header.frame_id = "world";
-        marker_noise.header.stamp = ros::Time::now();
-        marker_noise.ns = "obstacles_noise";
-        marker_noise.id = i;
-        marker_noise.type = visualization_msgs::Marker:: CYLINDER;
-        marker_noise.action = visualization_msgs::Marker::ADD;
-        marker_noise.pose.position.x = V_rel.x + obstacle_noise;
-        marker_noise.pose.position.y = V_rel.y + obstacle_noise;
-        marker_noise.pose.position.z = 0;
-        marker_noise.pose.orientation.x = 0.0;
-        marker_noise.pose.orientation.y = 0.0;
-        marker_noise.pose.orientation.z = 0.0;
-        marker_noise.pose.orientation.w = 1.0;
-        marker_noise.scale.x = radius*2;
-        marker_noise.scale.y = radius*2;
-        marker_noise.scale.z = 0.25;
-        marker_noise.color.a = 1.0;
-        marker_noise.color.r = 1.0;
-        marker_noise.color.g = 0.0;
-        marker_noise.color.b = 0.0;
-        marker_noise.lifetime = ros::Duration();
-        
-        marker_array_noise.markers.push_back(marker_noise);
-
-    }
-    
-    fake_pub.publish(marker_array_noise);
+   
 
   
     
@@ -433,13 +385,64 @@ int main(int argc, char ** argv){
             scan.intensities[i] = intensities[i];
         }
     
+
+
+         // marker arrays noise
+        obstacle_noise = m_n(get_random());
+        
+        visualization_msgs::MarkerArray marker_array_noise;
+
+
+        //publish obstacles with noise
+        for (int i = 0; i < num_markers; i++){
+            //Transformation of robot wrt world
+            turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
+            turtlelib::Transform2D Trw = Twr.inv();
+            
+            //Transform of markers wrt world
+            turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(i), y_m.at(i)}, 0.0};
+
+            //Transform from markers wrt robot
+            turtlelib::Transform2D Tro = Trw*Two;
+
+            V_rel = Tro.translation(); 
+
+
+            visualization_msgs::Marker marker_noise;
+            marker_noise.header.frame_id = "red-base_footprint";
+            marker_noise.header.stamp = ros::Time::now();
+            marker_noise.ns = "obstacles_noise";
+            marker_noise.id = i;
+            marker_noise.type = visualization_msgs::Marker:: CYLINDER;
+            marker_noise.action = visualization_msgs::Marker::ADD;
+            marker_noise.pose.position.x = V_rel.x + obstacle_noise;
+            marker_noise.pose.position.y = V_rel.y + obstacle_noise;
+            marker_noise.pose.position.z = 0;
+            marker_noise.pose.orientation.x = 0.0;
+            marker_noise.pose.orientation.y = 0.0;
+            marker_noise.pose.orientation.z = 0.0;
+            marker_noise.pose.orientation.w = 1.0;
+            marker_noise.scale.x = radius*2;
+            marker_noise.scale.y = radius*2;
+            marker_noise.scale.z = 0.25;
+            marker_noise.color.a = 1.0;
+            marker_noise.color.r = 0.0;
+            marker_noise.color.g = 1.0;
+            marker_noise.color.b = 0.0;
+            marker_noise.lifetime = ros::Duration();
+            
+            marker_array_noise.markers.push_back(marker_noise);
+
+    }
+    
+        fake_pub.publish(marker_array_noise);
         laser_pub.publish(scan);
         ++count;
 
-        
+            
         //publish sensor_data on red/sensor_data topic
         sensor_pub.publish(sensor_data);
-        
+            
 
         //publish path
         path_pub.publish(path);

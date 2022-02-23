@@ -77,8 +77,8 @@ namespace turtlelib
         w_vel.w1_vel = (1/r)*((-d*V.theta_dot) + V.x_dot);
         w_vel.w2_vel = (1/r)*((d*V.theta_dot) + V.x_dot);
         
-        std::cout << "w_vel.w1_vel " << w_vel.w1_vel << std::endl;
-        std::cout << "w_vel.w2_vel " << w_vel.w2_vel << std::endl;
+        // std::cout << "w_vel.w1_vel " << w_vel.w1_vel << std::endl;
+        // std::cout << "w_vel.w2_vel " << w_vel.w2_vel << std::endl;
 
         
         return w_vel;

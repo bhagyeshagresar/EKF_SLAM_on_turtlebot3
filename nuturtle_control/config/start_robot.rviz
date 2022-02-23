@@ -15,6 +15,7 @@ Panels:
         - /Path1
         - /LaserScan1
         - /RobotModel2
+        - /MarkerArray3
       Splitter Ratio: 0.5
     Tree Height: 719
   - Class: rviz/Selection
@@ -35,7 +36,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -116,7 +117,7 @@ Visualization Manager:
       Marker Topic: /obstacles
       Name: MarkerArray
       Namespaces:
-        {}
+        obstacles: true
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -173,7 +174,7 @@ Visualization Manager:
       Marker Topic: /walls
       Name: MarkerArray
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -277,6 +278,14 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /fake_sensor
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -305,7 +314,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.2152488231658936
+      Distance: 2.7903530597686768
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
