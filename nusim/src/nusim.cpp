@@ -36,12 +36,12 @@
 static std_msgs::UInt64 timestep;
 static double x, y, theta, rate, radius;
 static int num_markers;
-std::vector <double> x_m;
-std::vector <double> y_m;
-std::vector <double> wall_xpos{3.0, -3.0, 0.0, 0.0};
-std::vector <double> wall_ypos{0.0, 0.0, 3.0, -3.0};
-std::vector <double> x_length;
-std::vector <double> y_length;
+static std::vector <double> x_m;
+static std::vector <double> y_m;
+static std::vector <double> wall_xpos{3.0, -3.0, 0.0, 0.0};
+static std::vector <double> wall_ypos{0.0, 0.0, 3.0, -3.0};
+static std::vector <double> x_length;
+static std::vector <double> y_length;
 
 
 static double encoder_ticks_to_rad{0.0}, motor_cmd_to_radsec{0.0};
@@ -53,20 +53,17 @@ static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Configuration current_config;
 static double left_wheel_noise{0.0};
 static double right_wheel_noise{0.0};
-static double slip_min{0.0};
-static double slip_max{0.5};
-static double mu_1{0.0};
+static double old_x{0.0};
+static double old_y{0.0};
+static double old_theta{0.0};
 
 //define relative position variables
 static turtlelib::Vector2D V_rel;
 
 static double obstacle_noise{0.0};
-//distance between obstacle and robot
-std::vector <double> distance;
-std::vector <double> x_m_noise;
-std::vector <double> y_m_noise;
-
-
+static double distance_1 {0.0};
+static double distance_2 {0.0};
+static double distance_3 {0.0};
 
 
 
@@ -134,9 +131,6 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     left_wheel_noise = d1(get_random());
     right_wheel_noise = d2(get_random());
 
-  
-
-
 
     wheel_velocities.w1_vel = (left_wheel_noise*0.024);
     wheel_velocities.w2_vel = (right_wheel_noise*0.024);
@@ -199,10 +193,10 @@ int main(int argc, char ** argv){
 
     static tf2_ros::TransformBroadcaster broadcaster;
 
-    int num_readings = 100;
-    double laser_frequency = 40.0;
-    double ranges[num_readings];
-    double intensities[num_readings];
+    // int num_readings = 100;
+    // double laser_frequency = 40.0;
+    // double ranges[num_readings];
+    // double intensities[num_readings];
 
 
 
@@ -259,6 +253,7 @@ int main(int argc, char ** argv){
 
         
 
+
     //visualize the cylindrical obstacles
     timestep.data = 0;
     visualization_msgs::MarkerArray marker_array;
@@ -295,21 +290,33 @@ int main(int argc, char ** argv){
         }
     vis_pub.publish(marker_array);
     ROS_INFO_STREAM("publishing markers");
-  
+
+
+    
     
     std::normal_distribution<> m_n(0, 0.01);
 
 
+
+
+
+   
+
   
+    
+
 
     ros::Rate r(rate);
-    int count = 0;
+    // int count = 0;
 
     while(ros::ok()){
 
         pub.publish(timestep);
         timestep.data++;
         
+        // old_x = current_config.x_config;
+        // old_y = current_config.y_config;
+        // old_theta = current_config.theta_config;
         
 
 
@@ -317,31 +324,68 @@ int main(int argc, char ** argv){
         wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
         wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
 
-        wheel_angle.w_ang1 = wheel_angle.w_ang1 + (mu_1*wheel_velocities.w1_vel);
-        wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
+        // wheel_angle.w_ang1 = wheel_angle.w_ang1 + (mu_1*wheel_velocities.w1_vel);
+        // wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
 
        //Get the current_configuration of the robot using forward kinematics function
-        current_config = update_config.forward_kinematics(wheel_angle);
+        // current_config = update_config.forward_kinematics(wheel_angle);
+        
+        
 
-        // for (int i = 0; i < num_markers; i++){
-        //     //calculate noise markers location relative to robot
-        //     x_m_noise.at(i) = V_rel.x + obstacle_noise;
-        //     y_m_noise.at(i) = V_rel.y + obstacle_noise;
-        //     distance.at(i) = sqrt(pow(current_config.x_config - x_m_noise.at(i), 2) + pow(current_config.y_config - y_m_noise.at(i), 2));
-        //     if (distance.at(i) == 0.148){
-        //         x = current_config.x_config;
-        //         y = current_config.y_config;
-        //         theta = current_config.theta_config;
-                
-        //     }
-        // }
-        
-        
-        x = current_config.x_config;
-        y = current_config.y_config;
-        theta = current_config.theta_config;
+        // x = current_config.x_config;
+        // y = current_config.y_config;
+        // theta = current_config.theta_config;
 
+        distance_1 = sqrt(pow(current_config.x_config - x_m.at(0), 2) + pow(current_config.y_config - y_m.at(0), 2));
+        distance_2 = sqrt(pow(current_config.x_config - x_m.at(1), 2) + pow(current_config.y_config - y_m.at(1), 2));
+        distance_3 = sqrt(pow(current_config.x_config - x_m.at(2), 2) + pow(current_config.y_config - y_m.at(2), 2));
+
+        // ROS_WARN("distance_1 %f", distance_1);
+        // distance_1 = 0.1;
+        if(distance_1 <= 0.148){
+            ROS_INFO_STREAM("state reached");
+            x = old_x;
+            y = old_y;
+            theta = old_theta;
+        }
+        else{
+            current_config = update_config.forward_kinematics(wheel_angle);
+            x = current_config.x_config;
+            y = current_config.y_config;
+            theta = current_config.theta_config;
+
+        }
         
+        if(distance_2 <= 0.148){
+            ROS_INFO_STREAM("state reached");
+            x = old_x;
+            y = old_y;
+            theta = old_theta;
+        }
+        else{
+            current_config = update_config.forward_kinematics(wheel_angle);
+            x = current_config.x_config;
+            y = current_config.y_config;
+            theta = current_config.theta_config;
+
+        }
+
+        if(distance_3 <= 0.148){
+            ROS_INFO_STREAM("state reached");
+            x = old_x;
+            y = old_y;
+            theta = old_theta;
+        }
+        else{
+            current_config = update_config.forward_kinematics(wheel_angle);
+            x = current_config.x_config;
+            y = current_config.y_config;
+            theta = current_config.theta_config;
+
+        }        
+
+
+
 
        
         //broadcast the transform between nusim and red-base_footprint
@@ -373,29 +417,29 @@ int main(int argc, char ** argv){
         path.header.frame_id = "world";
         path.poses.push_back(pose);
        
-        for(int i = 0; i < num_readings; ++i){
-           ranges[i] = count;
-           intensities[i] = 100 + count;
-           }
-        ros::Time scan_time = ros::Time::now();
+        // for(int i = 0; i < num_readings; ++i){
+        //    ranges[i] = count;
+        //    intensities[i] = 100 + count;
+        //    }
+        // ros::Time scan_time = ros::Time::now();
    
-        //populate the LaserScan message
-        sensor_msgs::LaserScan scan;
-        scan.header.stamp = scan_time;
-        scan.header.frame_id = "red-base_footprint";
-        scan.angle_min = -1.57;
-        scan.angle_max = 1.57;
-        scan.angle_increment = 3.14 / num_readings;
-        scan.time_increment = (1 / laser_frequency) / (num_readings);
-        scan.range_min = 0.0;
-        scan.range_max = 100.0;
+        // //populate the LaserScan message
+        // sensor_msgs::LaserScan scan;
+        // scan.header.stamp = scan_time;
+        // scan.header.frame_id = "red-base_footprint";
+        // scan.angle_min = -1.57;
+        // scan.angle_max = 1.57;
+        // scan.angle_increment = 3.14 / num_readings;
+        // scan.time_increment = (1 / laser_frequency) / (num_readings);
+        // scan.range_min = 0.0;
+        // scan.range_max = 100.0;
     
-        scan.ranges.resize(num_readings);
-        scan.intensities.resize(num_readings);
-        for(unsigned int i = 0; i < num_readings; ++i){
-            scan.ranges[i] = ranges[i];
-            scan.intensities[i] = intensities[i];
-        }
+        // scan.ranges.resize(num_readings);
+        // scan.intensities.resize(num_readings);
+        // for(unsigned int i = 0; i < num_readings; ++i){
+        //     scan.ranges[i] = ranges[i];
+        //     scan.intensities[i] = intensities[i];
+        // }
     
 
 
@@ -445,25 +489,11 @@ int main(int argc, char ** argv){
             
             marker_array_noise.markers.push_back(marker_noise);
 
-            x_m_noise.at(i) = marker_noise.pose.position.x;
-            y_m_noise.at(i) = marker_noise.pose.position.y;
-            distance.at(i) = sqrt(pow(current_config.x_config - x_m_noise.at(i), 2) + pow(current_config.y_config - y_m_noise.at(i), 2));
-            if (distance.at(i) == 0.148){
-                x = current_config.x_config;
-                y = current_config.y_config;
-                theta = current_config.theta_config;
-                
-            }
-
-
     }
     
         fake_pub.publish(marker_array_noise);
-
-        
-        
-        laser_pub.publish(scan);
-        ++count;
+        // laser_pub.publish(scan);
+        // ++count;
 
             
         //publish sensor_data on red/sensor_data topic
@@ -472,6 +502,11 @@ int main(int argc, char ** argv){
 
         //publish path
         path_pub.publish(path);
+
+        old_x = current_config.x_config;
+        old_y = current_config.y_config;
+        old_theta = current_config.theta_config;
+        
 
 
         ros::spinOnce();

@@ -117,8 +117,11 @@ int main(int argc, char **argv){
 
 
   
-    js.position = {1, 2};
-    js.velocity = {2, 3};
+    // js.position = {1, 2};
+    // js.velocity = {2, 3};
+    // js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
+    // js.position = {left_wheel_angle, right_wheel_angle};
+    // js.velocity = {left_wheel_velocity, right_wheel_velocity};
 
 
     ros::Rate r(500);

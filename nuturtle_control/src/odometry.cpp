@@ -17,7 +17,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 
-nav_msgs::Odometry odom;
+static nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
 static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   

@@ -36,7 +36,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -123,51 +123,18 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: true
+      Enabled: false
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        blue-base_footprint:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        blue-base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        blue-base_scan:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        blue-caster_back_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        blue-imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        blue-wheel_left_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        blue-wheel_right_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: blue/robot_description
       TF Prefix: ""
       Update Interval: 0
-      Value: true
+      Value: false
       Visual Enabled: true
     - Class: rviz/MarkerArray
       Enabled: true
@@ -283,7 +250,7 @@ Visualization Manager:
       Marker Topic: /fake_sensor
       Name: MarkerArray
       Namespaces:
-        {}
+        obstacles_noise: true
       Queue Size: 100
       Value: true
   Enabled: true
