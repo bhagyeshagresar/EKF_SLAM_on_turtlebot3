@@ -66,6 +66,23 @@ static double distance_2 {0.0};
 static double distance_3 {0.0};
 
 
+// define variables for intersection 
+static double x_r{0.0};
+static double x_max{0.0};
+static double y_r{0.0};
+static double y_max{0.0};
+static double dx{0.0};
+static double dy{0.0};
+static double max_range{0.0};
+static double theta_range{0.0};
+static double x_p{0.0};
+static double y_p{0.0};
+static double x_pmax{0.0};
+static double y_pmax{0.0};
+static turtlelib::Vector2D V_po;
+static turtlelib::Vector2D Vpmax_o;
+
+
 
 std::mt19937 & get_random()
  {
@@ -185,7 +202,7 @@ int main(int argc, char ** argv){
     ros::Publisher path_pub = nh.advertise<nav_msgs::Path>("nusim_path", 500);
 
     //publish laser_scan
-    ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500);
+    ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500, true);
 
     //publish markerarray on te fake sensor topic
     ros::Publisher fake_pub = nh.advertise<visualization_msgs::MarkerArray>("/fake_sensor", 500, true);
@@ -193,9 +210,9 @@ int main(int argc, char ** argv){
 
     static tf2_ros::TransformBroadcaster broadcaster;
 
-    // int num_readings = 100;
-    // double laser_frequency = 40.0;
-    // double ranges[num_readings];
+    int num_readings = 360;
+    double laser_frequency = 5;
+    double ranges[num_readings];
     // double intensities[num_readings];
 
 
@@ -299,15 +316,8 @@ int main(int argc, char ** argv){
 
 
 
-
-   
-
-  
-    
-
-
     ros::Rate r(rate);
-    // int count = 0;
+    int count = 0;
 
     while(ros::ok()){
 
@@ -417,29 +427,109 @@ int main(int argc, char ** argv){
         path.header.frame_id = "world";
         path.poses.push_back(pose);
        
+        
+        
+        // //Lidar
         // for(int i = 0; i < num_readings; ++i){
         //    ranges[i] = count;
-        //    intensities[i] = 100 + count;
+        // //    intensities[i] = 100 + count;
         //    }
-        // ros::Time scan_time = ros::Time::now();
+        ros::Time scan_time = ros::Time::now();
    
-        // //populate the LaserScan message
-        // sensor_msgs::LaserScan scan;
-        // scan.header.stamp = scan_time;
-        // scan.header.frame_id = "red-base_footprint";
-        // scan.angle_min = -1.57;
-        // scan.angle_max = 1.57;
-        // scan.angle_increment = 3.14 / num_readings;
-        // scan.time_increment = (1 / laser_frequency) / (num_readings);
-        // scan.range_min = 0.0;
-        // scan.range_max = 100.0;
+
+        //populate the LaserScan message
+        sensor_msgs::LaserScan scan;
+        scan.header.stamp = scan_time;
+        scan.header.frame_id = "red-base_scan";
+        scan.angle_min = 0.0;
+        scan.angle_max = 6.28319;
+        scan.angle_increment = 3.14 / num_readings;
+        // scan.time_increment = 0.001;
+        scan.range_min = 0.120;
+        scan.range_max = 3.5;
     
-        // scan.ranges.resize(num_readings);
-        // scan.intensities.resize(num_readings);
-        // for(unsigned int i = 0; i < num_readings; ++i){
-        //     scan.ranges[i] = ranges[i];
-        //     scan.intensities[i] = intensities[i];
-        // }
+        scan.ranges.resize(num_readings);
+
+        for(unsigned int i = 0; i < num_readings; i++){
+            scan.ranges[i] = 2.0;
+            // scan.intensities[i] = intensities[i];
+        }
+
+        for (int i = 1; i <= num_readings; i++){
+            for(int j = 0; j < num_markers; j++){
+                
+                //compute points in robot frame
+                x_r = 0.0;
+                y_r = 0.0;
+                theta_range = scan.angle_min + scan.angle_increment;
+                x_max = (max_range*cos(theta_range)); // x = rcos(theta)
+                y_max = (max_range*sin(theta_range)); // y = rsin(theta)
+
+                //transform into obstacle frame
+                
+                //both points in robot frame
+                turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
+                turtlelib::Transform2D Trw = Twr.inv();
+            
+                //Transform of markers wrt world
+                turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(i), y_m.at(i)}, 0.0};
+
+                //Transform from markers wrt robot
+                turtlelib::Transform2D Tro = Trw*Two;
+
+
+                //convert robot point in marker frame
+                turtlelib::Transform2D Trp{turtlelib::Vector2D{x_r, y_r}, 0.0};
+                turtlelib::Transform2D Tpr = Trp.inv();
+
+                turtlelib::Transform2D Tpo = Tpr*Tro;
+                
+                Vpo = Tpo.translation();
+                x_p = Vpo.x;
+                y_p = Vpo.y;
+
+
+                //convert max point in marker frame
+                turtlelib::Transform2D Tr_pmax{turtlelib::Vector2D{x_max, y_max}, 0.0};
+                turtlelib::Transform2D Tpmax_r = Tr_pmax.inv();
+
+                turtlelib::Transform2D Tpmax_o = Tpmax_r*Tro;
+
+                Vpmax_o = Tpmax_o.translation();
+                x_pmax = Vpmax_o.x;
+                y_pmax = Vpmax_o.y;
+;                
+
+
+
+
+
+
+                      
+
+
+
+
+
+
+                
+
+
+
+
+            }
+
+            for(int k = 0; k < 4; k++){
+
+            }
+
+
+
+
+        }
+
+
+        
     
 
 
@@ -492,8 +582,8 @@ int main(int argc, char ** argv){
     }
     
         fake_pub.publish(marker_array_noise);
-        // laser_pub.publish(scan);
-        // ++count;
+        laser_pub.publish(scan);
+        ++count;
 
             
         //publish sensor_data on red/sensor_data topic

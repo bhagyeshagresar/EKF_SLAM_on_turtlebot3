@@ -36,7 +36,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -182,7 +182,7 @@ Visualization Manager:
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
-      Max Color: 255; 255; 255
+      Max Color: 237; 212; 0
       Min Color: 0; 0; 0
       Name: LaserScan
       Position Transformer: XYZ
@@ -297,9 +297,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4753968119621277
+      Pitch: 0.640396773815155
       Target Frame: <Fixed Frame>
-      Yaw: 2.940401792526245
+      Yaw: 2.0204005241394043
     Saved: ~
 Window Geometry:
   Displays:
