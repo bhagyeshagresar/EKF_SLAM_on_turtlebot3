@@ -71,16 +71,31 @@ static double x_r{0.0};
 static double x_max{0.0};
 static double y_r{0.0};
 static double y_max{0.0};
-static double dx{0.0};
-static double dy{0.0};
-static double max_range{0.0};
+static double max_range{3.5};
 static double theta_range{0.0};
 static double x_p{0.0};
 static double y_p{0.0};
 static double x_pmax{0.0};
 static double y_pmax{0.0};
-static turtlelib::Vector2D V_po;
-static turtlelib::Vector2D Vpmax_o;
+static double d_x{0.0};
+static double d_y{0.0};
+static double d_r{0.0};
+static double delta{0.0};
+static double x_int{0.0};
+static double y_int{0.0};
+static double sgn_dy{0.0};
+static double mod_dy{0.0};
+static double discriminant{0.0};
+static std::vector <double> x_int_array;
+static std::vector <double> y_int_array;
+static turtlelib::Vector2D V_rint;
+static double d_xint{0.0};
+static double d_yint{0.0};
+static double intersection_distance{0.0};
+static int num_readings = 360;
+// staticstd::vector <double> a;
+
+
 
 
 
@@ -95,7 +110,28 @@ std::mt19937 & get_random()
  }
 
 
+//calculate sgn(x)
+int sgn_fn(double a){
+    if (a < 0.0){
+        return -1;
+    }
+    return 1;
+}
 
+
+//calculate mod(x)
+double mod_fn(double a){
+    if(a < 0.0){
+        return a;
+    }
+    return a;
+
+}
+
+//calculate distance
+double distance_fn(double a, double b){
+    return sqrt(pow(a, 2) + pow(b, 2));
+}
 
 
 
@@ -210,9 +246,8 @@ int main(int argc, char ** argv){
 
     static tf2_ros::TransformBroadcaster broadcaster;
 
-    int num_readings = 360;
-    double laser_frequency = 5;
-    double ranges[num_readings];
+    double laser_frequency = 5.0;
+    // double ranges[num_readings];
     // double intensities[num_readings];
 
 
@@ -317,7 +352,6 @@ int main(int argc, char ** argv){
 
 
     ros::Rate r(rate);
-    int count = 0;
 
     while(ros::ok()){
 
@@ -338,61 +372,61 @@ int main(int argc, char ** argv){
         // wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
 
        //Get the current_configuration of the robot using forward kinematics function
-        // current_config = update_config.forward_kinematics(wheel_angle);
+        current_config = update_config.forward_kinematics(wheel_angle);
         
         
 
-        // x = current_config.x_config;
-        // y = current_config.y_config;
-        // theta = current_config.theta_config;
+        x = current_config.x_config;
+        y = current_config.y_config;
+        theta = current_config.theta_config;
 
-        distance_1 = sqrt(pow(current_config.x_config - x_m.at(0), 2) + pow(current_config.y_config - y_m.at(0), 2));
-        distance_2 = sqrt(pow(current_config.x_config - x_m.at(1), 2) + pow(current_config.y_config - y_m.at(1), 2));
-        distance_3 = sqrt(pow(current_config.x_config - x_m.at(2), 2) + pow(current_config.y_config - y_m.at(2), 2));
+        // distance_1 = sqrt(pow(current_config.x_config - x_m.at(0), 2) + pow(current_config.y_config - y_m.at(0), 2));
+        // distance_2 = sqrt(pow(current_config.x_config - x_m.at(1), 2) + pow(current_config.y_config - y_m.at(1), 2));
+        // distance_3 = sqrt(pow(current_config.x_config - x_m.at(2), 2) + pow(current_config.y_config - y_m.at(2), 2));
 
-        // ROS_WARN("distance_1 %f", distance_1);
-        // distance_1 = 0.1;
-        if(distance_1 <= 0.148){
-            ROS_INFO_STREAM("state reached");
-            x = old_x;
-            y = old_y;
-            theta = old_theta;
-        }
-        else{
-            current_config = update_config.forward_kinematics(wheel_angle);
-            x = current_config.x_config;
-            y = current_config.y_config;
-            theta = current_config.theta_config;
+        // // ROS_WARN("distance_1 %f", distance_1);
+        // // distance_1 = 0.1;
+        // if(distance_1 <= 0.148){
+        //     ROS_INFO_STREAM("state reached");
+        //     x = old_x;
+        //     y = old_y;
+        //     theta = old_theta;
+        // }
+        // else{
+        //     current_config = update_config.forward_kinematics(wheel_angle);
+        //     x = current_config.x_config;
+        //     y = current_config.y_config;
+        //     theta = current_config.theta_config;
 
-        }
+        // }
         
-        if(distance_2 <= 0.148){
-            ROS_INFO_STREAM("state reached");
-            x = old_x;
-            y = old_y;
-            theta = old_theta;
-        }
-        else{
-            current_config = update_config.forward_kinematics(wheel_angle);
-            x = current_config.x_config;
-            y = current_config.y_config;
-            theta = current_config.theta_config;
+        // if(distance_2 <= 0.148){
+        //     ROS_INFO_STREAM("state reached");
+        //     x = old_x;
+        //     y = old_y;
+        //     theta = old_theta;
+        // }
+        // else{
+        //     current_config = update_config.forward_kinematics(wheel_angle);
+        //     x = current_config.x_config;
+        //     y = current_config.y_config;
+        //     theta = current_config.theta_config;
 
-        }
+        // }
 
-        if(distance_3 <= 0.148){
-            ROS_INFO_STREAM("state reached");
-            x = old_x;
-            y = old_y;
-            theta = old_theta;
-        }
-        else{
-            current_config = update_config.forward_kinematics(wheel_angle);
-            x = current_config.x_config;
-            y = current_config.y_config;
-            theta = current_config.theta_config;
+        // if(distance_3 <= 0.148){
+        //     ROS_INFO_STREAM("state reached");
+        //     x = old_x;
+        //     y = old_y;
+        //     theta = old_theta;
+        // }
+        // else{
+        //     current_config = update_config.forward_kinematics(wheel_angle);
+        //     x = current_config.x_config;
+        //     y = current_config.y_config;
+        //     theta = current_config.theta_config;
 
-        }        
+        // }        
 
 
 
@@ -429,11 +463,7 @@ int main(int argc, char ** argv){
        
         
         
-        // //Lidar
-        // for(int i = 0; i < num_readings; ++i){
-        //    ranges[i] = count;
-        // //    intensities[i] = 100 + count;
-        //    }
+        //Generate Laser Scan
         ros::Time scan_time = ros::Time::now();
    
 
@@ -450,87 +480,141 @@ int main(int argc, char ** argv){
     
         scan.ranges.resize(num_readings);
 
-        for(unsigned int i = 0; i < num_readings; i++){
-            scan.ranges[i] = 2.0;
-            // scan.intensities[i] = intensities[i];
-        }
+        
 
-        for (int i = 1; i <= num_readings; i++){
+        for (int i = 0; i < num_readings; i++){
+            std::vector <double> a;
+            a.resize(num_readings);
+            ROS_WARN("print");
+            ROS_WARN("theta range: %f", theta_range);
+            
             for(int j = 0; j < num_markers; j++){
                 
                 //compute points in robot frame
                 x_r = 0.0;
                 y_r = 0.0;
-                theta_range = scan.angle_min + scan.angle_increment;
                 x_max = (max_range*cos(theta_range)); // x = rcos(theta)
                 y_max = (max_range*sin(theta_range)); // y = rsin(theta)
-
-                //transform into obstacle frame
                 
-                //both points in robot frame
+                ROS_WARN("points in robot frame");
+                
+                //transformation of robot wrt world
                 turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
                 turtlelib::Transform2D Trw = Twr.inv();
             
-                //Transform of markers wrt world
-                turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(i), y_m.at(i)}, 0.0};
+                //Transform of obstacles wrt world
+                turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(j), y_m.at(j)}, 0.0};
 
-                //Transform from markers wrt robot
+                // Transform from obstacles wrt robot
                 turtlelib::Transform2D Tro = Trw*Two;
+                turtlelib::Transform2D Tor = Tro.inv();
+             
+            
+                turtlelib::Vector2D V_op;
+                V_op = Tor(turtlelib::Vector2D{x_r, y_r});
 
-
-                //convert robot point in marker frame
-                turtlelib::Transform2D Trp{turtlelib::Vector2D{x_r, y_r}, 0.0};
-                turtlelib::Transform2D Tpr = Trp.inv();
-
-                turtlelib::Transform2D Tpo = Tpr*Tro;
+                turtlelib::Vector2D V_opmax;
+                V_opmax = Tor(turtlelib::Vector2D{x_max, y_max});
                 
-                Vpo = Tpo.translation();
-                x_p = Vpo.x;
-                y_p = Vpo.y;
+                //get points in obstacle frame
+                x_p = V_op.x;
+                y_p = V_op.y;
 
+                //get points in obstacle frame
+                x_pmax = V_opmax.x;
+                y_pmax = V_opmax.y;
 
-                //convert max point in marker frame
-                turtlelib::Transform2D Tr_pmax{turtlelib::Vector2D{x_max, y_max}, 0.0};
-                turtlelib::Transform2D Tpmax_r = Tr_pmax.inv();
+                //calculate distance from point on robot to the max point
+                d_x = x_pmax - x_p;
+                d_y = y_pmax - y_p;
 
-                turtlelib::Transform2D Tpmax_o = Tpmax_r*Tro;
+                d_r = distance_fn(d_x, d_y);
+                ROS_WARN("x_p: %f", x_p);
+                ROS_WARN("y_p: %f", y_p);
+                ROS_WARN("x_pmax: %f", x_pmax);
+                ROS_WARN("y_pmax: %f", y_pmax);
 
-                Vpmax_o = Tpmax_o.translation();
-                x_pmax = Vpmax_o.x;
-                y_pmax = Vpmax_o.y;
-;                
+                ROS_WARN("d_r: %f", d_r);
 
+                delta = ((x_p*y_pmax) - (x_pmax*x_p));
 
-
-
-
-
-                      
-
-
-
-
-
+                //determine points of intersection
+                
+                sgn_dy = sgn_fn(d_y);
+                mod_dy = mod_fn(d_y);
 
                 
+                
+
+                discriminant = (pow(radius, 2)*pow(d_r, 2) - pow(delta, 2));
+                ROS_WARN("got till discriminant");
+                ROS_WARN("discrimant value: %f", discriminant);
+                
+                //store intersection points in array
+                if(discriminant > 0.0){
+                    if ((sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))) < 0.0){
+                        
+                        x_int = ((delta*d_y - (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
+
+                    }
+                
+                    else{
+
+                        x_int = ((delta*d_y + (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
+                    }
+
+
+                    if ((mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)) < 0.0){
+
+                        y_int = ((-(delta*d_x) - (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+                    }
+                
+                    else{
+
+                        y_int = ((-(delta*d_x) + (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+
+                    }
+
+                    ROS_WARN("calculate all if elses");
+                    //calculate transform wrt obstacles for intersection points
+                    turtlelib::Transform2D T_oint{turtlelib::Vector2D{x_int, y_int}, 0.0};
 
 
 
+                    //transform points back to robot frame
+                    turtlelib::Transform2D T_rint = Tro*T_oint;
 
-            }
+                    //get intersection points in robot frame
+                    V_rint = T_rint.translation();
 
-            for(int k = 0; k < 4; k++){
+                    //calculate distance from robot to the intersection point in robot frame
+                    d_xint = V_rint.x - x_r;
+                    d_yint = V_rint.y - y_r;
 
-            }
+                    intersection_distance = distance_fn(d_xint, d_yint);
+                    
+                    a.push_back(intersection_distance);
+                    ROS_WARN("a[0]: %f", a[0]);
+                    ROS_WARN("a[1]: %f", a[1]);
+                    ROS_WARN("a[2]: %f", a[2]);
 
-
-
-
+                    
+                } 
+           
+            
+            
         }
 
+            // scan.ranges[i] = 1;
+            scan.ranges[i] = *min_element(a.begin(), a.end());
+            theta_range += scan.angle_increment; 
 
-        
+        }
     
+
+
+            
+
 
 
          // marker arrays noise
@@ -583,7 +667,6 @@ int main(int argc, char ** argv){
     
         fake_pub.publish(marker_array_noise);
         laser_pub.publish(scan);
-        ++count;
 
             
         //publish sensor_data on red/sensor_data topic
@@ -593,9 +676,9 @@ int main(int argc, char ** argv){
         //publish path
         path_pub.publish(path);
 
-        old_x = current_config.x_config;
-        old_y = current_config.y_config;
-        old_theta = current_config.theta_config;
+        // old_x = current_config.x_config;
+        // old_y = current_config.y_config;
+        // old_theta = current_config.theta_config;
         
 
 
