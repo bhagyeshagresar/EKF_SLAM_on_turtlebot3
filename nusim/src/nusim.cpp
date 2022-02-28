@@ -632,22 +632,27 @@ int main(int argc, char ** argv){
                 //compute points in robot frame
                 x_r = 0.0; // x1
                 y_r = 0.0; // y1
-                x_max = (max_range*cos(theta_range)); // x2
-                y_max = (max_range*sin(theta_range)); // y2
+                x_max = (max_range*cos(theta_range + theta)); // x2
+                y_max = (max_range*sin(theta_range + theta)); // y2
 
                 //compute transformation of robot to world
-                turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
-                turtlelib::Transform2D Trw = Twr.inv();
+                // turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
+                // turtlelib::Transform2D Trw = Twr.inv();
                 
-                //x_max and y_max in world frame
-                turtlelib::Vector2D V_world;
-                V_world = Twr(turtlelib::Vector2D{x_max, y_max});
+                // //x_max and y_max in world frame
+                // turtlelib::Vector2D V_world;
+                // V_world = Twr(turtlelib::Vector2D{x_max, y_max});
 
                 x_1 = x;
                 y_1 = y;
+                // ROS_WARN("x_1: %f", x_1);
+                // ROS_WARN("y_1: %f", y_1);
+
+                x_2 = x + x_max;
+                y_2 = y + y_max;
                 
-                x_2 = V_world.x;
-                y_2 = V_world.y;
+                // ROS_WARN("x_2: %f", x_2);
+                // ROS_WARN("y_2: %f", y_2);
 
                 
 
@@ -657,13 +662,41 @@ int main(int argc, char ** argv){
                 // turtlelib::Transform2D Twallr = Trwall.inv();
 
                 //wall points in world frame
-                x_3 = wall_xpos.at(k) + (6.1)/2.0;
-                y_3 = wall_ypos.at(k) + (6.1)/2.0;
+                if(k == 0){
+                    x_3 = 3.0;
+                    y_3 = 6.1/2.0;
+                    x_4 = 3.0;
+                    y_4 = -6.1/2.0;
+                }
 
-                x_4 = wall_xpos.at(k) - (6.1)/2.0;
-                y_4 = wall_ypos.at(k) - (6.1)/2.0;
+                if(k == 1){
+                    x_3 = -3.0;
+                    y_3 = 6.1/2.0;
+                    x_4 = -3.0;
+                    y_4 = -6.1/2.0;
+                }
 
-                
+                if(k == 2){
+                    x_3 = 3.0;
+                    y_3 = 6.1/2.0;
+                    x_4 = -3.0;
+                    y_4 = 6.1/2.0;
+                }
+
+                if(k == 3){
+                    x_3 = 3.0;
+                    y_3 = -6.1/2.0;
+                    x_4 = -3.0;
+                    y_4 = -6.1/2.0;
+                }
+
+                // ROS_WARN("x_3: %f", x_3);
+                // ROS_WARN("y_3: %f", y_3);
+
+                // ROS_WARN("x_4: %f", x_4);
+                // ROS_WARN("y_4: %f", y_4);
+
+
               
                 //calculate intersection in world frame
 
@@ -674,11 +707,18 @@ int main(int argc, char ** argv){
                 p_y = (((x_1*y_2 - y_1*x_2)*(y_3 - y_4) - (y_1 - y_2)*(x_3*y_4 - y_3*x_4))/d_new);
 
                 
+                // ROS_WARN("p_x: %f", p_x);
+                // ROS_WARN("p_y: %f", p_y);
+
+
+
+
                 //calculate intersection distance
                 d_x_new = p_x - x_1;
                 d_y_new = p_y - y_1;
 
                 intersection_distance_wall = distance_fn(d_x_new, d_y_new);
+
 
 
         
@@ -693,7 +733,7 @@ int main(int argc, char ** argv){
             // }
             scan.ranges[i] = intersection_distance_wall;
 
-            ROS_WARN("scan.ranges[i]: %f", scan.ranges[i]);
+            // ROS_WARN("scan.ranges[i]: %f", scan.ranges[i]);
             theta_range += scan.angle_increment; 
 
         
