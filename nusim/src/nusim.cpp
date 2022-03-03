@@ -643,11 +643,11 @@ int main(int argc, char ** argv){
                 // turtlelib::Vector2D V_world;
                 // V_world = Twr(turtlelib::Vector2D{x_max, y_max});
 
+                //position of robot in world frame
                 x_1 = x;
                 y_1 = y;
-                // ROS_WARN("x_1: %f", x_1);
-                // ROS_WARN("y_1: %f", y_1);
-
+                
+                //position of max point in world frame
                 x_2 = x + x_max;
                 y_2 = y + y_max;
                 
