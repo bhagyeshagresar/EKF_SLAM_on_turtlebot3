@@ -21,6 +21,7 @@ namespace slamlib
         arma::mat <double> covariance;
         arma::mat <double> q;
         arma::mat <double> state_vector;
+        int r;
 
     }
 

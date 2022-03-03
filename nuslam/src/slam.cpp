@@ -5,7 +5,6 @@
 
 
 
-
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <sensor_msgs/JointState.h>
@@ -17,6 +16,8 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/static_transform_broadcaster.h>
+#include <armadillo>
+#include "nuslam/slamlib.hpp"
 
 static nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
@@ -24,11 +25,41 @@ static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   
 static turtlelib::Twist2D V_twist;
 static turtlelib::DiffDrive fwd_diff_drive;
-
+static double init_x_pos{0.0};
+static double init_y_pos{0.0};
+static double init_theta_pos{0.0};
 
 //slam variables
 static int m{3};
 static int n{9};
+static slamlib::Estimate2d slam_obj(m, n);
+static arma::mat <double> covariance;
+static double r{0.0};
+static double phi{0.0};
+static arma::mat <double> m_vec(2, 1);
+
+
+void initialisation_fn(){
+    //slam intialisation steps
+    covariance = slam_obj.get_covariance();
+
+    //initialise covariance matrix
+    covariance(fill::zeros);
+    covariance(0, 0) = init_x_pos;
+    covariance(1, 1) = init_y_pos;
+    covariance(2, 2) = init_theta_pos;
+
+    for(int i = 0; i < m; i++){
+        //get x_bar and y_bar from fake_sensor
+        //calculate r
+        //calculate phi
+        //get mx and my
+        //
+        
+    }
+
+    
+}
 
 
 
@@ -79,8 +110,6 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
 
 
-    
-
     //subscribe to red/jointStates
     ros::Subscriber js_sub = nh.subscribe("red/joint_states", 10, joint_state_callback);
 
@@ -96,7 +125,7 @@ int main(int argc, char **argv){
 
 
     //subscribe to fake_sensor for SLAM
-    ros::Subscriber fake_sub = nh.subscribe("/fake_sensor", 500);
+    ros::Subscriber fake_sub = nh.subscribe("/fake_sensor", 10, fake_sensor_callback);
 
 
 
@@ -108,10 +137,17 @@ int main(int argc, char **argv){
     geometry_msgs::TransformStamped odom_trans;
 
 
-    ros::Rate r(500);
-
+    nh.getParam("x0", init_x_pos);
+    nh.getParam("y0", init_y_pos);
+    nh.getParam("theta0", init_theta_pos);
 
     
+    initialisation_fn();
+   
+
+
+    ros::Rate r(500);
+
     
     while(ros::ok()){
         current_time = ros::Time::now();
