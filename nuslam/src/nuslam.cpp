@@ -1,6 +1,8 @@
 #include "nuslam/nuslam.hpp"
 #include "turtlelib/rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
 #include <armadillo>
+#include "visualization_msgs/MarkerArray.h"
 
 
 
@@ -25,23 +27,23 @@ namespace slamlib{
    
 
     //calculate state vector (zeta)
-    arma::mat <double> Estimate2d::updated_state_vector(turtlelib::Twist2D u){
+    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u){
         
-        arma::mat <double> state_vector(1, n);
+        arma::mat state_vector(1, n);
 
         if (u.theta_dot == 0){
             //fill the state vector 
             state_vector(0, 0) = prev_state_vector(0, 0) + 0.0;
-            state_vector(0, 1) = prev_state_vector(0, 1) + (u.x_dot*cos(robot_config.theta));
-            state_vector(0, 2) = prev_state_vector(0, 2) + (u.x_dot*sin(robot_config.theta));
+            state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
+            state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
 
         
             return state_vector;
         }
         else{
             state_vector(0, 0) = prev_state_vector(0, 0) + u.theta_dot;
-            state_vector(0, 1) = prev_state_vector(0, 1) + (-(u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2)) + ((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2) + u.theta_dot));
-            state_vector(0, 2) = prev_state_vector(0, 2) + ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2)) - ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2) + u.theta_dot));
+            state_vector(1, 0) = prev_state_vector(1, 0) + (-(u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0))) + ((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0) + u.theta_dot));
+            state_vector(2, 0) = prev_state_vector(2, 0) + ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0))) - ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0) + u.theta_dot));
 
             return state_vector;
 
@@ -51,8 +53,8 @@ namespace slamlib{
 
 
     //calculate A matrix
-    arma::mat <double> Estimate2d::calculate_A_matrix(turtlelib::Twist2D u){
-        if (theta == 0.0)
+    arma::mat Estimate2d::calculate_A_matrix(turtlelib::Twist2D u){
+        if (u.theta_dot == 0.0)
         {   
             //unit matrix
             arma::mat a_1;
@@ -76,8 +78,8 @@ namespace slamlib{
             a_1.eye(n,n);
             arma::mat a_2(n, n);
           
-            a_2(1, 0) = -(u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2)) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2) + u.theta_dot;
-            a_2(2, 0) = -(u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2)) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2) + u.theta_dot;
+            a_2(1, 0) = -((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2))) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2)) + u.theta_dot;
+            a_2(2, 0) = -((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2))) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2)) + u.theta_dot;
             arma::mat a_3 = a_1 + a_2;
             
             return a_3;
@@ -88,10 +90,15 @@ namespace slamlib{
     
     
     //function to compute H
-    arma::mat <double> Estimate2d::calculate_h(arma::mat m_vec){
+    arma::mat Estimate2d::calculate_h(arma::mat m_vec){
+        double d_x{0.0};
+        double d_y{0.0};
+        double d{0.0};
+        double d_root{0.0};
+
         d_x = m_vec(0,0) - state_vector(0, 0);
         d_y = m_vec(0,1) - state_vector(0, 1);
-        d = ((pow(d_x, 2) + pow(d_y, 2));
+        d = ((pow(d_x, 2) + pow(d_y, 2)));
         d_root = sqrt(d);
 
         arma::mat h_2(2, n);
@@ -112,7 +119,7 @@ namespace slamlib{
 
 
     //calculate r matrix
-    arma::mat <double> Estimate2d::calculate_r_mat(int r){
+    arma::mat Estimate2d::calculate_r_mat(int r){
         arma::mat r_mat(2, 2);
         r_mat(0, 0) = r;
         r_mat(1, 1) = r;
@@ -121,7 +128,7 @@ namespace slamlib{
 
     
     //calculate q matrix
-    arma::mat <double> Estimate2d::calculate_q_mat(int q){
+    arma::mat Estimate2d::calculate_q_mat(int q){
         arma::mat q_mat(n, n);
         q_mat(0, 0) = q;
         q_mat(1, 1) = q;
@@ -131,10 +138,10 @@ namespace slamlib{
 
     
     //calculate z
-    arma::mat <double> Estimate2d::calculate_z(double x, double y){
+    arma::mat Estimate2d::calculate_z(double x, double y){
         double r_j{0.0};
         double phi{0.0};
-        arma::mat <double> h(2, 1);
+        arma::mat h(2, 1);
         // for(int i = 0; i < m; i++){
         r_j = sqrt(pow(x, 2) + pow(y, 2));
         phi = atan2(y, x);
@@ -145,13 +152,13 @@ namespace slamlib{
 
     
     //calculate z_hat
-    arma::mat <double> Estimate2d::calculate_z_hat(int i){
+    arma::mat Estimate2d::calculate_z_hat(int i){
         double r_j{0.0};
         double phi{0.0};
-        arma::mat <double> h(2, 1);
+        arma::mat h(2, 1);
 
-        r_j = sqrt(pow(state_vector(0, 3+(2*i)) - state_vector(0,0), 2) + pow(state_vector(0, (4+(2*i))) - state_vector(0,1), 2));
-        phi = atan2(state_vector(0, (4+(2*i)) - state_vector(0,1), state_vector(0, 3+(2*i)) - state_vector(0,0)) - state_vector(0,2);
+        r_j = sqrt(pow(state_vector(0, 3+(2*i)) - state_vector(0,0), 2) + pow(state_vector(0, 4+(2*i)) - state_vector(0,1), 2));
+        phi = atan2(state_vector(0, 4+(2*i)) - state_vector(0,1), state_vector(0, 3+(2*i)) - state_vector(0,0)) - state_vector(0,2);
 
         h(0, 0) = r_j;
         h(0, 1) = phi;
@@ -161,28 +168,28 @@ namespace slamlib{
     
     
     //get covariance
-    arma::mat <double> Estimate2d::get_covariance(){
+    arma::mat Estimate2d::get_covariance(){
         return covariance;
     }
 
     //get state_vector zeta
-    arma::mat <double> Estimate2d::get_state_vector(){
+    arma::mat Estimate2d::get_state_vector(){
         return state_vector;
     }
     
     
     //get previous state
-    arma::mat <double> Estimate2d::get_prev_state_vector(){
+    arma::mat Estimate2d::get_prev_state_vector(){
         return prev_state_vector;
     }
 
     //get q_matrix
-    arma::mat <double> Estimate2d::get_q_matrix(){
+    arma::mat Estimate2d::get_q_matrix(){
         return q_mat;
     }
 
     //get r_matrix
-    arma::mat <double> Estimate2d::get_r_matrix(){
+    arma::mat Estimate2d::get_r_matrix(){
         return r_mat;
     }
 

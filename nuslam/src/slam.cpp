@@ -18,6 +18,9 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <armadillo>
 #include "nuslam/nuslam.hpp"
+#include "turtlelib/rigid2d.hpp"
+#include "turtlelib/diff_drive.hpp"
+#include "visualization_msgs/MarkerArray.h"
 
 
 
@@ -35,29 +38,30 @@ static double init_theta_pos{0.0};
 static int m{3};
 static int n{9};
 static slamlib::Estimate2d slam_obj(m, n);
-static arma::mat <double> covariance;
-static arma::mat <double> prev_state_vector;
-static arma::mat <double> state_vector;
-static arma::mat <double> q_mat;
-static arma::mat <double> r_mat;
+static arma::mat covariance;
+static arma::mat prev_state_vector;
+static arma::mat state_vector;
+static arma::mat q_mat;
+static arma::mat r_mat;
 static double r{0.0};
 static double phi{0.0};
-static arma::mat <double> m_vec(2, 1);
+static arma::mat  m_vec(2, 1);
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static double r_noise{100.0};
 static double q_noise{1000.0};
+static arma::mat z;
 
 
 
 
 
 
-void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
+void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     
     for(int i = 0; i < 3; i++){
-        x_bar.at[i] = msg.marker_noise[i].pose.position.x;
-        y_bar.at[i] = msg.marker_noise[i].pose.position.y;
+        x_bar.at(i) = msg.markers[i].pose.position.x;
+        y_bar.at(i) = msg.markers[i].pose.position.y;
     }
    
  
@@ -76,36 +80,36 @@ void initialisation_fn(){
     r_mat = slam_obj.get_r_matrix(); // get r matrix
 
     
-    covariance(fill::zeros);
-    state_vector(fill::zeros);
-    prev_state_vector(fill::zeros);
-    q_mat(fill::zeros);
-    r_mat(fill::zeros);
+    covariance(arma::fill::zeros);
+    state_vector(arma::fill::zeros);
+    prev_state_vector(arma::fill::zeros);
+    q_mat(arma::fill::zeros);
+    r_mat(arma::fill::zeros);
     
     slam_obj.set_r(r_noise);
     slam_obj.set_q(q_noise);
 
 
     q_mat = slam_obj.calculate_q_mat(int q);
-    r_mat = slam_obj.calculate_r_mat(int q);
+    r_mat = slam_obj.calculate_r_mat(int r);
 
     
 
-    covariance(0, 0) = init_x_pos;
-    covariance(1, 1) = init_y_pos;
-    covariance(2, 2) = init_theta_pos;
+    covariance(0, 0) = init_theta_pos;
+    covariance(1, 1) = init_x_pos;
+    covariance(2, 2) = init_y_pos;
 
-    prev_state_vector(0, 0) = init_x_pos;
-    prev_state_vector(0, 1) = init_y_pos;
-    prev_state_vector(0, 2) = init_theta_pos;
+    prev_state_vector(0, 0) = init_theta_pos;
+    prev_state_vector(1, 0) = init_x_pos;
+    prev_state_vector(2, 0) = init_y_pos;
 
     for(int i = 0; i < m; i++){
         
-        r = sqrt(pow(x_bar, 2) + pow(y_bar, 2));
-        phi = atan2(y_bar, x_bar);
-        m_vect(0, 0) = (prev_state_vector(0, 0) + r*cos(phi + prev_state_vector(0, 2)));
-        m_vect(0, 1) = (prev_state_vector(0, 1) + r*sin(phi + prev_state_vector(0, 2)));
-        state_vector = arma::join_cols(state_vector, m_vect);
+        r = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
+        phi = atan2(y_bar.at(i), x_bar.at(i));
+        m_vec(0, 0) = (prev_state_vector(1, 0) + r*cos(phi + prev_state_vector(0, 0)));
+        m_vec(1, 0) = (prev_state_vector(2, 0) + r*sin(phi + prev_state_vector(0, 0)));
+        state_vector = arma::join_cols(state_vector, m_vec);
     }
 
     
@@ -115,25 +119,25 @@ void initialisation_fn(){
 void slam_fn(int m){
     for(int i = 0; i < m; i++){
         //prediction step 1
-        state_vector = Estimate2d::updated_state_vector(V_twist);
+        state_vector = slam_obj.updated_state_vector(V_twist);
 
-        arma::mat <double> a = Estimate2d::calculate_A_matrix(V_twist);
-        arma::mat <double> a2 = a.t();
+        arma::mat a = slam_obj.calculate_A_matrix(V_twist);
+        arma::mat a2 = a.t();
     
         //prediction step 2
-        arma::mat <double> sigma = (a*covariance*a2) + q_mat;
+        arma::mat sigma = (a*covariance*a2) + q_mat;
 
         //update step 1
-        arma::mat z_hat = Estimate2d::calculate_z_hat(i);
+        arma::mat z_hat = slam_obj.calculate_z_hat(i);
 
         //update step 2
-        arma::mat h = Estimate2d::calculate_h(m_vec);
+        arma::mat h = slam_obj.calculate_h(m_vec);
 
         arma::mat ki = sigma*h.t()*(h*sigma*h.t() + r_mat).i();
 
 
         //update step 3
-        z = calculate_z(x_bar.at(i), y_bar.at(i));
+        z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
         state_vector = state_vector + ki*(z - z_hat);
 
         //update step 4
