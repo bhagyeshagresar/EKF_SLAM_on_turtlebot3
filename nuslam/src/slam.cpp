@@ -36,12 +36,17 @@ static int m{3};
 static int n{9};
 static slamlib::Estimate2d slam_obj(m, n);
 static arma::mat <double> covariance;
+static arma::mat <double> prev_state_vector;
+static arma::mat <double> state_vector;
+static arma::mat <double> q_mat;
+static arma::mat <double> r_mat;
 static double r{0.0};
 static double phi{0.0};
 static arma::mat <double> m_vec(2, 1);
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
-static arma::mat <double> m_vect;
+static double r_noise{100.0};
+static double q_noise{1000.0};
 
 
 
@@ -50,9 +55,10 @@ static arma::mat <double> m_vect;
 
 void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
     
-    x_bar = msg.marker_noise.pose.position.x;
-    y_bar = msg.marker_noise.pose.position.y;
-
+    for(int i = 0; i < 3; i++){
+        x_bar.at[i] = msg.marker_noise[i].pose.position.x;
+        y_bar.at[i] = msg.marker_noise[i].pose.position.y;
+    }
     //prediction step 1
     state_vector = Estimate2d::updated_state_vector(V_twist);
 
@@ -60,8 +66,26 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
     arma::mat <double> a = Estimate2d::calculate_A_matrix(V_twist);
     arma::mat <double> a2 = a.t();
     
+    //prediction step 2
+    covariance = (a*covariance*a2) + q_mat;
+
+    //update step 1
+    arma::mat z_hat = Estimate2d::calculate_z_hat(m);
+
+    //update step 2
+    arma::mat h = Estimate2d::calculate_h(m_vec);
+
     
-    covariance = a*covariance*a2;
+    arma::mat ki = covariance*h.t()*(h*covariance*h.t() + r_mat).i());
+
+
+
+    //update step 3
+    state_vector = state_vector + ki*(z - z_hat)
+
+
+
+
     
 
 
@@ -76,12 +100,28 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
 
 void initialisation_fn(){
     //slam intialisation steps
-    covariance = slam_obj.get_covariance();
-    state_vector = slam_obj.get_state_vector();
-    prev_state_vector = slam_obj.get_prev_state_vector();
+    covariance = slam_obj.get_covariance(); // get covariance matrix with size n,n
+    state_vector = slam_obj.get_state_vector(); //get state vector with size 1,n
+    prev_state_vector = slam_obj.get_prev_state_vector(); //get prev state vector with size 1,n
+    q_mat = slam_obj.get_q_matrix(); //get q matrix with 
+    r_mat = slam_obj.get_r_matrix(); // get r matrix
 
-    //initialise covariance matrix
+    
     covariance(fill::zeros);
+    state_vector(fill::zeros);
+    prev_state_vector(fill::zeros);
+    q_mat(fill::zeros);
+    r_mat(fill::zeros);
+    
+    slam_obj.set_r(r_noise);
+    slam_obj.set_q(q_noise);
+
+
+    q_mat = slam_obj.calculate_q_mat(int q);
+    r_mat = slam_obj.calculate_r_mat(int q);
+
+    
+
     covariance(0, 0) = init_x_pos;
     covariance(1, 1) = init_y_pos;
     covariance(2, 2) = init_theta_pos;
@@ -91,11 +131,7 @@ void initialisation_fn(){
     prev_state_vector(0, 2) = init_theta_pos;
 
     for(int i = 0; i < m; i++){
-        //get x_bar and y_bar from fake_sensor
-        //calculate r
-        //calculate phi
-        //get mx and my
-        // combine with state vector
+        
         r = sqrt(pow(x_bar, 2) + pow(y_bar, 2));
         phi = atan2(y_bar, x_bar);
         m_vect(0, 0) = (prev_state_vector(0, 0) + r*cos(phi + prev_state_vector(0, 2)));
@@ -106,6 +142,38 @@ void initialisation_fn(){
     
 }
 
+
+void slam_fn(int m){
+    for(int i = 0; i < m; i++){
+        //prediction step 1
+        state_vector = Estimate2d::updated_state_vector(V_twist);
+
+        arma::mat <double> a = Estimate2d::calculate_A_matrix(V_twist);
+        arma::mat <double> a2 = a.t();
+    
+        //prediction step 2
+        arma::mat <double> sigma = (a*covariance*a2) + q_mat;
+
+        //update step 1
+        arma::mat z_hat = Estimate2d::calculate_z_hat(i);
+
+        //update step 2
+        arma::mat h = Estimate2d::calculate_h(m_vec);
+
+        arma::mat ki = sigma*h.t()*(h*sigma*h.t() + r_mat).i();
+
+
+        //update step 3
+        z = calculate_z(x_bar.at(i), y_bar.at(i));
+        state_vector = state_vector + ki*(z - z_hat);
+
+        //update step 4
+        arma::mat identity(n, n);
+        sigma = (identity - (ki*h))*sigma;
+
+
+    }
+}
 
 
 /// \brief function to compute the wheel_angles and wheel_velocities from joint_state message
