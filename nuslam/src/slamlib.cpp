@@ -50,7 +50,7 @@ namespace slamlib{
 
 
     //calculate state vector
-    arma::mat <double> Estimate2d::calculate_state_vector(turtlelib::Twist2D u){
+    arma::mat <double> Estimate2d::updated_state_vector(turtlelib::Twist2D u){
         
         arma::mat <double> state_vector(1, n);
 
@@ -92,10 +92,10 @@ namespace slamlib{
             
             a_2(1, 0) = -u.x_dot*sin(prev_state_vector(0, 2));
             a_2(2, 0) = u.x_dot*cos(prev_state_vector(0, 2));
-            arma::mat a_t = a_1 + a_2;
+            arma::mat a_3 = a_1 + a_2;
 
 
-            return a_t;
+            return a_3;
 
         }
 
@@ -107,9 +107,9 @@ namespace slamlib{
           
             a_2(1, 0) = -(u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2)) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 2) + u.theta_dot;
             a_2(2, 0) = -(u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2)) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 2) + u.theta_dot;
-            arma::mat a_t = a_1 + a_2;
+            arma::mat a_3 = a_1 + a_2;
             
-            return a_t;
+            return a_3;
         }        
 
     }
@@ -171,17 +171,21 @@ namespace slamlib{
 
     //step 2 - calculate sigma_t_
         
-    //calculate a_t and a_t_transpose
-    arma::mat a = calculate_A_matrix(u);
-    arma::mat a_transpose = a_t.t();
-
+   
        
     // arma::mat covariance = (a*covariance*a_transpose) + q);
 
     arma::mat Estimate2d::get_covariance(){
         return covariance;
     }
-        
+
+    arma::mat Estimate2d::get_state_vector(){
+        return state_vector;
+    }
+    
+    arma::mat Estimate2d::get_prev_state_vector(){
+        return prev_state_vector;
+    }
 
 
 

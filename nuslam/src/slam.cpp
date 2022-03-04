@@ -19,6 +19,8 @@
 #include <armadillo>
 #include "nuslam/slamlib.hpp"
 
+
+
 static nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
 static turtlelib::Wheel_angles wheel_angle;
@@ -37,11 +39,46 @@ static arma::mat <double> covariance;
 static double r{0.0};
 static double phi{0.0};
 static arma::mat <double> m_vec(2, 1);
+static std::vector <double> x_bar;
+static std::vector <double> y_bar;
+static arma::mat <double> m_vect;
+
+
+
+
+
+
+void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
+    
+    x_bar = msg.marker_noise.pose.position.x;
+    y_bar = msg.marker_noise.pose.position.y;
+
+    //prediction step 1
+    state_vector = Estimate2d::updated_state_vector(V_twist);
+
+    //get A and A_transpose, Covariance
+    arma::mat <double> a = Estimate2d::calculate_A_matrix(V_twist);
+    arma::mat <double> a2 = a.t();
+    
+    
+    covariance = a*covariance*a2;
+    
+
+
+    
+
+}
+
+
+
+
 
 
 void initialisation_fn(){
     //slam intialisation steps
     covariance = slam_obj.get_covariance();
+    state_vector = slam_obj.get_state_vector();
+    prev_state_vector = slam_obj.get_prev_state_vector();
 
     //initialise covariance matrix
     covariance(fill::zeros);
@@ -49,13 +86,21 @@ void initialisation_fn(){
     covariance(1, 1) = init_y_pos;
     covariance(2, 2) = init_theta_pos;
 
+    prev_state_vector(0, 0) = init_x_pos;
+    prev_state_vector(0, 1) = init_y_pos;
+    prev_state_vector(0, 2) = init_theta_pos;
+
     for(int i = 0; i < m; i++){
         //get x_bar and y_bar from fake_sensor
         //calculate r
         //calculate phi
         //get mx and my
-        //
-        
+        // combine with state vector
+        r = sqrt(pow(x_bar, 2) + pow(y_bar, 2));
+        phi = atan2(y_bar, x_bar);
+        m_vect(0, 0) = (prev_state_vector(0, 0) + r*cos(phi + prev_state_vector(0, 2)));
+        m_vect(0, 1) = (prev_state_vector(0, 1) + r*sin(phi + prev_state_vector(0, 2)));
+        state_vector = arma::join_cols(state_vector, m_vect);
     }
 
     
@@ -152,7 +197,6 @@ int main(int argc, char **argv){
     while(ros::ok()){
         current_time = ros::Time::now();
         
-        //perform prediction
 
 
     
