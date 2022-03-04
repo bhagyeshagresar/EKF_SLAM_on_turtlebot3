@@ -81,6 +81,7 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
     js.position = {left_wheel_angle, right_wheel_angle};
     js.velocity = {left_wheel_velocity, right_wheel_velocity};
+    js.effort = {0.0, 0.0};
 
 
 }

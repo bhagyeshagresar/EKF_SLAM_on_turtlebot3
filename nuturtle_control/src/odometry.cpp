@@ -55,11 +55,6 @@ bool set_pose(nuturtle_control::Set_Pose::Request &req, nuturtle_control::Set_Po
     fwd_diff_drive.set_config(current_config);
 
 
-
-
-
-
-
     return true;
 
 }

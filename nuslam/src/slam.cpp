@@ -17,7 +17,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <armadillo>
-#include "nuslam/slamlib.hpp"
+#include "nuslam/nuslam.hpp"
 
 
 
@@ -59,41 +59,10 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray::ConstPtr& msg){
         x_bar.at[i] = msg.marker_noise[i].pose.position.x;
         y_bar.at[i] = msg.marker_noise[i].pose.position.y;
     }
-    //prediction step 1
-    state_vector = Estimate2d::updated_state_vector(V_twist);
-
-    //get A and A_transpose, Covariance
-    arma::mat <double> a = Estimate2d::calculate_A_matrix(V_twist);
-    arma::mat <double> a2 = a.t();
-    
-    //prediction step 2
-    covariance = (a*covariance*a2) + q_mat;
-
-    //update step 1
-    arma::mat z_hat = Estimate2d::calculate_z_hat(m);
-
-    //update step 2
-    arma::mat h = Estimate2d::calculate_h(m_vec);
-
-    
-    arma::mat ki = covariance*h.t()*(h*covariance*h.t() + r_mat).i());
-
-
-
-    //update step 3
-    state_vector = state_vector + ki*(z - z_hat)
-
-
-
-
-    
-
-
-    
+   
+ 
 
 }
-
-
 
 
 

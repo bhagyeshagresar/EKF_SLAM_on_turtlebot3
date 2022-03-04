@@ -1,4 +1,4 @@
-#include "nuslam/slam.hpp"
+#include "nuslam/nuslam.hpp"
 #include "turtlelib/rigid2d.hpp"
 #include <armadillo>
 
@@ -88,7 +88,7 @@ namespace slamlib{
     
     
     //function to compute H
-    arma::mat Estimate2d::calculate_h(arma::mat m_vec){
+    arma::mat <double> Estimate2d::calculate_h(arma::mat m_vec){
         d_x = m_vec(0,0) - state_vector(0, 0);
         d_y = m_vec(0,1) - state_vector(0, 1);
         d = ((pow(d_x, 2) + pow(d_y, 2));
@@ -112,7 +112,7 @@ namespace slamlib{
 
 
     //calculate r matrix
-    arma::mat Estimate2d::calculate_r_mat(int r){
+    arma::mat <double> Estimate2d::calculate_r_mat(int r){
         arma::mat r_mat(2, 2);
         r_mat(0, 0) = r;
         r_mat(1, 1) = r;
@@ -121,7 +121,7 @@ namespace slamlib{
 
     
     //calculate q matrix
-    arma::mat Estimate2d::calculate_q_mat(int q){
+    arma::mat <double> Estimate2d::calculate_q_mat(int q){
         arma::mat q_mat(n, n);
         q_mat(0, 0) = q;
         q_mat(1, 1) = q;
@@ -131,7 +131,7 @@ namespace slamlib{
 
     
     //calculate z
-    arma::mat Estimate2d::calculate_z(double x, double y){
+    arma::mat <double> Estimate2d::calculate_z(double x, double y){
         double r_j{0.0};
         double phi{0.0};
         arma::mat <double> h(2, 1);
@@ -145,7 +145,7 @@ namespace slamlib{
 
     
     //calculate z_hat
-    arma::mat Estimate2d::calculate_z_hat(int i){
+    arma::mat <double> Estimate2d::calculate_z_hat(int i){
         double r_j{0.0};
         double phi{0.0};
         arma::mat <double> h(2, 1);
@@ -161,28 +161,28 @@ namespace slamlib{
     
     
     //get covariance
-    arma::mat Estimate2d::get_covariance(){
+    arma::mat <double> Estimate2d::get_covariance(){
         return covariance;
     }
 
     //get state_vector zeta
-    arma::mat Estimate2d::get_state_vector(){
+    arma::mat <double> Estimate2d::get_state_vector(){
         return state_vector;
     }
     
     
     //get previous state
-    arma::mat Estimate2d::get_prev_state_vector(){
+    arma::mat <double> Estimate2d::get_prev_state_vector(){
         return prev_state_vector;
     }
 
     //get q_matrix
-    arma::mat Estimate2d::get_q_matrix(){
+    arma::mat <double> Estimate2d::get_q_matrix(){
         return q_mat;
     }
 
     //get r_matrix
-    arma::mat Estimate2d::get_r_matrix(){
+    arma::mat <double> Estimate2d::get_r_matrix(){
         return r_mat;
     }
 

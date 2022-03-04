@@ -1,5 +1,5 @@
-#ifndef SLAMLIB_INCLUDE_GUARD_HPP
-#define SLAMLIB_INCLUDE_GUARD_HPP
+#ifndef NUSLAM_INCLUDE_GUARD_HPP
+#define NUSLAM_INCLUDE_GUARD_HPP
 
 
 #include "turtlelib/rigid2d.hpp"
@@ -17,7 +17,7 @@ namespace slamlib
     private:
         int m; //number of obstacles
         int n; //size of matrix
-        arma::mat <double> prev_state_vector;
+        arma::mat prev_state_vector;
         arma::mat <double> covariance;
         arma::mat <double> state_vector;
         int r;
@@ -74,47 +74,6 @@ namespace slamlib
 }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
