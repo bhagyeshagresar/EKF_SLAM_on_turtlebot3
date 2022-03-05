@@ -41,66 +41,45 @@ static std::vector <double> velocities;
 //slam variables
 static int m{3};
 static int n{9};
-static slamlib::Estimate2d slam_obj(m, n);
-static arma::mat covariance(n, n);
-static arma::mat prev_state_vector(n, 1);
-static arma::mat state_vector(n, 1);
-static arma::mat q_mat(n, 1);
-static arma::mat r_mat(n, 1);
+static double r_noise{100.0};
+static double q_noise{1000.0};
 static double r{0.0};
 static double phi{0.0};
 static arma::mat  m_vec(2, 1);
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
-static double r_noise{100.0};
-static double q_noise{1000.0};
-// static arma::mat z;
-// static arma::mat map_to_green;
-// static tf2_ros::StaticTransformBroadcaster static_broadcaster;
 static int state = 1;
+static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
+
 
 
 void init_fn(double init_x_pos, double init_y_pos, double init_theta_pos, double r_noise, double q_noise, std::vector <double> x_bar, std::vector <double> y_bar){
     //slam intialisation steps
-    covariance = slam_obj.get_covariance(); // get covariance matrix with size n,n
-    state_vector = slam_obj.get_state_vector(); //get state vector with size 1,n
-    prev_state_vector = slam_obj.get_prev_state_vector(); //get prev state vector with size 1,n
-    q_mat = slam_obj.get_q_matrix(); //get q matrix with 
-    r_mat = slam_obj.get_r_matrix(); // get r matrix
+    // covariance = slam_obj.get_covariance(n); // get covariance matrix with size n,n
+    // state_vector = slam_obj.get_state_vector(n); //get state vector with size 1,n
+    // prev_state_vector = slam_obj.get_prev_state_vector(n); //get prev state vector with size 1,n
+    // q_mat = slam_obj.get_q_matrix(n); //get q matrix with 
+    // r_mat = slam_obj.get_r_matrix(); // get r matrix
 
-    covariance.print("coviarance matrix");
-    prev_state_vector.print("prev state vector");
-    q_mat.print("q_mat");
-    r_mat.print("r_mat");    
-    
-    slam_obj.set_r(r_noise);
-    slam_obj.set_q(q_noise);
-
-
-    q_mat = slam_obj.calculate_q_mat(q_noise, q_mat);
-    r_mat = slam_obj.calculate_r_mat(r_noise, r_mat);
-
+    // covariance.print("coviarance matrix");
+    // prev_state_vector.print("prev state vector");
+    // q_mat.print("q_mat");
+    // r_mat.print("r_mat");    
     
 
-    covariance(0, 0) = init_theta_pos;
-    covariance(1, 1) = init_x_pos;
-    covariance(2, 2) = init_y_pos;
-
-    prev_state_vector(0, 0) = init_theta_pos;
-    prev_state_vector(1, 0) = init_x_pos;
-    prev_state_vector(2, 0) = init_y_pos;
-
+    
    
     for(int i = 0; i < m; i++){
         
         r = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
         phi = atan2(y_bar.at(i), x_bar.at(i));
-        m_vec(0, 0) = (prev_state_vector(1, 0) + r*cos(phi + prev_state_vector(0, 0)));
-        m_vec(1, 0) = (prev_state_vector(2, 0) + r*sin(phi + prev_state_vector(0, 0)));
-        state_vector = arma::join_cols(state_vector, m_vec);
+        m_vec(0, 0) = (slam_obj.get_prev_state_vector()(1, 0)) + r*cos(phi + slam_obj.get_prev_state_vector()(0, 0));
+        m_vec(1, 0) = (slam_obj.get_prev_state_vector()(2, 0)) + r*sin(phi + slam_obj.get_prev_state_vector()(0, 0));
+        slam_obj.get_state_vector() = arma::join_cols(state_vector, m_vec);
     }
 
-    state_vector.print("state vector");
+    slam_obj.get_state_vector().print("state vector");
+    slam_obj.get_covariance().print("covariance");
 
 }
 
@@ -111,8 +90,6 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         for(int i = 0; i < m; i++){
             x_bar.at(i) = msg.markers[i].pose.position.x;
             y_bar.at(i) = msg.markers[i].pose.position.y;
-        // x_bar.at(i) = 3.0;
-        // y_bar.at(i) = 3.0;
             ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
         }
         ROS_WARN("calling init fn");
@@ -131,90 +108,63 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
 
 
 
-// void init_fn(double init_x_pos, double init_y_pos, double init_theta_pos, double r_noise, double q_noise){
-//     //slam intialisation steps
-//     covariance = slam_obj.get_covariance(); // get covariance matrix with size n,n
-//     state_vector = slam_obj.get_state_vector(); //get state vector with size 1,n
-//     prev_state_vector = slam_obj.get_prev_state_vector(); //get prev state vector with size 1,n
-//     q_mat = slam_obj.get_q_matrix(); //get q matrix with 
-//     r_mat = slam_obj.get_r_matrix(); // get r matrix
 
-//     covariance.print("coviarance matrix");
-//     state_vector.print("state vector");
-//     prev_state_vector.print("prev state vector");
-//     q_mat.print("q_mat");
-//     r_mat.print("r_mat");    
-    
-//     slam_obj.set_r(r_noise);
-//     slam_obj.set_q(q_noise);
+arma::mat slam_fn(int m){
+    for(int i = 0; i < m; i++){
+        //prediction step 1
+        slam_obj.get_state_vector().print("step 1: state_vector");
+        slam_obj.get_state_vector() = slam_obj.updated_state_vector(V_twist, n, state_vector);
+        slam_obj.get_state_vector().print("step 2: state_vector");
 
-
-//     q_mat = slam_obj.calculate_q_mat(q_noise, q_mat);
-//     r_mat = slam_obj.calculate_r_mat(r_noise, r_mat);
+        // a.print("step 3: a");
+        arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
+        arma::mat a2 = a.t();
+        a.print("step 4: a");
 
     
+        //prediction step 2
+        // sigma.print("step 5: sigma");
+        arma::mat sigma = (a*covariance*a2) + q_mat;
+        sigma.print("step 6: sigma");
 
-//     covariance(0, 0) = init_theta_pos;
-//     covariance(1, 1) = init_x_pos;
-//     covariance(2, 2) = init_y_pos;
+        //update step 1
+        // z_hat.print("step 7: z_hat");
+        arma::mat z_hat = slam_obj.calculate_z_hat(i);
+        z_hat.print("step 8: z_hat");
 
-//     prev_state_vector(0, 0) = init_theta_pos;
-//     prev_state_vector(1, 0) = init_x_pos;
-//     prev_state_vector(2, 0) = init_y_pos;
+        //update step 2
+        // h.print("step 9: h");
+        arma::mat h = slam_obj.calculate_h(m_vec);
+        h.print("step 10: h");
 
-//     x_bar.at(0);
-//     ROS_WARN("x_bar %f", x_bar);
-
-//     // for(int i = 0; i < m; i++){
-        
-//     //     r = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
-//         // phi = atan2(y_bar.at(i), x_bar.at(i));
-//         // m_vec(0, 0) = (prev_state_vector(1, 0) + r*cos(phi + prev_state_vector(0, 0)));
-//         // m_vec(1, 0) = (prev_state_vector(2, 0) + r*sin(phi + prev_state_vector(0, 0)));
-//         // state_vector = arma::join_cols(state_vector, m_vec);
-//     }
-
-    
+        // ki.print("step 11: ki");
+        arma::mat ki = sigma*h.t()*(h*sigma*h.t() + r_mat).i();
+        ki.print("step 12: ki");
 
 
+        //update step 3
+        // z.print("step 13: z");
+        arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
+        z.print("step 14: z");
 
-// arma::mat slam_fn(int m){
-//     for(int i = 0; i < m; i++){
-//         //prediction step 1
-//         ROS_WARN("step 1: state_vector: %f", state_vector);
-//         state_vector = slam_obj.updated_state_vector(V_twist);
-//         ROS_WARN("step 1: state_vector: %f", state_vector);
+        // state_vector.print("step 15: state_vector");
+        state_vector = state_vector + ki*(z - z_hat);
+        state_vector.print("step 16: state_vector");
 
-//         arma::mat a = slam_obj.calculate_A_matrix(V_twist);
-//         arma::mat a2 = a.t();
-    
-//         //prediction step 2
-//         arma::mat sigma = (a*covariance*a2) + q_mat;
+        //update step 4
+        arma::mat identity(n, n);
+        // sigma.print("step 17: sigma");
+        sigma = (identity - (ki*h))*sigma;
+        sigma.print("step 18: sigma");
 
-//         //update step 1
-//         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-
-//         //update step 2
-//         arma::mat h = slam_obj.calculate_h(m_vec);
-
-//         arma::mat ki = sigma*h.t()*(h*sigma*h.t() + r_mat).i();
+        // prev_state_vector.print("step 19: prev_state_vector");
+        slam_obj.get_prev_state_vector() = slam_obj.get_state_vector();
+        slam_obj.get_prev_state_vector().print("step 20: prev_state_vector");
 
 
-//         //update step 3
-//         arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
-//         state_vector = state_vector + ki*(z - z_hat);
-
-//         //update step 4
-//         arma::mat identity(n, n);
-//         sigma = (identity - (ki*h))*sigma;
-
-//         prev_state_vector = state_vector;
-        
-//         return state_vector;
-
-
-//     }
-// }
+    }
+    return slam_obj.get_state_vector();
+}
 
 
 /// \brief function to compute the wheel_angles and wheel_velocities from joint_state message
@@ -324,7 +274,7 @@ int main(int argc, char **argv){
         current_config = fwd_diff_drive.get_config();
 
         //map - green_base_footprint
-        // arma::mat map_to_green = slam_fn(m);
+        arma::mat map_to_green = slam_fn(m);
         // turtlelib::Transform2D Tmb{turtlelib::Vector2D{map_to_green(1, 0), map_to_green(2, 0)}, map_to_green(0, 0)};
         // turtlelib::Transform2D Tob{turtlelib::Vector2D{current_config.x_config, current_config.y_config}, current_config.theta_config};
         // turtlelib::Transform2D Tbo = Tob.inv();

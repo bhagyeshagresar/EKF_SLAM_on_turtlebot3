@@ -24,27 +24,30 @@ namespace slamlib
         arma::mat r_mat;
         int r;
         int q;
+        double init_x_pos;
+        double init_y_pos; 
+        double init_theta_pos;
 
     
 
     public:
     
-        Estimate2d(int a, int b);
+        Estimate2d(int a, int b, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos);
 
         //calculate state vector (zeta)
-        arma::mat updated_state_vector(turtlelib::Twist2D u);
+        arma::mat updated_state_vector(turtlelib::Twist2D u, int n, arma::mat state_vector);
 
         //calculate A matrix
-        arma::mat calculate_A_matrix(turtlelib::Twist2D u);
+        arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
 
         //function to compute H
         arma::mat calculate_h(arma::mat m_vec);
 
-        //calculate r matrix
-        arma::mat calculate_r_mat(int r, arma::mat r_mat);
+        // //calculate r matrix
+        // arma::mat calculate_r_mat();
 
-        //calculate q matrix
-        arma::mat calculate_q_mat(int q, arma::mat q_mat);
+        // //calculate q matrix
+        // arma::mat calculate_q_mat();
 
         //calculate z
         arma::mat calculate_z(double x, double y);
@@ -61,17 +64,23 @@ namespace slamlib
         //get previous state
         arma::mat get_prev_state_vector();
 
-        //get q_matrix
-        arma::mat get_q_matrix();
+        // //get q_matrix
+        // arma::mat get_q_matrix();
 
-        //get r_matrix
-        arma::mat get_r_matrix();
+        // //get r_matrix
+        // arma::mat get_r_matrix();
     
-        //set r value
-        void set_r(int a);
+        // //set r value
+        // void set_r(int a);
 
-        //set q value
-        void set_q(int a);
+        // //set q value
+        // void set_q(int a);
+
+        //initalise covariance matrix
+        // arma::mat init_covariance(double init_x_pos, double init_y_pos,  double init_theta_pos);
+
+        // //initialise prev_state_vector
+        // arma::mat init_prev_state_vector(double init_x_pos, double init_y_pos,  double init_theta_pos);
 
 };
 
