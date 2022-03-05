@@ -12,11 +12,11 @@ namespace slamlib{
     Estimate2d::Estimate2d(int a, int b)
         :m{a}, 
          n{b},
-         prev_state_vector(1, n), 
-         covariance(n, n), 
-         state_vector(n, 1), 
-         q_mat(n, n), 
-         r_mat(2, 2), 
+         prev_state_vector(n, 1, arma::fill::zeros), 
+         covariance(n, n, arma::fill::zeros), 
+         state_vector(n, 1, arma::fill::zeros), 
+         q_mat(n, n, arma::fill::zeros), 
+         r_mat(2, 2, arma::fill::zeros), 
          r{0}, 
          q{0} 
          {
@@ -29,7 +29,7 @@ namespace slamlib{
     //calculate state vector (zeta)
     arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u){
         
-        arma::mat state_vector(1, n);
+        arma::mat state_vector(n, 1);
 
         if (u.theta_dot == 0){
             //fill the state vector 
@@ -119,8 +119,7 @@ namespace slamlib{
 
 
     //calculate r matrix
-    arma::mat Estimate2d::calculate_r_mat(int r){
-        arma::mat r_mat(2, 2);
+    arma::mat Estimate2d::calculate_r_mat(int r, arma::mat r_mat){
         r_mat(0, 0) = r;
         r_mat(1, 1) = r;
         return r_mat;
@@ -128,8 +127,8 @@ namespace slamlib{
 
     
     //calculate q matrix
-    arma::mat Estimate2d::calculate_q_mat(int q){
-        arma::mat q_mat(n, n);
+    arma::mat Estimate2d::calculate_q_mat(int q, arma::mat q_mat){
+        
         q_mat(0, 0) = q;
         q_mat(1, 1) = q;
         q_mat(2, 2) = q;

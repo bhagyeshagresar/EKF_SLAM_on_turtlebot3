@@ -21,7 +21,8 @@
 static nuturtlebot_msgs::WheelCommands wheel_cmd;
 static sensor_msgs::JointState js;
 static double motor_cmd_to_rad_sec, encoder_ticks_to_rad;
-static double left_encoder_ticks{0.0}, right_encoder_ticks{0.0}, left_wheel_angle{0.0}, right_wheel_angle{0.0}, left_wheel_velocity{0.0}, right_wheel_velocity{0.0};
+static int left_encoder_ticks{0}, right_encoder_ticks{0};
+static double left_wheel_angle{0.0}, right_wheel_angle{0.0}, left_wheel_velocity{0.0}, right_wheel_velocity{0.0};
 static turtlelib::Twist2D V;
 static turtlelib::Wheels_vel w_vel;
 static turtlelib::DiffDrive diff_drive;
@@ -59,7 +60,6 @@ void cmd_vel_callback(const geometry_msgs::Twist::ConstPtr& twist_msg){
     }
 
 
-
 }
 
 /// \brief function to get joint states for left and right wheels. Function calculates the left and right encoder ticks
@@ -71,16 +71,18 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     
     
 
-    left_wheel_angle = (encoder_ticks_to_rad)*left_encoder_ticks;
-    right_wheel_angle = (encoder_ticks_to_rad)*right_encoder_ticks;
+    left_wheel_angle = (double)(encoder_ticks_to_rad)*left_encoder_ticks;
+    right_wheel_angle = (double)(encoder_ticks_to_rad)*right_encoder_ticks;
 
-    left_wheel_velocity = (motor_cmd_to_rad_sec)*left_encoder_ticks;
-    right_wheel_velocity = (motor_cmd_to_rad_sec)*right_encoder_ticks;
+    left_wheel_velocity = (double)(motor_cmd_to_rad_sec)*left_encoder_ticks;
+    right_wheel_velocity = (double)(motor_cmd_to_rad_sec)*right_encoder_ticks;
 
     js.header.stamp = ros::Time::now();
     js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
     js.position = {left_wheel_angle, right_wheel_angle};
     js.velocity = {left_wheel_velocity, right_wheel_velocity};
+    // js.position = {1, 2};
+    // js.velocity = {2, 3};
     js.effort = {0.0, 0.0};
 
 

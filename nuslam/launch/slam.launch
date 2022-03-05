@@ -1,0 +1,78 @@
+<launch>
+
+
+    <arg name="cmd_src" default="none"/>
+    <arg name="robot" default="none"/>
+    <arg name="use_rviz" default="false"/>
+    <arg name="use_jsp" default="false"/>
+
+    <!-- remap topics -->
+    <remap from= "/red/joint_states" to="/joint_states"/>
+    <remap from= "/red/wheel_cmd" to="/wheel_cmd"/>
+    <remap from= "/red/sensor_data" to="/sensor_data"/>
+    
+
+    
+    <!-- run circle -->
+    <node name="circle" type="circle" pkg="nuturtle_control" output="screen"
+      if="$(eval arg('cmd_src') == 'circle')"/> 
+
+    <!-- run teleop -->
+    <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_key.launch"
+          if="$(eval arg('cmd_src') == 'teleop')"/>  
+  
+   
+    <!-- load diff_params.yaml and basic_world.yaml -->
+    <rosparam command = "load" file = "$(find nuturtle_description)/config/diff_params.yaml"/>
+    <rosparam command = "load" file = "$(find nusim)/config/basic_world.yaml"/>
+
+
+    <!-- real_robot -->
+    <group if="$(eval arg('robot')!= 'nusim')">
+      <node name="turtle_interface" type="turtle_interface" pkg="nuturtle_control" output="screen" machine="turtlebot"/>
+      <node name="slam" type="slam" pkg="nuslam" output="screen" machine="turtlebot"/>
+      <include file="$(find nuturtle_control)/launch/basic_remote.launch" pass_all_args="true"/>
+    </group>
+
+
+    <!-- nusim -->
+    <group if="$(eval arg('robot') == 'nusim')">
+      <node name="turtle_interface" type="turtle_interface" pkg="nuturtle_control" output="screen"/>
+      <node name="slam" type="slam" pkg="nuslam" output="screen"/>
+      <node name="nusim" type="nusim" pkg="nusim" output="screen"/>
+      <param name="red/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=red"/>
+      <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "red"/>
+      <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "red"/> -->
+
+
+    </group>
+
+
+   
+    
+    
+   <!-- blue robot  -->
+    <param name="blue/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=blue"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "blue"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "blue"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_odom" args=" 0 0 0 0 0 0 1  world odom" />
+    
+    
+     <!-- green robot  -->
+    <param name="green/robot_description" command="$(find xacro)/xacro $(find nuturtle_description)/urdf/turtlebot3_burger.urdf.xacro color:=green"/>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns= "green"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns= "green"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" args=" 0 0 0 0 0 0 1  world map" />
+
+
+
+
+    
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nuturtle_control)/config/start_robot.rviz -f world"/>
+
+
+
+
+
+
+</launch>

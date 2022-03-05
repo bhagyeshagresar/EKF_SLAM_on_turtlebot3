@@ -160,7 +160,10 @@ double distance_fn(double a, double b){
 static nuturtlebot_msgs::SensorData sensor_data;
 
 //define path
-static nav_msgs::Path path; 
+static nav_msgs::Path path1; 
+static nav_msgs::Path path2; 
+static nav_msgs::Path path3; 
+
 
 
 /// \brief function to reset to the initial state of the simulation
@@ -214,7 +217,8 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
     sensor_data.left_encoder = (int)((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1)/encoder_ticks_to_rad;
     sensor_data.right_encoder = (int)((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2)/encoder_ticks_to_rad;
 
-   
+    // ROS_WARN("sensor_data left_encoder %d", sensor_data.left_encoder);
+    // ROS_WARN("sensor_data right_encoder %d", sensor_data.right_encoder);
    
     
 }
@@ -256,7 +260,10 @@ int main(int argc, char ** argv){
     ros::Publisher sensor_pub = nh.advertise<nuturtlebot_msgs::SensorData>("red/sensor_data", 500);
 
     //publish path
-    ros::Publisher path_pub = nh.advertise<nav_msgs::Path>("nusim_path", 500);
+    ros::Publisher path_pub1 = nh.advertise<nav_msgs::Path>("red_path", 500);
+    ros::Publisher path_pub2 = nh.advertise<nav_msgs::Path>("blue_path", 500);
+    ros::Publisher path_pub3 = nh.advertise<nav_msgs::Path>("green_path", 500);
+
 
     //publish laser_scan
     ros::Publisher laser_pub = nh.advertise<sensor_msgs::LaserScan>("laser_scan", 500, true);
@@ -467,18 +474,48 @@ int main(int argc, char ** argv){
         broadcaster.sendTransform(transformStamped);
 
 
-        //specify path traced by robot
-        geometry_msgs::PoseStamped pose;
-        pose.header.stamp = ros::Time::now();
-        pose.header.frame_id = "red-base_footprint";
-        pose.pose.position.x = x;
-        pose.pose.position.y = y;
-        pose.pose.position.z = 0.0;
+        //specify path traced by red robot
+        geometry_msgs::PoseStamped pose1;
+        pose1.header.stamp = ros::Time::now();
+        pose1.header.frame_id = "red-base_footprint";
+        pose1.pose.position.x = x;
+        pose1.pose.position.y = y;
+        pose1.pose.position.z = 0.0;
 
-        path.header.stamp = ros::Time::now();
-        path.header.frame_id = "world";
-        path.poses.push_back(pose);
+        path1.header.stamp = ros::Time::now();
+        path1.header.frame_id = "world";
+        path1.poses.push_back(pose1);
        
+
+
+        //specify path traced by blue robot
+        geometry_msgs::PoseStamped pose2;
+        pose2.header.stamp = ros::Time::now();
+        pose2.header.frame_id = "blue-base_footprint";
+        pose2.pose.position.x = x;
+        pose2.pose.position.y = y;
+        pose2.pose.position.z = 0.0;
+
+        path2.header.stamp = ros::Time::now();
+        path2.header.frame_id = "world";
+        path2.poses.push_back(pose2);
+
+
+        //specify path traced by blue robot
+        geometry_msgs::PoseStamped pose3;
+        pose3.header.stamp = ros::Time::now();
+        pose3.header.frame_id = "green-base_footprint";
+        pose3.pose.position.x = x;
+        pose3.pose.position.y = y;
+        pose3.pose.position.z = 0.0;
+
+        path3.header.stamp = ros::Time::now();
+        path3.header.frame_id = "world";
+        path3.poses.push_back(pose3);
+
+
+
+
         
         
         //Generate Laser Scan
@@ -805,7 +842,10 @@ int main(int argc, char ** argv){
             
 
         //publish path
-        path_pub.publish(path);
+        path_pub1.publish(path1);
+        path_pub2.publish(path2);
+        path_pub3.publish(path3);
+
 
         // old_x = current_config.x_config;
         // old_y = current_config.y_config;

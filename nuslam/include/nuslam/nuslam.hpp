@@ -41,10 +41,10 @@ namespace slamlib
         arma::mat calculate_h(arma::mat m_vec);
 
         //calculate r matrix
-        arma::mat calculate_r_mat(int r);
+        arma::mat calculate_r_mat(int r, arma::mat r_mat);
 
         //calculate q matrix
-        arma::mat calculate_q_mat(int q);
+        arma::mat calculate_q_mat(int q, arma::mat q_mat);
 
         //calculate z
         arma::mat calculate_z(double x, double y);

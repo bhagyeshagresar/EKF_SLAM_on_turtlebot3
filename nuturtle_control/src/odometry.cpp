@@ -23,22 +23,36 @@ static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   
 static turtlelib::Twist2D V_twist;
 static turtlelib::DiffDrive fwd_diff_drive;
+static std::vector <double> positions;
+static std::vector <double> velocities;
 
 
 /// \brief function to compute the wheel_angles and wheel_velocities from joint_state message
 /// \param js_msg - joint state message
 void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
-    
-    wheel_angle.w_ang1 = js_msg->position[0]; //wheel angle1
-    wheel_angle.w_ang2 = js_msg->position[1]; // wheel angle2
 
+    positions.resize(2);
+    velocities.resize(2);
+    positions = js_msg->position;
+    velocities = js_msg->velocity;
 
+    wheel_angle.w_ang1 = positions[0]; //wheel angle1
+    wheel_angle.w_ang2 = positions[1]; // wheel angle2
+    // wheel_angle.w_ang1 = 1.0;
+    // wheel_angle.w_ang2 = 2.0;
     current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
+
+    // ROS_WARN("wheel angles");
+
+    // current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
     
 
 
-    wheel_vel.w1_vel = js_msg->velocity[0]; //wheel velocity 1
-    wheel_vel.w2_vel = js_msg->velocity[1]; //wheel velocity 2
+    wheel_vel.w1_vel = velocities[0]; //wheel velocity 1
+    wheel_vel.w2_vel = velocities[1]; //wheel velocity 2
+    // wheel_vel.w1_vel = 3.0;
+    // wheel_vel.w2_vel = 4.0;
+    // ROS_WARN("wheel_vel.w1_vel: %f", wheel_vel.w1_vel);
 
 }
 
