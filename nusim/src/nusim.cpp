@@ -813,8 +813,8 @@ int main(int argc, char ** argv){
             marker_noise.id = i;
             marker_noise.type = visualization_msgs::Marker:: CYLINDER;
             marker_noise.action = visualization_msgs::Marker::ADD;
-            marker_noise.pose.position.x = V_rel.x + obstacle_noise;
-            marker_noise.pose.position.y = V_rel.y + obstacle_noise;
+            marker_noise.pose.position.x = V_rel.x;
+            marker_noise.pose.position.y = V_rel.y;
             marker_noise.pose.position.z = 0;
             marker_noise.pose.orientation.x = 0.0;
             marker_noise.pose.orientation.y = 0.0;

@@ -3,7 +3,8 @@
 #include "turtlelib/diff_drive.hpp"
 #include <armadillo>
 #include "visualization_msgs/MarkerArray.h"
-
+#include <ros/ros.h>
+#include <ros/console.h>
 
 
 namespace slamlib{
@@ -84,7 +85,6 @@ namespace slamlib{
             
             return a_3;
         }        
-
     }
     
     
