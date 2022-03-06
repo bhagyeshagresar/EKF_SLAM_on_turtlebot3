@@ -27,7 +27,8 @@ namespace slamlib
         double init_x_pos;
         double init_y_pos; 
         double init_theta_pos;
-
+        
+        
     
 
     public:
@@ -35,7 +36,7 @@ namespace slamlib
         Estimate2d(int a, int b, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos);
 
         //calculate state vector (zeta)
-        arma::mat updated_state_vector(turtlelib::Twist2D u, int n, arma::mat state_vector);
+        arma::mat updated_state_vector(turtlelib::Twist2D u, int n);
 
         //calculate A matrix
         arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
@@ -64,11 +65,13 @@ namespace slamlib
         //get previous state
         arma::mat get_prev_state_vector();
 
-        // //get q_matrix
-        // arma::mat get_q_matrix();
+        //get q_matrix
+        arma::mat get_q_matrix();
 
-        // //get r_matrix
-        // arma::mat get_r_matrix();
+        //get r_matrix
+        arma::mat get_r_matrix();
+
+        void init_fn(std::vector <double> x, std::vector <double> y);
     
         // //set r value
         // void set_r(int a);

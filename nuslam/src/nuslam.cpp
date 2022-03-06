@@ -41,8 +41,6 @@ namespace slamlib{
             q_mat(0, 0) = q;
             q_mat(1, 1) = q;
             q_mat(2, 2) = q;
-
-             
                 
          }
 
@@ -50,7 +48,7 @@ namespace slamlib{
    
 
     //calculate state vector (zeta)
-    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u, int n, arma::mat state_vector){
+    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u, int n){
         
 
         if (u.theta_dot == 0.0){
@@ -202,15 +200,33 @@ namespace slamlib{
         return prev_state_vector;
     }
 
-    // //get q_matrix
-    // arma::mat Estimate2d::get_q_matrix(int n){
-    //     return q_mat;
-    // }
+    //get q_matrix
+    arma::mat Estimate2d::get_q_matrix(){
+        return q_mat;
+    }
 
-    // //get r_matrix
-    // arma::mat Estimate2d::get_r_matrix(){
-    //     return r_mat;
-    // }
+    //get r_matrix
+    arma::mat Estimate2d::get_r_matrix(){
+        return r_mat;
+    }
+
+    void Estimate2d::init_fn(std::vector <double> x, std::vector <double> y){
+        double range{0.0};
+        double phi{0.0};
+        arma::mat m_vec(2, 1);
+        
+        for(int i = 0; i < m; i++){
+            range = sqrt(pow(x.at(i), 2) + pow(y.at(i), 2));
+            phi = atan2(y.at(i), x.at(i));
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + r*cos(phi + prev_state_vector(0, 0));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + r*sin(phi + prev_state_vector(0, 0));
+
+            state_vector = arma::join_cols(prev_state_vector, m_vec);
+        }
+
+        state_vector.print("state vector");
+
+    }
 
     
     // //set r value
