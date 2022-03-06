@@ -27,13 +27,15 @@ namespace slamlib
         double init_x_pos;
         double init_y_pos; 
         double init_theta_pos;
+        arma::mat m_vec;
+        arma::mat h_2;
         
         
     
 
     public:
     
-        Estimate2d(int a, int b, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos);
+        Estimate2d(int m, int n, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos);
 
         //calculate state vector (zeta)
         arma::mat updated_state_vector(turtlelib::Twist2D u, int n);
@@ -42,7 +44,7 @@ namespace slamlib
         arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
 
         //function to compute H
-        arma::mat calculate_h(arma::mat m_vec);
+        arma::mat calculate_h();
 
         // //calculate r matrix
         // arma::mat calculate_r_mat();

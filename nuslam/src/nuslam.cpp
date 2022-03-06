@@ -10,9 +10,9 @@
 namespace slamlib{
     
     //default constructor
-    Estimate2d::Estimate2d(int a, int b, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos)
-        :m{a}, 
-         n{b},
+    Estimate2d::Estimate2d(int m, int n, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos)
+        :m{m}, 
+         n{n},
          prev_state_vector(n, 1, arma::fill::zeros),
          covariance(n, n, arma::fill::zeros),
          state_vector(n, 1, arma::fill::zeros), 
@@ -22,11 +22,13 @@ namespace slamlib{
          q{q_noise},
          init_theta_pos{init_theta_pos},
          init_x_pos{init_x_pos},
-         init_y_pos{init_y_pos}
-         {
+         init_y_pos{init_y_pos},
+         m_vec(2, 1, arma::fill::zeros),
+         h_2(2, n, arma::fill::zeros)
+         { 
             prev_state_vector(0, 0) = init_theta_pos;
-            prev_state_vector(1, 1) = init_x_pos;
-            prev_state_vector(2, 2) = init_y_pos;
+            prev_state_vector(1, 0) = init_x_pos;
+            prev_state_vector(2, 0) = init_y_pos;
             covariance(0, 0) = init_theta_pos;
             covariance(1, 1) = init_x_pos;
             covariance(2, 2) = init_y_pos;
@@ -36,11 +38,14 @@ namespace slamlib{
             covariance(6, 6) = 100000;
             covariance(7, 7) = 100000;
             covariance(8, 8) = 100000;
+            std::cout << "constructor test" << std::endl;
             r_mat(0, 0) = r;
             r_mat(1, 1) = r;
+            std::cout << "constructor test" << std::endl;
             q_mat(0, 0) = q;
             q_mat(1, 1) = q;
             q_mat(2, 2) = q;
+            std::cout << "constructor test" << std::endl;
                 
          }
 
@@ -108,18 +113,18 @@ namespace slamlib{
     
     
     //function to compute H
-    arma::mat Estimate2d::calculate_h(arma::mat m_vec){
+    arma::mat Estimate2d::calculate_h(){
         double d_x{0.0};
         double d_y{0.0};
         double d{0.0};
         double d_root{0.0};
 
-        d_x = m_vec(0,0) - state_vector(0, 0);
-        d_y = m_vec(0,1) - state_vector(0, 1);
+        d_x = m_vec(0,0) - state_vector(1, 0);
+        d_y = m_vec(1,0) - state_vector(2, 0);
         d = ((pow(d_x, 2) + pow(d_y, 2)));
         d_root = sqrt(d);
 
-        arma::mat h_2(2, n);
+        // arma::mat h_2(2, n);
         h_2(1,0) = -1;
         h_2(0,1) = -(d_x/d_root);
         h_2(0, 2) = -(d_y/d_root);
@@ -129,6 +134,9 @@ namespace slamlib{
         h_2(0, 7) = (d_y/d_root);
         h_2(1, 6) = -(d_y/d_root);
         h_2(1, 7) = (d_x/d_root);
+
+        std::cout << "d_root %f" << d_root << std::endl;
+
 
         return h_2;
 
@@ -158,12 +166,12 @@ namespace slamlib{
     arma::mat Estimate2d::calculate_z(double x, double y){
         double r_j{0.0};
         double phi{0.0};
-        arma::mat h(2, 1);
+        arma::mat h(2, 1, arma::fill::zeros);
         // for(int i = 0; i < m; i++){
         r_j = sqrt(pow(x, 2) + pow(y, 2));
         phi = atan2(y, x);
         h(0, 0) = r_j;
-        h(0, 1) = phi;
+        h(1, 0) = phi;
         return h;
     }
 
@@ -174,11 +182,11 @@ namespace slamlib{
         double phi{0.0};
         arma::mat h(2, 1);
 
-        r_j = sqrt(pow(state_vector(0, 3+(2*i)) - state_vector(0,0), 2) + pow(state_vector(0, 4+(2*i)) - state_vector(0,1), 2));
-        phi = atan2(state_vector(0, 4+(2*i)) - state_vector(0,1), state_vector(0, 3+(2*i)) - state_vector(0,0)) - state_vector(0,2);
+        r_j = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
+        phi = atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0);
 
         h(0, 0) = r_j;
-        h(0, 1) = phi;
+        h(1, 0) = phi;
         
         return h;
     }
@@ -213,7 +221,7 @@ namespace slamlib{
     void Estimate2d::init_fn(std::vector <double> x, std::vector <double> y){
         double range{0.0};
         double phi{0.0};
-        arma::mat m_vec(2, 1);
+        // arma::mat m_vec(2, 1);
         
         for(int i = 0; i < m; i++){
             range = sqrt(pow(x.at(i), 2) + pow(y.at(i), 2));
@@ -221,10 +229,18 @@ namespace slamlib{
             m_vec(0, 0) = (prev_state_vector(1, 0)) + r*cos(phi + prev_state_vector(0, 0));
             m_vec(1, 0) = (prev_state_vector(2, 0)) + r*sin(phi + prev_state_vector(0, 0));
 
-            state_vector = arma::join_cols(prev_state_vector, m_vec);
+            state_vector(3+(2*i), 0) = m_vec(0, 0);
+            state_vector(4+(2*i), 0) = m_vec(1, 0);
         }
 
-        state_vector.print("state vector");
+        state_vector.print("init state_vector");
+
+        // state_vector.print("state vector");
+        // covariance.print("covariance matrix");
+        // q_mat.print("q_matrix");
+        // r_mat.print("r_matrix");
+        // prev_state_vector.print("prev state vector");
+        // h_2.print("H matrix");
 
     }
 

@@ -83,22 +83,98 @@ static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init
 
 // }
 
+
+arma::mat slam_fn(int m, int n){
+    arma::mat state_vector_1 =  slam_obj.get_state_vector();
+    for(int i = 0; i < m; i++){
+        // prediction step 1
+        // state_vector_1.print("step 1: state_vector");
+        state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
+        state_vector_1.print("step 2: state_vector");
+
+        // a.print("step 3: a");
+        arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
+        arma::mat a2 = a.t();
+        a.print("step 4: a");
+
+    
+        //prediction step 2
+        // sigma.print("step 5: sigma");
+        arma::mat covariance = slam_obj.get_covariance();
+        arma::mat q_mat = slam_obj.get_q_matrix();
+        arma::mat sigma = (a*covariance*a2) + q_mat;
+        sigma.print("step 6: sigma");
+
+        // //update step 1
+        arma::mat z_hat = slam_obj.calculate_z_hat(i);
+        z_hat.print("step 8: z_hat");
+
+        //update step 2
+        // h.print("step 9: h");
+        arma::mat h = slam_obj.calculate_h();
+        h.print("step 10: h");
+
+        // // ki.print("step 11: ki");
+        arma::mat ki = sigma*h.t()*(h*sigma*h.t() + slam_obj.get_r_matrix()).i();
+        ki.print("step 12: ki");
+
+
+        //update step 3
+        // z.print("step 13: z");
+        arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
+        z.print("step 14: z");
+
+        // // state_vector.print("step 15: state_vector");
+        arma::mat temp = (ki*(z - z_hat));
+        // state_vector_1 = state_vector_1 + (ki*(z - z_hat));
+        // temp.print("step 16: temp");
+        // state_vector_1.print("step 17: state_vector");
+        state_vector_1 = state_vector_1 + temp;
+        
+        state_vector_1.print("step 16: state_vector");
+
+
+        //update step 4
+        arma::mat identity(n, n);
+        // sigma.print("step 17: sigma");
+        sigma = (identity - (ki*h))*sigma;
+        sigma.print("step 18: sigma");
+
+        // prev_state_vector.print("step 19: prev_state_vector");
+        arma::mat prev_vector = slam_obj.get_prev_state_vector();
+        prev_vector = state_vector_1;
+        prev_vector.print("step 20: prev_state_vector");
+
+
+    }
+    return state_vector_1;
+}
+
+
+
+
+
+
 void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     x_bar.resize(3);
     y_bar.resize(3);
+    // ROS_WARN("m: %d", m);
     if(state == 1){
         for(int i = 0; i < m; i++){
+            // ROS_WARN("m: %d", m);
             x_bar.at(i) = msg.markers[i].pose.position.x;
             y_bar.at(i) = msg.markers[i].pose.position.y;
             ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
         }
-        ROS_WARN("calling init fn");
+        // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
         slam_obj.init_fn(x_bar, y_bar);
     }
        
     
     state = 0;
+    arma::mat map_to_green = slam_fn(m, n);
+
     // ROS_WARN("state changed");
    
  
@@ -109,65 +185,6 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
 
 
 
-// arma::mat slam_fn(int m){
-//     arma::mat state_vector_1 =  slam_obj.get_state_vector();
-//     for(int i = 0; i < m; i++){
-//         //prediction step 1
-//         // state_vector_1.print("step 1: state_vector");
-//         // state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
-//         // state_vector_1.print("step 2: state_vector");
-
-//         // a.print("step 3: a");
-//         // arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
-//         // arma::mat a2 = a.t();
-//         // a.print("step 4: a");
-
-    
-//         // //prediction step 2
-//         // // sigma.print("step 5: sigma");
-//         // arma::mat covariance = slam_obj.get_covariance();
-//         // arma::mat q_mat = slam_obj.get_q_matrix();
-//         // arma::mat sigma = (a*covariance*a2) + q_mat;
-//         // sigma.print("step 6: sigma");
-
-//         // //update step 1
-//         // arma::mat z_hat = slam_obj.calculate_z_hat(i);
-//         // z_hat.print("step 8: z_hat");
-
-//         // //update step 2
-//         // // h.print("step 9: h");
-//         // arma::mat h = slam_obj.calculate_h(m_vec);
-//         // h.print("step 10: h");
-
-//         // // ki.print("step 11: ki");
-//         // arma::mat ki = sigma*h.t()*(h*sigma*h.t() + slam_obj.get_r_matrix()).i();
-//         // ki.print("step 12: ki");
-
-
-//         // //update step 3
-//         // // z.print("step 13: z");
-//         // arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
-//         // z.print("step 14: z");
-
-//         // // state_vector.print("step 15: state_vector");
-//         // state_vector_1 = state_vector_1 + ki*(z - z_hat);
-//         // state_vector_1.print("step 16: state_vector");
-
-//         // //update step 4
-//         // arma::mat identity(n, n);
-//         // // sigma.print("step 17: sigma");
-//         // sigma = (identity - (ki*h))*sigma;
-//         // sigma.print("step 18: sigma");
-
-//         // // prev_state_vector.print("step 19: prev_state_vector");
-//         // arma::mat prev_vector = slam_obj.get_prev_state_vector();
-//         // prev_vector = state_vector_1;
-//         // prev_vector.print("step 20: prev_state_vector");
-
-
-//     }
-//     return state_vector_1;
-// }
 
 
 /// \brief function to compute the wheel_angles and wheel_velocities from joint_state message
