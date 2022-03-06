@@ -48,6 +48,7 @@ static double phi{0.0};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
+arma::mat map_to_green(n, 1, arma::fill::zeros);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
 
 
@@ -173,7 +174,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
        
     
     state = 0;
-    arma::mat map_to_green = slam_fn(m, n);
+    map_to_green = slam_fn(m, n);
 
     // ROS_WARN("state changed");
    
@@ -295,33 +296,33 @@ int main(int argc, char **argv){
 
         //map - green_base_footprint
         // arma::mat map_to_green = slam_fn(m);
-        // turtlelib::Transform2D Tmb{turtlelib::Vector2D{map_to_green(1, 0), map_to_green(2, 0)}, map_to_green(0, 0)};
-        // turtlelib::Transform2D Tob{turtlelib::Vector2D{current_config.x_config, current_config.y_config}, current_config.theta_config};
-        // turtlelib::Transform2D Tbo = Tob.inv();
-        // turtlelib::Transform2D Tmo = Tmb*Tbo;
+        turtlelib::Transform2D Tmb{turtlelib::Vector2D{map_to_green(1, 0), map_to_green(2, 0)}, map_to_green(0, 0)};
+        turtlelib::Transform2D Tob{turtlelib::Vector2D{current_config.x_config, current_config.y_config}, current_config.theta_config};
+        turtlelib::Transform2D Tbo = Tob.inv();
+        turtlelib::Transform2D Tmo = Tmb*Tbo;
 
         //map to odom 
-        // turtlelib::Vector2D v_mo= Tmo.translation();
-        // double theta_mo = Tmo.rotation();
+        turtlelib::Vector2D v_mo= Tmo.translation();
+        double theta_mo = Tmo.rotation();
         
 
 
         
         //publish transform between map to odom
-        // geometry_msgs::TransformStamped transformStamped_map_to_odom;
-        // transformStamped_map_to_odom.header.stamp = ros::Time::now();
-        // transformStamped_map_to_odom.header.frame_id = "map";
-        // transformStamped_map_to_odom.child_frame_id = "odom";
-        // transformStamped_map_to_odom.transform.translation.x = v_mo.x;
-        // transformStamped_map_to_odom.transform.translation.y = v_mo.y;
-        // transformStamped_map_to_odom.transform.translation.z = 0;
-        // tf2::Quaternion q;
-        // q.setRPY(0, 0, theta_mo);
-        // transformStamped_map_to_odom.transform.rotation.x = q.x();
-        // transformStamped_map_to_odom.transform.rotation.y = q.y();
-        // transformStamped_map_to_odom.transform.rotation.z = q.z();
-        // transformStamped_map_to_odom.transform.rotation.w = q.w();
-        // broadcaster_map_to_odom.sendTransform(transformStamped_map_to_odom);
+        geometry_msgs::TransformStamped transformStamped_map_to_odom;
+        transformStamped_map_to_odom.header.stamp = ros::Time::now();
+        transformStamped_map_to_odom.header.frame_id = "map";
+        transformStamped_map_to_odom.child_frame_id = "odom";
+        transformStamped_map_to_odom.transform.translation.x = v_mo.x;
+        transformStamped_map_to_odom.transform.translation.y = v_mo.y;
+        transformStamped_map_to_odom.transform.translation.z = 0;
+        tf2::Quaternion q;
+        q.setRPY(0, 0, theta_mo);
+        transformStamped_map_to_odom.transform.rotation.x = q.x();
+        transformStamped_map_to_odom.transform.rotation.y = q.y();
+        transformStamped_map_to_odom.transform.rotation.z = q.z();
+        transformStamped_map_to_odom.transform.rotation.w = q.w();
+        broadcaster_map_to_odom.sendTransform(transformStamped_map_to_odom);
 
         
         
@@ -330,20 +331,20 @@ int main(int argc, char **argv){
         
         
         //publish transform between odom and green-base_footprint
-        // geometry_msgs::TransformStamped transformStamped_odom_to_green;
-        // transformStamped_odom_to_green.header.stamp = ros::Time::now();
-        // transformStamped_odom_to_green.header.frame_id = "odom";
-        // transformStamped_odom_to_green.child_frame_id = "green-base_footprint";
-        // transformStamped_odom_to_green.transform.translation.x = current_config.x_config;
-        // transformStamped_odom_to_green.transform.translation.y = current_config.y_config;
-        // transformStamped_odom_to_green.transform.translation.z = 0;
-        // tf2::Quaternion q2;
-        // q2.setRPY(0, 0, current_config.theta_config);
-        // transformStamped_odom_to_green.transform.rotation.x = q2.x();
-        // transformStamped_odom_to_green.transform.rotation.y = q2.y();
-        // transformStamped_odom_to_green.transform.rotation.z = q2.z();
-        // transformStamped_odom_to_green.transform.rotation.w = q2.w();
-        // broadcaster_odom_to_green.sendTransform(transformStamped_odom_to_green);
+        geometry_msgs::TransformStamped transformStamped_odom_to_green;
+        transformStamped_odom_to_green.header.stamp = ros::Time::now();
+        transformStamped_odom_to_green.header.frame_id = "odom";
+        transformStamped_odom_to_green.child_frame_id = "green-base_footprint";
+        transformStamped_odom_to_green.transform.translation.x = current_config.x_config;
+        transformStamped_odom_to_green.transform.translation.y = current_config.y_config;
+        transformStamped_odom_to_green.transform.translation.z = 0;
+        tf2::Quaternion q2;
+        q2.setRPY(0, 0, current_config.theta_config);
+        transformStamped_odom_to_green.transform.rotation.x = q2.x();
+        transformStamped_odom_to_green.transform.rotation.y = q2.y();
+        transformStamped_odom_to_green.transform.rotation.z = q2.z();
+        transformStamped_odom_to_green.transform.rotation.w = q2.w();
+        broadcaster_odom_to_green.sendTransform(transformStamped_odom_to_green);
 
       
 
