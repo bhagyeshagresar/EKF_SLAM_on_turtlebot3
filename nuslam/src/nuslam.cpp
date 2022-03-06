@@ -185,7 +185,7 @@ namespace slamlib{
         arma::mat h(2, 1);
 
         r_j = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
-        phi = atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0);
+        phi = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
 
         h(0, 0) = r_j;
         h(1, 0) = phi;
@@ -227,22 +227,23 @@ namespace slamlib{
         
         for(int i = 0; i < m; i++){
             range = sqrt(pow(x.at(i), 2) + pow(y.at(i), 2));
-            phi = atan2(y.at(i), x.at(i));
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + r*cos(phi + prev_state_vector(0, 0));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + r*sin(phi + prev_state_vector(0, 0));
+            phi = turtlelib::normalize_angle(atan2(y.at(i), x.at(i)));
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + range*cos(phi + prev_state_vector(0, 0));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + range*sin(phi + prev_state_vector(0, 0));
 
             state_vector(3+(2*i), 0) = m_vec(0, 0);
             state_vector(4+(2*i), 0) = m_vec(1, 0);
+            // ROS_WARN("r: ")
         }
 
         // state_vector.print("init state_vector");
 
         state_vector.print("state vector");
-        covariance.print("covariance matrix");
-        q_mat.print("q_matrix");
-        r_mat.print("r_matrix");
+        // covariance.print("covariance matrix");
+        // q_mat.print("q_matrix");
+        // r_mat.print("r_matrix");
         prev_state_vector.print("prev state vector");
-        h_2.print("H matrix");
+        // h_2.print("H matrix");
 
     }
 

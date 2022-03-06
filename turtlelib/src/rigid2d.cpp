@@ -145,20 +145,7 @@ namespace turtlelib
         return theta_2;
     }
 
-    //normalize angle
-    // double normalize_angle(double theta){
-    //     double theta_3 = theta;
-    //     if(theta_3 > M_PI){
-    //         theta_3 = M_PI;
-    //     }
-        
-    //     if(theta_3 <= -M_PI){
-    //         theta_3 = -3.14;
-    //     }
     
-    //     return theta_3;
-
-    // }
 
 
     
@@ -267,6 +254,20 @@ namespace turtlelib
          }
 
        
+
+    }
+
+    //normalize angle
+    double normalize_angle(double theta){
+        double theta_3 = theta;
+        while(theta_3 > M_PI){
+            theta_3 -= 2*M_PI;
+        }
+        while(theta_3 < -M_PI){
+            theta_3 += 2*M_PI;
+        }
+    
+        return theta_3;
 
     }
 

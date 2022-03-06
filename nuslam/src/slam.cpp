@@ -51,6 +51,8 @@ static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
 static arma::mat map_to_green(n, 1, arma::fill::zeros);
+static arma::mat delta_z(2, 1, arma::fill::zeros);
+
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
 
 
@@ -95,7 +97,10 @@ arma::mat slam_fn(int m, int n){
         // z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
-        arma::mat temp = (ki*(z - z_hat));
+        delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
+        delta_z(1, 0) = z(1, 0) - z_hat(1, 0);
+        delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
+        arma::mat temp = (ki*(delta_z));
         state_vector_1 = state_vector_1 + temp;
         
         // state_vector_1.print("step 16: state_vector");

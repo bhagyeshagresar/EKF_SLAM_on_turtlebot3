@@ -180,7 +180,6 @@ namespace turtlelib
         /// \return the angular displacement, in radians
         double rotation() const;
 
-        double normalize_angle(double theta);
 
         
 
@@ -238,6 +237,9 @@ namespace turtlelib
     /// \param V - Twist2D V
     /// \return new transformation matrix Tbb_
     Transform2D integrate_twist(Twist2D V);
+
+    double normalize_angle(double theta);
+
 
 
 }
