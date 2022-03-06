@@ -137,7 +137,7 @@ namespace slamlib{
             h_2(1, 4+(2*i)) = (d_x/d);
 
         }
-        std::cout << "d_root %f" << d_root << std::endl;
+        // std::cout << "d_root %f" << d_root << std::endl;
 
 
         return h_2;
@@ -235,14 +235,14 @@ namespace slamlib{
             state_vector(4+(2*i), 0) = m_vec(1, 0);
         }
 
-        state_vector.print("init state_vector");
+        // state_vector.print("init state_vector");
 
-        // state_vector.print("state vector");
-        // covariance.print("covariance matrix");
-        // q_mat.print("q_matrix");
-        // r_mat.print("r_matrix");
-        // prev_state_vector.print("prev state vector");
-        // h_2.print("H matrix");
+        state_vector.print("state vector");
+        covariance.print("covariance matrix");
+        q_mat.print("q_matrix");
+        r_mat.print("r_matrix");
+        prev_state_vector.print("prev state vector");
+        h_2.print("H matrix");
 
     }
 

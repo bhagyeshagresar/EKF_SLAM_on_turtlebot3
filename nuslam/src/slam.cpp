@@ -21,6 +21,7 @@
 #include "turtlelib/rigid2d.hpp"
 #include "turtlelib/diff_drive.hpp"
 #include "visualization_msgs/MarkerArray.h"
+#include "visualization_msgs/Marker.h"
 #include <tf2_ros/static_transform_broadcaster.h>
 
 
@@ -41,6 +42,7 @@ static std::vector <double> velocities;
 //slam variables
 static int m{3};
 static int n{9};
+static double radius{0.038};
 static double r_noise{100.0};
 static double q_noise{1000.0};
 static double r{0.0};
@@ -48,7 +50,7 @@ static double phi{0.0};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
-arma::mat map_to_green(n, 1, arma::fill::zeros);
+static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
 
 
@@ -61,54 +63,54 @@ arma::mat slam_fn(int m, int n){
     for(int i = 0; i < m; i++){
         // prediction step 1
         state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
-        state_vector_1.print("step 2: state_vector");
+        // state_vector_1.print("step 2: state_vector");
 
         // a.print("step 3: a");
         arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
         arma::mat a2 = a.t();
-        a.print("step 4: a");
+        // a.print("step 4: a");
 
     
         //prediction step 2
         arma::mat covariance = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         arma::mat sigma = (a*covariance*a2) + q_mat;
-        sigma.print("step 6: sigma");
+        // sigma.print("step 6: sigma");
 
         // //update step 1
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-        z_hat.print("step 8: z_hat");
+        // z_hat.print("step 8: z_hat");
 
         //update step 2
         arma::mat h = slam_obj.calculate_h(i);
-        h.print("step 10: h");
+        // h.print("step 10: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
         arma::mat ki = (sigma * h.t())*((h * sigma * h.t()) + r_matrix).i();
-        ki.print("step 12: ki");
+        // ki.print("step 12: ki");
 
 
         //update step 3
         arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
-        z.print("step 14: z");
+        // z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
         arma::mat temp = (ki*(z - z_hat));
         state_vector_1 = state_vector_1 + temp;
         
-        state_vector_1.print("step 16: state_vector");
+        // state_vector_1.print("step 16: state_vector");
 
 
         //update step 4
         arma::mat identity(n, n);
         // sigma.print("step 17: sigma");
         sigma = (identity - (ki*h))*sigma;
-        sigma.print("step 18: sigma");
+        // sigma.print("step 18: sigma");
 
         // prev_state_vector.print("step 19: prev_state_vector");
         arma::mat prev_vector = slam_obj.get_prev_state_vector();
         prev_vector = state_vector_1;
-        prev_vector.print("step 20: prev_state_vector");
+        // prev_vector.print("step 20: prev_state_vector");
 
 
     }
@@ -139,7 +141,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     
     state = 0;
     map_to_green = slam_fn(m, n);
-
+    // map_to_green.print("map");
     // ROS_WARN("state changed");
    
  
@@ -223,6 +225,8 @@ int main(int argc, char **argv){
 
     //subscribe to fake_sensor for SLAM
     ros::Subscriber fake_sub = n.subscribe("/fake_sensor", 10, fake_sensor_callback);
+
+    ros::Publisher slam_marker_pub = n.advertise<visualization_msgs::MarkerArray>("/slam_markers", 500, true);
 
     // state = 1;
 
@@ -355,6 +359,39 @@ int main(int argc, char **argv){
         //publish the odometry message
         odom_pub.publish(odom);
 
+        visualization_msgs::MarkerArray slam_array;
+        //publish slam markers
+        for (int i = 0; i < m; i++){
+            // map_to_green.print("map");
+            
+
+            visualization_msgs::Marker slam_marker;
+            slam_marker.header.frame_id = "map";
+            slam_marker.header.stamp = ros::Time::now();
+            slam_marker.ns = "slam_marker";
+            slam_marker.id = i;
+            slam_marker.type = visualization_msgs::Marker:: CYLINDER;
+            slam_marker.action = visualization_msgs::Marker::ADD;
+            slam_marker.pose.position.x = map_to_green(3+(2*i), 0);
+            slam_marker.pose.position.y = map_to_green(4+(2*i), 0);
+            slam_marker.pose.position.z = 0;
+            slam_marker.pose.orientation.x = 0.0;
+            slam_marker.pose.orientation.y = 0.0;
+            slam_marker.pose.orientation.z = 0.0;
+            slam_marker.pose.orientation.w = 1.0;
+            slam_marker.scale.x = radius*2;
+            slam_marker.scale.y = radius*2;
+            slam_marker.scale.z = 0.25;
+            slam_marker.color.a = 1.0;
+            slam_marker.color.r = 0.0;
+            slam_marker.color.g = 0.0;
+            slam_marker.color.b = 1.0;
+            slam_marker.lifetime = ros::Duration();
+            
+            slam_array.markers.push_back(slam_marker);
+            
+            }
+        slam_marker_pub.publish(slam_array);
 
 
 
