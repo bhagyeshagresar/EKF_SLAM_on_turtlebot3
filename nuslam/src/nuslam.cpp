@@ -102,8 +102,8 @@ namespace slamlib{
             //second term
             
           
-            a_2(1, 0) = -((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0)) + u.theta_dot;
-            a_2(2, 0) = -((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0)) + u.theta_dot;
+            a_2(1, 0) = -((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0) + u.theta_dot);
+            a_2(2, 0) = -((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0) + u.theta_dot);
             a_3 = a_1 + a_2;
             
         }
@@ -113,7 +113,7 @@ namespace slamlib{
     
     
     //function to compute H
-    arma::mat Estimate2d::calculate_h(){
+    arma::mat Estimate2d::calculate_h(int i){
         double d_x{0.0};
         double d_y{0.0};
         double d{0.0};
@@ -125,16 +125,18 @@ namespace slamlib{
         d_root = sqrt(d);
 
         // arma::mat h_2(2, n);
-        h_2(1,0) = -1;
-        h_2(0,1) = -(d_x/d_root);
-        h_2(0, 2) = -(d_y/d_root);
-        h_2(1, 1) = (d_y/d_root);
-        h_2(1, 2) = -(d_x/d_root);
-        h_2(0, 6) = (d_x/d_root);
-        h_2(0, 7) = (d_y/d_root);
-        h_2(1, 6) = -(d_y/d_root);
-        h_2(1, 7) = (d_x/d_root);
+        for(int i = 0; i < m; i++){
+            h_2(1,0) = -1;
+            h_2(0,1) = -(d_x/d_root);
+            h_2(0, 2) = -(d_y/d_root);
+            h_2(1, 1) = (d_y/d);
+            h_2(1, 2) = -(d_x/d);
+            h_2(0, 3+(2*i)) = (d_x/d_root);
+            h_2(0, 4+(2*i)) = (d_y/d_root);
+            h_2(1, 3+(2*i)) = -(d_y/d);
+            h_2(1, 4+(2*i)) = (d_x/d);
 
+        }
         std::cout << "d_root %f" << d_root << std::endl;
 
 

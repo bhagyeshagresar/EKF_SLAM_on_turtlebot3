@@ -53,43 +53,13 @@ static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init
 
 
 
-// void init_fn(double init_x_pos, double init_y_pos, double init_theta_pos, double r_noise, double q_noise, std::vector <double> x_bar, std::vector <double> y_bar){
-//     //slam intialisation steps
-//     // covariance = slam_obj.get_covariance(n); // get covariance matrix with size n,n
-//     // state_vector = slam_obj.get_state_vector(n); //get state vector with size 1,n
-//     // prev_state_vector = slam_obj.get_prev_state_vector(n); //get prev state vector with size 1,n
-//     // q_mat = slam_obj.get_q_matrix(n); //get q matrix with 
-//     // r_mat = slam_obj.get_r_matrix(); // get r matrix
 
-//     // covariance.print("coviarance matrix");
-//     // prev_state_vector.print("prev state vector");
-//     // q_mat.print("q_mat");
-//     // r_mat.print("r_mat");    
-    
-
-    
-//     arma::mat combined_vector =  slam_obj.get_state_vector();
-//     arma::mat previous_vector = slam_obj.get_prev_state_vector();
-//     for(int i = 0; i < m; i++){
-        
-//         r = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
-//         phi = atan2(y_bar.at(i), x_bar.at(i));
-//         m_vec(0, 0) = (previous_vector(1, 0)) + r*cos(phi + previous_vector(0, 0));
-//         m_vec(1, 0) = (previous_vector(2, 0)) + r*sin(phi + previous_vector(0, 0));
-
-//         combined_vector = arma::join_cols(previous_vector, m_vec);
-//     }
-
-//     combined_vector.print("state vector");
-
-// }
 
 
 arma::mat slam_fn(int m, int n){
     arma::mat state_vector_1 =  slam_obj.get_state_vector();
     for(int i = 0; i < m; i++){
         // prediction step 1
-        // state_vector_1.print("step 1: state_vector");
         state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
         state_vector_1.print("step 2: state_vector");
 
@@ -100,7 +70,6 @@ arma::mat slam_fn(int m, int n){
 
     
         //prediction step 2
-        // sigma.print("step 5: sigma");
         arma::mat covariance = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         arma::mat sigma = (a*covariance*a2) + q_mat;
@@ -111,25 +80,20 @@ arma::mat slam_fn(int m, int n){
         z_hat.print("step 8: z_hat");
 
         //update step 2
-        // h.print("step 9: h");
-        arma::mat h = slam_obj.calculate_h();
+        arma::mat h = slam_obj.calculate_h(i);
         h.print("step 10: h");
 
-        // // ki.print("step 11: ki");
-        arma::mat ki = sigma*h.t()*(h*sigma*h.t() + slam_obj.get_r_matrix()).i();
+        arma::mat r_matrix = slam_obj.get_r_matrix();
+        arma::mat ki = (sigma * h.t())*((h * sigma * h.t()) + r_matrix).i();
         ki.print("step 12: ki");
 
 
         //update step 3
-        // z.print("step 13: z");
         arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
         z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
         arma::mat temp = (ki*(z - z_hat));
-        // state_vector_1 = state_vector_1 + (ki*(z - z_hat));
-        // temp.print("step 16: temp");
-        // state_vector_1.print("step 17: state_vector");
         state_vector_1 = state_vector_1 + temp;
         
         state_vector_1.print("step 16: state_vector");

@@ -44,7 +44,7 @@ namespace slamlib
         arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
 
         //function to compute H
-        arma::mat calculate_h();
+        arma::mat calculate_h(int i);
 
         // //calculate r matrix
         // arma::mat calculate_r_mat();
