@@ -43,16 +43,17 @@ static std::vector <double> velocities;
 static int m{3};
 static int n{9};
 static double radius{0.038};
-static double r_noise{100.0};
-static double q_noise{1000.0};
-static double r{0.0};
-static double phi{0.0};
+static double r_noise{0.1};
+static double q_noise{0.01};
+// static double r{0.0};
+// static double phi{0.0};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
+static int flag = 7;
 static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
-
+static arma::mat state_vector_1(n, 1);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
 
 
@@ -61,40 +62,40 @@ static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init
 
 
 arma::mat slam_fn(int m, int n){
-    arma::mat state_vector_1 =  slam_obj.get_state_vector();
+    // arma::mat state_vector_1 =  slam_obj.get_state_vector();
     for(int i = 0; i < m; i++){
         // prediction step 1
         state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
-        // state_vector_1.print("step 2: state_vector");
+        state_vector_1.print("step 2: state_vector");
 
         // a.print("step 3: a");
         arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
         arma::mat a2 = a.t();
-        // a.print("step 4: a");
+        a.print("step 4: a");
 
     
         //prediction step 2
-        arma::mat covariance = slam_obj.get_covariance();
+        arma::mat sigma = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
-        arma::mat sigma = (a*covariance*a2) + q_mat;
-        // sigma.print("step 6: sigma");
+        sigma = (a*sigma*a2) + q_mat;
+        sigma.print("step 6: sigma");
 
         // //update step 1
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-        // z_hat.print("step 8: z_hat");
+        z_hat.print("step 8: z_hat");
 
         //update step 2
         arma::mat h = slam_obj.calculate_h(i);
-        // h.print("step 10: h");
+        h.print("step 10: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
         arma::mat ki = (sigma * h.t())*((h * sigma * h.t()) + r_matrix).i();
-        // ki.print("step 12: ki");
+        ki.print("step 12: ki");
 
 
         //update step 3
         arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
-        // z.print("step 14: z");
+        z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
         delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
@@ -103,22 +104,25 @@ arma::mat slam_fn(int m, int n){
         arma::mat temp = (ki*(delta_z));
         state_vector_1 = state_vector_1 + temp;
         
-        // state_vector_1.print("step 16: state_vector");
+        state_vector_1.print("step 16: state_vector");
 
 
         //update step 4
         arma::mat identity(n, n);
-        // sigma.print("step 17: sigma");
         sigma = (identity - (ki*h))*sigma;
-        // sigma.print("step 18: sigma");
+        sigma.print("step 18: sigma");
 
         // prev_state_vector.print("step 19: prev_state_vector");
         arma::mat prev_vector = slam_obj.get_prev_state_vector();
         prev_vector = state_vector_1;
-        // prev_vector.print("step 20: prev_state_vector");
-
+        prev_vector.print("step 20: prev_state_vector");
+        flag++;
+        
 
     }
+    
+    double theta = state_vector_1(0, 0);
+    state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
     return state_vector_1;
 }
 
@@ -141,6 +145,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
         slam_obj.init_fn(x_bar, y_bar);
+        state_vector_1 = slam_obj.get_state_vector();
     }
        
     
@@ -389,8 +394,8 @@ int main(int argc, char **argv){
             slam_marker.scale.z = 0.25;
             slam_marker.color.a = 1.0;
             slam_marker.color.r = 0.0;
-            slam_marker.color.g = 0.0;
-            slam_marker.color.b = 1.0;
+            slam_marker.color.g = 1.0;
+            slam_marker.color.b = 0.0;
             slam_marker.lifetime = ros::Duration();
             
             slam_array.markers.push_back(slam_marker);

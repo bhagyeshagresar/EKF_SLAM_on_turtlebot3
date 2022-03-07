@@ -58,16 +58,17 @@ namespace slamlib{
 
         if (u.theta_dot == 0.0){
             //fill the state vector 
-            state_vector(0, 0) = prev_state_vector(0, 0) + 0.0;
+            state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + 0.0);
             state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
             state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
 
         
         }
         else{
-            state_vector(0, 0) = prev_state_vector(0, 0) + u.theta_dot;
-            state_vector(1, 0) = prev_state_vector(1, 0) + (-(u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0))) + ((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0) + u.theta_dot));
-            state_vector(2, 0) = prev_state_vector(2, 0) + ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0))) - ((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0) + u.theta_dot));
+            double delta = u.x_dot/u.theta_dot;
+            state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
+            state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*sin(prev_state_vector(0, 0))) + ((delta)*sin(prev_state_vector(0, 0) + u.theta_dot));
+            state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*cos(prev_state_vector(0, 0))) - ((delta)*cos(prev_state_vector(0, 0) + u.theta_dot));
 
 
 
@@ -81,7 +82,7 @@ namespace slamlib{
     arma::mat Estimate2d::calculate_A_matrix(turtlelib::Twist2D u, int n){
         arma::mat a_1 = arma::eye(n, n);
         arma::mat a_2(n, n, arma::fill::zeros);
-        arma::mat a_3(n, n);
+        arma::mat a_3(n, n, arma::fill::zeros);
         
         if (u.theta_dot == 0.0)
         {   
@@ -173,7 +174,7 @@ namespace slamlib{
         r_j = sqrt(pow(x, 2) + pow(y, 2));
         phi = atan2(y, x);
         h(0, 0) = r_j;
-        h(1, 0) = phi;
+        h(1, 0) = turtlelib::normalize_angle(phi);
         return h;
     }
 
@@ -228,8 +229,8 @@ namespace slamlib{
         for(int i = 0; i < m; i++){
             range = sqrt(pow(x.at(i), 2) + pow(y.at(i), 2));
             phi = turtlelib::normalize_angle(atan2(y.at(i), x.at(i)));
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + range*cos(phi + prev_state_vector(0, 0));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + range*sin(phi + prev_state_vector(0, 0));
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + range*cos(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + range*sin(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
 
             state_vector(3+(2*i), 0) = m_vec(0, 0);
             state_vector(4+(2*i), 0) = m_vec(1, 0);
