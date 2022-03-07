@@ -28,7 +28,7 @@ namespace slamlib
         double init_y_pos; 
         double init_theta_pos;
         arma::mat m_vec;
-        arma::mat h_2;
+        // arma::mat h_2;
         
         
     

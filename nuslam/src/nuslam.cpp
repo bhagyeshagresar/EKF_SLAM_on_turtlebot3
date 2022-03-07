@@ -23,8 +23,7 @@ namespace slamlib{
          init_theta_pos{init_theta_pos},
          init_x_pos{init_x_pos},
          init_y_pos{init_y_pos},
-         m_vec(2, 1, arma::fill::zeros),
-         h_2(2, n, arma::fill::zeros)
+         m_vec(2, 1, arma::fill::zeros)
          { 
             prev_state_vector(0, 0) = init_theta_pos;
             prev_state_vector(1, 0) = init_x_pos;
@@ -101,10 +100,10 @@ namespace slamlib{
 
         else{
             //second term
-            
+            double delta_2 = u.x_dot/u.theta_dot;
           
-            a_2(1, 0) = -((u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*cos(prev_state_vector(0, 0) + u.theta_dot);
-            a_2(2, 0) = -((u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0))) + (u.x_dot/u.theta_dot)*sin(prev_state_vector(0, 0) + u.theta_dot);
+            a_2(1, 0) = -((delta_2)*cos(prev_state_vector(0, 0))) + (delta_2)*cos(prev_state_vector(0, 0) + u.theta_dot);
+            a_2(2, 0) = -((delta_2)*sin(prev_state_vector(0, 0))) + (delta_2)*sin(prev_state_vector(0, 0) + u.theta_dot);
             a_3 = a_1 + a_2;
             
         }
@@ -120,12 +119,12 @@ namespace slamlib{
         double d{0.0};
         double d_root{0.0};
 
-        d_x = m_vec(0,0) - state_vector(1, 0);
-        d_y = m_vec(1,0) - state_vector(2, 0);
+        d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
+        d_y = state_vector(4+(2*i),0) - state_vector(2, 0);
         d = ((pow(d_x, 2) + pow(d_y, 2)));
         d_root = sqrt(d);
 
-        // arma::mat h_2(2, n);
+        arma::mat h_2(2, n, arma::fill::zeros);
         for(int i = 0; i < m; i++){
             h_2(1,0) = -1;
             h_2(0,1) = -(d_x/d_root);
