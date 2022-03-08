@@ -43,8 +43,8 @@ static std::vector <double> velocities;
 static int m{3};
 static int n{9};
 static double radius{0.038};
-static double r_noise{100};
-static double q_noise{0.01};
+static double r_noise{0.1};
+static double q_noise{1.0};
 // static double r{0.0};
 // static double phi{0.0};
 static std::vector <double> x_bar;
@@ -72,38 +72,47 @@ arma::mat slam_fn(int m, int n){
         arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
         arma::mat a2 = a.t();
         a.print("step 4: a");
-
+        a.t().print("step 4: a+t");
     
-        //prediction step 2
+        // // // //prediction step 2
         arma::mat sigma = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         sigma = (a*sigma*a2) + q_mat;
         sigma.print("step 6: sigma");
 
-        // //update step 1
-        arma::mat z_hat = slam_obj.calculate_z_hat(i);
+        // // //update step 1
+        arma::mat z_hat = slam_obj.calculate_h(i);
         z_hat.print("step 8: z_hat");
 
-        //update step 2
+        // //update step 2
         arma::mat h = slam_obj.calculate_h(i);
         h.print("step 10: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
-        arma::mat ki = (sigma * h.t())*(arma::inv(h * sigma * h.t() + r_matrix));
+        arma::mat h_tranpose = h.t();
+        h_tranpose.print("step 11: h_transpose");
+        r_matrix.print("step 12: r_matrix");
+        arma::mat mat_inv = arma::inv(h * sigma * h_tranpose + r_matrix);
+        mat_inv.print("step 13: matInv");
+        arma::mat ki = (sigma * h_tranpose * mat_inv);
         ki.print("step 12: ki");
 
 
         //update step 3
-        arma::mat z = slam_obj.calculate_z(x_bar.at(i), y_bar.at(i));
+        slam_obj.calculate_range_bearing(x_bar.at(i), y_bar.at(i));
+        arma::mat z = slam_obj.calculate_z();
         z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
-        delta_z = z - z_hat;
+        arma::mat delta_z(2, 1, arma::fill::zeros);
+        delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
+        delta_z(1, 0) = z(1, 0) - z_hat(1, 0);
         delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
-        arma::mat temp = (ki*(delta_z));
-        state_vector_1 = state_vector_1 + temp;
+        delta_z.print("step 15: delta_z");
+        state_vector_1 = state_vector_1 + (ki*(delta_z));
+        state_vector_1.print("step 16: state_vector_1");
         
-        state_vector_1.print("step 16: state_vector");
+        // state_vector_1.print("step 16: state_vector");
 
 
         //update step 4

@@ -10,7 +10,7 @@
 namespace slamlib{
     
     //default constructor
-    Estimate2d::Estimate2d(int m, int n, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos)
+    Estimate2d::Estimate2d(int m, int n, double r, double q, double init_theta_pos, double init_x_pos, double init_y_pos)
         :m{m}, 
          n{n},
          prev_state_vector(n, 1, arma::fill::zeros),
@@ -18,19 +18,18 @@ namespace slamlib{
          state_vector(n, 1, arma::fill::zeros), 
          q_mat(n, n, arma::fill::zeros), 
          r_mat(2, 2, arma::fill::zeros), 
-         r{r_noise}, 
-         q{q_noise},
+         r{r}, 
+         q{q},
          init_theta_pos{init_theta_pos},
          init_x_pos{init_x_pos},
          init_y_pos{init_y_pos},
-         m_vec(2, 1, arma::fill::zeros)
+         m_vec(2, 1, arma::fill::zeros),
+         r_j{0.0},
+         phi{0.0}
          { 
-            prev_state_vector(0, 0) = init_theta_pos;
-            prev_state_vector(1, 0) = init_x_pos;
-            prev_state_vector(2, 0) = init_y_pos;
-            covariance(0, 0) = init_theta_pos;
-            covariance(1, 1) = init_x_pos;
-            covariance(2, 2) = init_y_pos;
+            prev_state_vector(0, 0) = 0;
+            prev_state_vector(1, 0) = 0;
+            prev_state_vector(2, 0) = 0;
             covariance(3, 3) = 100000;
             covariance(4, 4) = 100000;
             covariance(5, 5) = 100000;
@@ -119,8 +118,8 @@ namespace slamlib{
         double d{0.0};
         double d_root{0.0};
 
-        d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
-        d_y = state_vector(4+(2*i),0) - state_vector(2, 0);
+        d_x = m_vec(0, 0) - state_vector(1, 0);
+        d_y = m_vec(1, 0) - state_vector(2, 0);
         d = ((pow(d_x, 2) + pow(d_y, 2)));
         d_root = sqrt(d);
 
@@ -165,13 +164,8 @@ namespace slamlib{
 
     
     //calculate z
-    arma::mat Estimate2d::calculate_z(double x, double y){
-        double r_j{0.0};
-        double phi{0.0};
-        arma::mat h(2, 1, arma::fill::zeros);
-        // for(int i = 0; i < m; i++){
-        r_j = sqrt(pow(x, 2) + pow(y, 2));
-        phi = atan2(y, x);
+    arma::mat Estimate2d::calculate_z(){
+        arma::mat h(2, 1);
         h(0, 0) = r_j;
         h(1, 0) = turtlelib::normalize_angle(phi);
         return h;
@@ -180,15 +174,13 @@ namespace slamlib{
     
     //calculate z_hat
     arma::mat Estimate2d::calculate_z_hat(int i){
-        double r_j{0.0};
-        double phi{0.0};
+       
         arma::mat h(2, 1);
 
-        r_j = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
-        phi = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
+        h(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
+        h(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
 
-        h(0, 0) = r_j;
-        h(1, 0) = phi;
+       
         
         return h;
     }
@@ -244,6 +236,14 @@ namespace slamlib{
         // r_mat.print("r_matrix");
         prev_state_vector.print("prev state vector");
         // h_2.print("H matrix");
+
+    }
+
+
+    void Estimate2d::calculate_range_bearing(double x, double y){
+       
+        r_j = sqrt(pow(x, 2) + pow(y, 2));
+        phi = turtlelib::normalize_angle(atan2(y, x));
 
     }
 

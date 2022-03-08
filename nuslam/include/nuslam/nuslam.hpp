@@ -22,12 +22,14 @@ namespace slamlib
         arma::mat state_vector;
         arma::mat q_mat;
         arma::mat r_mat;
-        int r;
-        int q;
+        double r;
+        double q;
         double init_x_pos;
         double init_y_pos; 
         double init_theta_pos;
         arma::mat m_vec;
+        double r_j;
+        double phi;
         // arma::mat h_2;
         
         
@@ -35,7 +37,7 @@ namespace slamlib
 
     public:
     
-        Estimate2d(int m, int n, int r_noise, int q_noise, double init_theta_pos, double init_x_pos, double init_y_pos);
+        Estimate2d(int m, int n, double r, double q, double init_theta_pos, double init_x_pos, double init_y_pos);
 
         //calculate state vector (zeta)
         arma::mat updated_state_vector(turtlelib::Twist2D u, int n);
@@ -53,7 +55,7 @@ namespace slamlib
         // arma::mat calculate_q_mat();
 
         //calculate z
-        arma::mat calculate_z(double x, double y);
+        arma::mat calculate_z();
 
         //calculate z_hat
         arma::mat calculate_z_hat(int i);
@@ -74,6 +76,8 @@ namespace slamlib
         arma::mat get_r_matrix();
 
         void init_fn(std::vector <double> x, std::vector <double> y);
+
+        void calculate_range_bearing(double x, double y);
     
         // //set r value
         // void set_r(int a);
