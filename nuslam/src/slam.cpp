@@ -40,7 +40,7 @@ static std::vector <double> velocities;
 
 
 //slam variables
-static int m{3};
+static int m{2};
 static int n{9};
 static double radius{0.038};
 static double r_noise{0.1};
@@ -50,7 +50,7 @@ static double q_noise{1.0};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
-static int flag = 7;
+// static int flag = 7;
 static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
 // static arma::mat state_vector_1(n, 1);
@@ -65,7 +65,7 @@ arma::mat slam_fn(int m, int n){
     arma::mat state_vector_1 =  slam_obj.get_state_vector();
     for(int i = 0; i < m; i++){
         // prediction step 1
-        state_vector_1 = slam_obj.updated_state_vector(V_twist, n);
+        state_vector_1 = slam_obj.updated_state_vector(V_twist);
         state_vector_1.print("step 2: state_vector");
 
         // a.print("step 3: a");
@@ -148,10 +148,12 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
             x_bar.at(i) = msg.markers[i].pose.position.x;
             y_bar.at(i) = msg.markers[i].pose.position.y;
             ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
+            slam_obj.calculate_range_bearing(x_bar.at(i), y_bar.at(i));
+
         }
         // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
-        slam_obj.init_fn(x_bar, y_bar);
+        slam_obj.init_fn();
         // state_vector_1 = slam_obj.get_state_vector();
     }
        

@@ -201,16 +201,16 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
     
     
-    std::normal_distribution<> d1(wheel_velocity_left, 0.01);
-    std::normal_distribution<> d2(wheel_velocity_right, 0.01);
+    // std::normal_distribution<> d1(wheel_velocity_left, 0.01);
+    // std::normal_distribution<> d2(wheel_velocity_right, 0.01);
 
-    //wheel velocities with noise 
-    left_wheel_noise = d1(get_random());
-    right_wheel_noise = d2(get_random());
+    // //wheel velocities with noise 
+    // left_wheel_noise = d1(get_random());
+    // right_wheel_noise = d2(get_random());
 
 
-    wheel_velocities.w1_vel = (left_wheel_noise*0.024);
-    wheel_velocities.w2_vel = (right_wheel_noise*0.024);
+    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
+    wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
 
    
 

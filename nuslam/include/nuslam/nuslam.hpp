@@ -40,7 +40,7 @@ namespace slamlib
         Estimate2d(int m, int n, double r, double q, double init_theta_pos, double init_x_pos, double init_y_pos);
 
         //calculate state vector (zeta)
-        arma::mat updated_state_vector(turtlelib::Twist2D u, int n);
+        arma::mat updated_state_vector(turtlelib::Twist2D u);
 
         //calculate A matrix
         arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
@@ -75,7 +75,7 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        void init_fn(std::vector <double> x, std::vector <double> y);
+        void init_fn();
 
         void calculate_range_bearing(double x, double y);
     

@@ -51,7 +51,7 @@ namespace slamlib{
    
 
     //calculate state vector (zeta)
-    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u, int n){
+    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u){
         
 
         if (u.theta_dot == 0.0){
@@ -118,24 +118,24 @@ namespace slamlib{
         double d{0.0};
         double d_root{0.0};
 
-        d_x = m_vec(0, 0) - state_vector(1, 0);
-        d_y = m_vec(1, 0) - state_vector(2, 0);
+        d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
+        d_y = state_vector(4+(2*i), 0) - state_vector(2, 0);
         d = ((pow(d_x, 2) + pow(d_y, 2)));
         d_root = sqrt(d);
 
         arma::mat h_2(2, n, arma::fill::zeros);
-        for(int i = 0; i < m; i++){
-            h_2(1,0) = -1;
-            h_2(0,1) = -(d_x/d_root);
-            h_2(0, 2) = -(d_y/d_root);
-            h_2(1, 1) = (d_y/d);
-            h_2(1, 2) = -(d_x/d);
-            h_2(0, 3+(2*i)) = (d_x/d_root);
-            h_2(0, 4+(2*i)) = (d_y/d_root);
-            h_2(1, 3+(2*i)) = -(d_y/d);
-            h_2(1, 4+(2*i)) = (d_x/d);
+        h_2(1,0) = -1;
+        h_2(0,1) = -(d_x/d_root);
+        h_2(0, 2) = -(d_y/d_root);
+        h_2(1, 1) = (d_y/d);
+        h_2(1, 2) = -(d_x/d);
+        h_2(0, 3+(2*i)) = (d_x/d_root);
+        h_2(0, 4+(2*i)) = (d_y/d_root);
+        h_2(1, 3+(2*i)) = -(d_y/d);
+        h_2(1, 4+(2*i)) = (d_x/d);
 
-        }
+        
+        // h_2.print("check h calculations");
         // std::cout << "d_root %f" << d_root << std::endl;
 
 
@@ -212,16 +212,15 @@ namespace slamlib{
         return r_mat;
     }
 
-    void Estimate2d::init_fn(std::vector <double> x, std::vector <double> y){
-        double range{0.0};
-        double phi{0.0};
+    void Estimate2d::init_fn(
+        
+    ){
+      
         // arma::mat m_vec(2, 1);
         
         for(int i = 0; i < m; i++){
-            range = sqrt(pow(x.at(i), 2) + pow(y.at(i), 2));
-            phi = turtlelib::normalize_angle(atan2(y.at(i), x.at(i)));
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + range*cos(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + range*sin(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + r_j*cos(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + r_j*sin(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
 
             state_vector(3+(2*i), 0) = m_vec(0, 0);
             state_vector(4+(2*i), 0) = m_vec(1, 0);
@@ -243,7 +242,7 @@ namespace slamlib{
     void Estimate2d::calculate_range_bearing(double x, double y){
        
         r_j = sqrt(pow(x, 2) + pow(y, 2));
-        phi = turtlelib::normalize_angle(atan2(y, x));
+        phi = atan2(y, x);
 
     }
 
