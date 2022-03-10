@@ -40,7 +40,7 @@ static std::vector <double> velocities;
 
 
 //slam variables
-static int m{2};
+static int m{3};
 static int n{9};
 static double radius{0.038};
 static double r_noise{0.1};
@@ -53,8 +53,10 @@ static int state = 1;
 // static int flag = 7;
 static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
+
+static arma::mat temp_vec(6, 1, arma::fill::zeros);
 // static arma::mat state_vector_1(n, 1);
-static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise, init_theta_pos, init_x_pos, init_y_pos);
+static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
 
 
 
@@ -99,7 +101,6 @@ arma::mat slam_fn(int m, int n){
 
 
         //update step 3
-        slam_obj.calculate_range_bearing(x_bar.at(i), y_bar.at(i));
         arma::mat z = slam_obj.calculate_z();
         z.print("step 14: z");
 
@@ -142,18 +143,24 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     x_bar.resize(3);
     y_bar.resize(3);
     // ROS_WARN("m: %d", m);
-    if(state == 1){
-        for(int i = 0; i < m; i++){
-            // ROS_WARN("m: %d", m);
-            x_bar.at(i) = msg.markers[i].pose.position.x;
-            y_bar.at(i) = msg.markers[i].pose.position.y;
-            ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
-            slam_obj.calculate_range_bearing(x_bar.at(i), y_bar.at(i));
+    for(int i = 0; i < m; i++){
+        // ROS_WARN("m: %d", m);
+        x_bar.at(i) = msg.markers[i].pose.position.x;
+        y_bar.at(i) = msg.markers[i].pose.position.y;
+        ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
+        double r_j = slam_obj.get_rj();
+        double phi = slam_obj.get_phi();
+        r_j = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
+        phi = atan2(y_bar.at(i), x_bar.at(i));
 
-        }
+        temp_vec(2*i, 0) = r_j;
+        temp_vec((2*i)+1, 0) = phi;
+
+    }
+    if(state == 1){
         // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
-        slam_obj.init_fn();
+        slam_obj.init_fn(temp_vec, m);
         // state_vector_1 = slam_obj.get_state_vector();
     }
        

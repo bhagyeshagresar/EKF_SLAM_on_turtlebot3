@@ -10,7 +10,7 @@
 namespace slamlib{
     
     //default constructor
-    Estimate2d::Estimate2d(int m, int n, double r, double q, double init_theta_pos, double init_x_pos, double init_y_pos)
+    Estimate2d::Estimate2d(int m, int n, double r, double q)
         :m{m}, 
          n{n},
          prev_state_vector(n, 1, arma::fill::zeros),
@@ -20,9 +20,6 @@ namespace slamlib{
          r_mat(2, 2, arma::fill::zeros), 
          r{r}, 
          q{q},
-         init_theta_pos{init_theta_pos},
-         init_x_pos{init_x_pos},
-         init_y_pos{init_y_pos},
          m_vec(2, 1, arma::fill::zeros),
          r_j{0.0},
          phi{0.0}
@@ -44,6 +41,7 @@ namespace slamlib{
             q_mat(1, 1) = q;
             q_mat(2, 2) = q;
             std::cout << "constructor test" << std::endl;
+          
                 
          }
 
@@ -59,6 +57,8 @@ namespace slamlib{
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + 0.0);
             state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
             state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
+            
+
 
         
         }
@@ -67,6 +67,7 @@ namespace slamlib{
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
             state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*sin(prev_state_vector(0, 0))) + ((delta)*sin(prev_state_vector(0, 0) + u.theta_dot));
             state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*cos(prev_state_vector(0, 0))) - ((delta)*cos(prev_state_vector(0, 0) + u.theta_dot));
+           
 
 
 
@@ -175,14 +176,14 @@ namespace slamlib{
     //calculate z_hat
     arma::mat Estimate2d::calculate_z_hat(int i){
        
-        arma::mat h(2, 1);
+        arma::mat z_hat(2, 1, arma::fill::zeros);
 
-        h(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
-        h(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
+        z_hat(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
+        z_hat(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
 
        
         
-        return h;
+        return z_hat;
     }
     
     
@@ -212,15 +213,16 @@ namespace slamlib{
         return r_mat;
     }
 
-    void Estimate2d::init_fn(
-        
-    ){
+    void Estimate2d::init_fn(arma::mat temp_vec, int m)
+    {
+       
       
         // arma::mat m_vec(2, 1);
         
         for(int i = 0; i < m; i++){
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + r_j*cos(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + r_j*sin(turtlelib::normalize_angle(phi + prev_state_vector(0, 0)));
+            
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
 
             state_vector(3+(2*i), 0) = m_vec(0, 0);
             state_vector(4+(2*i), 0) = m_vec(1, 0);
@@ -246,7 +248,14 @@ namespace slamlib{
 
     }
 
-    
+    double Estimate2d::get_rj(){
+        return r_j;
+    }
+
+    double Estimate2d::get_phi(){
+        return phi;
+    }
+
     // //set r value
     // void Estimate2d::set_r(int a){
     //     r = a;

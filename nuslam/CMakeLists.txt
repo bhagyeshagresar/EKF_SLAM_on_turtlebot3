@@ -169,7 +169,7 @@ add_library(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # target_include_directories(nuslam PUBLIC include/)
 
-add_executable(slam src/slam.cpp)
+add_executable(slam src/slam.cpp src/test_slam.cpp)
 
 # # enable C++ 17
 # target_compile_features(nuslam PUBLIC cxx_std_17) 
