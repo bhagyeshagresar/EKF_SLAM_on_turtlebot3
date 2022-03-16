@@ -43,8 +43,8 @@ static std::vector <double> velocities;
 static int m{3};
 static int n{9};
 static double radius{0.038};
-static double r_noise{0.1};
-static double q_noise{1.0};
+static double r_noise{10};
+static double q_noise{100};
 // static double r{0.0};
 // static double phi{0.0};
 static std::vector <double> x_bar;
@@ -55,6 +55,8 @@ static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
 
 static arma::mat temp_vec(6, 1, arma::fill::zeros);
+double r_j{0.0};
+double phi{0.0};
 // static arma::mat state_vector_1(n, 1);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
 
@@ -62,6 +64,7 @@ static arma::mat state_vector_1 =  slam_obj.get_state_vector();
 static arma::mat prev_vector = slam_obj.get_prev_state_vector();
 static arma::mat sigma_prev = slam_obj.get_covariance();
 static arma::mat sigma_new = slam_obj.get_covariance();
+
 
 
 
@@ -105,7 +108,7 @@ arma::mat slam_fn(int m, int n){
 
 
         //update step 3
-        arma::mat z = slam_obj.calculate_z();
+        arma::mat z = slam_obj.calculate_z(r_j, phi);
         z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
@@ -153,8 +156,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         x_bar.at(i) = msg.markers[i].pose.position.x;
         y_bar.at(i) = msg.markers[i].pose.position.y;
         ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
-        double r_j = slam_obj.get_rj();
-        double phi = slam_obj.get_phi();
+       
         r_j = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
         phi = atan2(y_bar.at(i), x_bar.at(i));
 
@@ -278,7 +280,7 @@ int main(int argc, char **argv){
 
 
 
-    ros::Rate r(500);
+    ros::Rate r(100);
 
     
     while(ros::ok()){

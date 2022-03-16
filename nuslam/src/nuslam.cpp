@@ -20,9 +20,7 @@ namespace slamlib{
          r_mat(2, 2, arma::fill::zeros), 
          r{r}, 
          q{q},
-         m_vec(2, 1, arma::fill::zeros),
-         r_j{0.0},
-         phi{0.0}
+         m_vec(2, 1, arma::fill::zeros)
          { 
             prev_state_vector(0, 0) = 0;
             prev_state_vector(1, 0) = 0;
@@ -165,10 +163,10 @@ namespace slamlib{
 
     
     //calculate z
-    arma::mat Estimate2d::calculate_z(){
+    arma::mat Estimate2d::calculate_z(double g, double y){
         arma::mat h(2, 1);
-        h(0, 0) = r_j;
-        h(1, 0) = turtlelib::normalize_angle(phi);
+        h(0, 0) = g;
+        h(1, 0) = turtlelib::normalize_angle(y);
         return h;
     }
 
@@ -241,20 +239,20 @@ namespace slamlib{
     }
 
 
-    void Estimate2d::calculate_range_bearing(double x, double y){
+    // void Estimate2d::calculate_range_bearing(double x, double y){
        
-        r_j = sqrt(pow(x, 2) + pow(y, 2));
-        phi = atan2(y, x);
+    //     r_j = sqrt(pow(x, 2) + pow(y, 2));
+    //     phi = atan2(y, x);
 
-    }
+    // }
 
-    double Estimate2d::get_rj(){
-        return r_j;
-    }
+    // double Estimate2d::get_rj(){
+    //     return r_j;
+    // }
 
-    double Estimate2d::get_phi(){
-        return phi;
-    }
+    // double Estimate2d::get_phi(){
+    //     return phi;
+    // }
 
     void Estimate2d::set_prev_vector(arma::mat a){
         prev_state_vector = a;
