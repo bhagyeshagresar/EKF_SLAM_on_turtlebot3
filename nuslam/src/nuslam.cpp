@@ -13,7 +13,7 @@ namespace slamlib{
     Estimate2d::Estimate2d(int m, int n, double r, double q)
         :m{m}, 
          n{n},
-         prev_state_vector(n, 1, arma::fill::zeros),
+        //  prev_state_vector(n, 1, arma::fill::zeros),
          covariance(n, n, arma::fill::zeros),
          state_vector(n, 1, arma::fill::zeros), 
          q_mat(n, n, arma::fill::zeros), 
@@ -22,9 +22,9 @@ namespace slamlib{
          q{q},
          m_vec(2, 1, arma::fill::zeros)
          { 
-            prev_state_vector(0, 0) = 0;
-            prev_state_vector(1, 0) = 0;
-            prev_state_vector(2, 0) = 0;
+            // prev_state_vector(0, 0) = 0;
+            // prev_state_vector(1, 0) = 0;
+            // prev_state_vector(2, 0) = 0;
             covariance(3, 3) = 100000;
             covariance(4, 4) = 100000;
             covariance(5, 5) = 100000;
@@ -47,14 +47,19 @@ namespace slamlib{
    
 
     //calculate state vector (zeta)
-    arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u){
-        
+    void Estimate2d::updated_state_vector(turtlelib::Twist2D u){
+        arma::mat temp_state(3, 1, arma::fill::zeros);
+        double delta_x = u.x_dot;
+        double delta_y = u.y_dot;
+        double delta_theta = u.theta_dot;
+
+
 
         if (u.theta_dot == 0.0){
             //fill the state vector 
-            state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + 0.0);
-            state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*std::cos(prev_state_vector(0, 0)));
-            state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*std::sin(prev_state_vector(0, 0)));
+            // state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + 0.0);
+            temp_state(1, 0) = (delta_x*std::cos(state_vector(0, 0)));
+            temp_state(2, 0) = (delta_y*std::sin(state_vector(0, 0)));
             
 
 
@@ -62,24 +67,31 @@ namespace slamlib{
         }
         else{
             double delta = u.x_dot/u.theta_dot;
-            state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
-            state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*std::sin(prev_state_vector(0, 0))) + ((delta)*std::sin(prev_state_vector(0, 0) + u.theta_dot));
-            state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*std::cos(prev_state_vector(0, 0))) - ((delta)*std::cos(prev_state_vector(0, 0) + u.theta_dot));
+            temp_state(0, 0) = u.theta_dot;
+            temp_state(1, 0) = (-(delta)*std::sin(state_vector(0, 0))) + ((delta)*std::sin(state_vector(0, 0) + delta_theta));
+            temp_state(2, 0) = ((delta)*std::cos(state_vector(0, 0))) - ((delta)*std::cos(state_vector(0, 0) + delta_theta));
            
 
 
 
         }
-        return state_vector;
+
+        state_vector(0, 0) =  state_vector(0, 0) + temp_state(0, 0);
+        state_vector(1, 0) =  state_vector(1, 0) + temp_state(1, 0);
+        state_vector(2, 0) =  state_vector(2, 0) + temp_state(2, 0);
+        // state_vector(0, 0) = temp_state(0, 0);
+        // state_vector(1, 0) = temp_state(1, 0);
+        // state_vector(2, 0) = temp_state(2, 0);
+
 
     }
 
 
     //calculate A matrix
     arma::mat Estimate2d::calculate_A_matrix(turtlelib::Twist2D u, int n){
-        arma::mat a_1 = arma::eye(n, n);
-        arma::mat a_2(n, n, arma::fill::zeros);
-        arma::mat a_3(n, n, arma::fill::zeros);
+        arma::mat a_1 = arma::eye(9, 9);
+        arma::mat a_2(9, 9, arma::fill::zeros);
+        arma::mat a_3(9, 9, arma::fill::zeros);
         
         if (u.theta_dot == 0.0)
         {   
@@ -88,9 +100,9 @@ namespace slamlib{
 
             //second term
             
-            a_2(1, 0) = -u.x_dot*std::sin(prev_state_vector(0, 0));
-            a_2(2, 0) = u.x_dot*std::cos(prev_state_vector(0, 0));
-            a_3 = a_1 + a_2;
+            a_2(1, 0) = -u.x_dot*std::sin(state_vector(0, 0));
+            a_2(2, 0) = u.x_dot*std::cos(state_vector(0, 0));
+            // a_3 = a_1 + a_2;
 
 
 
@@ -100,12 +112,13 @@ namespace slamlib{
             //second term
             double delta_2 = u.x_dot/u.theta_dot;
           
-            a_2(1, 0) = -((delta_2)*std::cos(prev_state_vector(0, 0))) + (delta_2)*std::cos(prev_state_vector(0, 0) + u.theta_dot);
-            a_2(2, 0) = -((delta_2)*std::sin(prev_state_vector(0, 0))) + (delta_2)*std::sin(prev_state_vector(0, 0) + u.theta_dot);
-            a_3 = a_1 + a_2;
+            a_2(1, 0) = -((delta_2)*std::cos(state_vector(0, 0))) + (delta_2)*std::cos(state_vector(0, 0) + u.theta_dot);
+            a_2(2, 0) = -((delta_2)*std::sin(state_vector(0, 0))) + (delta_2)*std::sin(state_vector(0, 0) + u.theta_dot);
+            // a_3 = a_1 + a_2;
             
         }
-        return a_3;        
+        a_3 = a_1 + a_2;
+        return a_3;    
     }
     
     
@@ -116,24 +129,25 @@ namespace slamlib{
         double d_y{0.0};
         double d{0.0};
         double d_root{0.0};
+        arma::mat h_2(2, n, arma::fill::zeros);
 
+        
         d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
         d_y = state_vector(4+(2*i), 0) - state_vector(2, 0);
         d = ((std::pow(d_x, 2) + std::pow(d_y, 2)));
         d_root = std::sqrt(d);
+        if(d != 0){
+            h_2(1,0) = -1;
+            h_2(0,1) = -(d_x/d_root);
+            h_2(0, 2) = -(d_y/d_root);
+            h_2(1, 1) = (d_y/d);
+            h_2(1, 2) = -(d_x/d);
+            h_2(0, 3+(2*i)) = (d_x/d_root);
+            h_2(0, 4+(2*i)) = (d_y/d_root);
+            h_2(1, 3+(2*i)) = -(d_y/d);
+            h_2(1, 4+(2*i)) = (d_x/d);
 
-        arma::mat h_2(2, n, arma::fill::zeros);
-        h_2(1,0) = -1;
-        h_2(0,1) = -(d_x/d_root);
-        h_2(0, 2) = -(d_y/d_root);
-        h_2(1, 1) = (d_y/d);
-        h_2(1, 2) = -(d_x/d);
-        h_2(0, 3+(2*i)) = (d_x/d_root);
-        h_2(0, 4+(2*i)) = (d_y/d_root);
-        h_2(1, 3+(2*i)) = -(d_y/d);
-        h_2(1, 4+(2*i)) = (d_x/d);
-
-        
+        }
         // h_2.print("check h calculations");
         // std::cout << "d_root %f" << d_root << std::endl;
 
@@ -197,9 +211,9 @@ namespace slamlib{
     
     
     //get previous state
-    arma::mat Estimate2d::get_prev_state_vector(){
-        return prev_state_vector;
-    }
+    // arma::mat Estimate2d::get_prev_state_vector(){
+    //     return prev_state_vector;
+    // }
 
     //get q_matrix
     arma::mat Estimate2d::get_q_matrix(){
@@ -219,11 +233,9 @@ namespace slamlib{
         
         for(int i = 0; i < marker; i++){
             
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*std::cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*std::sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
-
-            state_vector(3+(2*i), 0) = m_vec(0, 0);
-            state_vector(4+(2*i), 0) = m_vec(1, 0);
+            
+            state_vector(3+(2*i), 0) = temp_vec(2*i, 0)*std::cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + state_vector(0, 0)));
+            state_vector(4+(2*i), 0) = temp_vec(2*i, 0)*std::sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + state_vector(0, 0)));
             // ROS_WARN("r: ")
         }
 
@@ -233,7 +245,7 @@ namespace slamlib{
         // covariance.print("covariance matrix");
         // q_mat.print("q_matrix");
         // r_mat.print("r_matrix");
-        prev_state_vector.print("prev state vector");
+        // prev_state_vector.print("prev state vector");
         // h_2.print("H matrix");
 
     }
@@ -254,9 +266,9 @@ namespace slamlib{
     //     return phi;
     // }
 
-    void Estimate2d::set_prev_vector(arma::mat a){
-        prev_state_vector = a;
-    }
+    // void Estimate2d::set_prev_vector(arma::mat a){
+    //     prev_state_vector = a;
+    // }
 
     // //set r value
     // void Estimate2d::set_r(int a){

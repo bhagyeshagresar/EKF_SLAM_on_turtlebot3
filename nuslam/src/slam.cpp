@@ -68,9 +68,9 @@ static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
 
 arma::mat slam_fn(int m, int n){
     arma::mat state_vector_1 =  slam_obj.get_state_vector();
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < 3; i++){
         // prediction step 1
-        state_vector_1 = slam_obj.updated_state_vector(V_twist);
+        slam_obj.updated_state_vector(V_twist);
         state_vector_1.print("step 2: state_vector");
 
         // a.print("step 3: a");
@@ -79,17 +79,17 @@ arma::mat slam_fn(int m, int n){
         a.print("step 4: a");
         a.t().print("step 4: a+t");
     
-        // // // //prediction step 2
+        // // // // // //prediction step 2
         arma::mat sigma = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         sigma = (a*sigma*a2) + q_mat;
         sigma.print("step 6: sigma");
 
-        // // //update step 1
+        // // // //update step 1
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
         z_hat.print("step 8: z_hat");
 
-        // //update step 2
+        // // //update step 2
         arma::mat h = slam_obj.calculate_h(i);
         h.print("step 10: h");
 
@@ -103,7 +103,7 @@ arma::mat slam_fn(int m, int n){
         ki.print("step 12: ki");
 
 
-        //update step 3
+        // //update step 3
         
         arma::mat z = slam_obj.calculate_z(r_j, phi);
         z.print("step 14: z");
@@ -117,19 +117,19 @@ arma::mat slam_fn(int m, int n){
         state_vector_1 = state_vector_1 + (ki*(delta_z));
         state_vector_1.print("step 16: state_vector_1");
         
-        // state_vector_1.print("step 16: state_vector");
+        // // state_vector_1.print("step 16: state_vector");
 
 
-        //update step 4
-        arma::mat identity = arma::eye(n, n);
-        sigma = (identity - (ki*h))*sigma;
-        sigma.print("step 18: sigma");
+        // //update step 4
+        // arma::mat identity = arma::eye(n, n);
+        // sigma = (identity - (ki*h))*sigma;
+        // sigma.print("step 18: sigma");
 
-        // prev_state_vector.print("step 19: prev_state_vector");
-        // arma::mat prev_vector = slam_obj.get_prev_state_vector();
-        double theta = state_vector_1(0, 0);
-        state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
-        slam_obj.set_prev_vector(state_vector_1);
+        // // prev_state_vector.print("step 19: prev_state_vector");
+        // // arma::mat prev_vector = slam_obj.get_prev_state_vector();
+        // double theta = state_vector_1(0, 0);
+        // state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
+        // // slam_obj.set_prev_vector(state_vector_1);
         
         
         // prev_vector.print("step 19: prev_state_vector");
@@ -282,7 +282,7 @@ int main(int argc, char **argv){
 
 
 
-    ros::Rate r(500);
+    ros::Rate r(100);
 
     
     while(ros::ok()){

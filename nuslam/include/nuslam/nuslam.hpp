@@ -17,7 +17,7 @@ namespace slamlib
     private:
         int m; //number of obstacles
         int n; //size of matrix
-        arma::mat prev_state_vector;
+        // arma::mat prev_state_vector;
         arma::mat covariance;
         arma::mat state_vector;
         arma::mat q_mat;
@@ -40,7 +40,7 @@ namespace slamlib
         Estimate2d(int m, int n, double r, double q);
 
         //calculate state vector (zeta)
-        arma::mat updated_state_vector(turtlelib::Twist2D u);
+        void updated_state_vector(turtlelib::Twist2D u);
 
         //calculate A matrix
         arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n);
@@ -67,7 +67,7 @@ namespace slamlib
         arma::mat get_state_vector();
 
         //get previous state
-        arma::mat get_prev_state_vector();
+        // arma::mat get_prev_state_vector();
 
         //get q_matrix
         arma::mat get_q_matrix();
