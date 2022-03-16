@@ -79,9 +79,9 @@ namespace slamlib
 
         // void calculate_range_bearing(double x, double y);
 
-        double get_rj();
+        // double get_rj();
 
-        double get_phi();
+        // double get_phi();
 
         void set_prev_vector(arma::mat a);
     
