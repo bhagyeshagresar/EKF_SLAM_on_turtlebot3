@@ -51,7 +51,7 @@ static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
 // static int flag = 7;
-static arma::mat map_to_green(n, 1, arma::fill::zeros);
+static arma::mat map_to_green(9, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
 
 static arma::mat temp_vec(6, 1, arma::fill::zeros);
@@ -60,8 +60,16 @@ double phi{0.0};
 // static arma::mat state_vector_1(n, 1);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
 
-static arma::mat state_vector_1 =  slam_obj.get_state_vector();
-static arma::mat prev_vector = slam_obj.get_prev_state_vector();
+static arma::mat state_vector_1 = slam_obj.get_state_vector();
+static arma::mat prev_state_vector(9, 1, arma::fill::zeros);
+// static arma::mat sigma_prev(9, 9, arma::fill::zeros);
+// static arma::mat sigma_new(9, 9, arma::fill::zeros);
+// sigma_prev(3, 3) = 1000000;
+// sigma_prev(4, 4) = 1000000;
+// sigma_prev(5, 5) = 1000000;
+// sigma_prev(6, 6) = 1000000;
+// sigma_prev(7, 7) = 1000000;
+// sigma_prev(8, 8) = 1000000;
 static arma::mat sigma_prev = slam_obj.get_covariance();
 static arma::mat sigma_new = slam_obj.get_covariance();
 
@@ -69,28 +77,28 @@ static arma::mat sigma_new = slam_obj.get_covariance();
 
 
 
-arma::mat slam_fn(int m, int n){
+
+arma::mat slam_fn(){
    
 
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < 3; i++){
         // prediction step 1
-        state_vector_1 = slam_obj.updated_state_vector(V_twist);
+        state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
         state_vector_1.print("step 2: state_vector");
 
-        // a.print("step 3: a");
-        arma::mat a = slam_obj.calculate_A_matrix(V_twist, n);
+        arma::mat a = slam_obj.calculate_A_matrix(V_twist, n, prev_state_vector);
         arma::mat a2 = a.t();
         a.print("step 4: a");
         a.t().print("step 4: a+t");
     
-        // // // //prediction step 2
+        // // //prediction step 2
         // sigma_prev = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         sigma_new = (a*sigma_prev*a2) + q_mat;
         sigma_new.print("step 6: sigma");
 
         // // //update step 1
-        arma::mat z_hat = slam_obj.calculate_h(i);
+        arma::mat z_hat = slam_obj.calculate_z_hat(i);
         z_hat.print("step 8: z_hat");
 
         // //update step 2
@@ -101,7 +109,7 @@ arma::mat slam_fn(int m, int n){
         arma::mat h_tranpose = h.t();
         h_tranpose.print("step 11: h_transpose");
         r_matrix.print("step 12: r_matrix");
-        arma::mat mat_inv = arma::inv(h * sigma_new * h_tranpose + r_matrix);
+        arma::mat mat_inv = arma::inv((h * sigma_new * h_tranpose) + r_matrix);
         mat_inv.print("step 13: matInv");
         arma::mat ki = (sigma_new * h_tranpose * mat_inv);
         ki.print("step 12: ki");
@@ -128,14 +136,13 @@ arma::mat slam_fn(int m, int n){
         sigma_new = (identity - (ki*h))*sigma_new;
         sigma_new.print("step 18: sigma");
 
-        // prev_state_vector.print("step 19: prev_state_vector");
         
 
     }
     
-    double theta = state_vector_1(0, 0);
-    state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
-    prev_vector = state_vector_1;
+    // double theta = state_vector_1(0, 0);
+    // state_vector_1(0, 0) = theta;
+    prev_state_vector = state_vector_1;
     sigma_prev = sigma_new;
 
 
@@ -167,13 +174,13 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     if(state == 1){
         // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
-        slam_obj.init_fn(temp_vec, m);
+        slam_obj.init_fn(temp_vec, m, prev_state_vector);
         // state_vector_1 = slam_obj.get_state_vector();
     }
        
     
     state = 0;
-    map_to_green = slam_fn(m, n);
+    map_to_green = slam_fn();
     // map_to_green.print("map");
     // ROS_WARN("state changed");
    

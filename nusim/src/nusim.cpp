@@ -541,244 +541,184 @@ int main(int argc, char ** argv){
         for (int i = 0; i < num_readings; i++){
             double min_distance{0.0};
        
-            // for(int j = 0; j < num_markers; j++){
-            //     // std::vector <double> a(num_readings);
+            for(int j = 0; j < num_markers; j++){
+                // std::vector <double> a(num_readings);
 
                 
+                //compute points in robot frame
+                x_r = 0.0;
+                y_r = 0.0;
+                x_max = (max_range*cos(theta_range)); // x = rcos(theta)
+                y_max = (max_range*sin(theta_range)); // y = rsin(theta)
+                
+                // ROS_WARN("points in robot frame");
+                
+                //transformation of robot wrt world
+                turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
+                turtlelib::Transform2D Trw = Twr.inv();
+            
+                //Transform of obstacles wrt world
+                turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(j), y_m.at(j)}, 0.0};
+
+                // Transform from obstacles wrt robot
+                turtlelib::Transform2D Tro = Trw*Two;
+                turtlelib::Transform2D Tor = Tro.inv();
+             
+            
+                turtlelib::Vector2D V_op;
+                V_op = Tor(turtlelib::Vector2D{x_r, y_r});
+
+                turtlelib::Vector2D V_opmax;
+                V_opmax = Tor(turtlelib::Vector2D{x_max, y_max});
+                
+                //get points in obstacle frame
+                x_p = V_op.x;
+                y_p = V_op.y;
+
+                //get points in obstacle frame
+                x_pmax = V_opmax.x;
+                y_pmax = V_opmax.y;
+
+                //calculate distance from point on robot to the max point
+                d_x = x_pmax - x_p;
+                d_y = y_pmax - y_p;
+
+                d_r = distance_fn(d_x, d_y);
+                // ROS_WARN("x_p: %f", x_p);
+                // ROS_WARN("y_p: %f", y_p);
+                // ROS_WARN("x_pmax: %f", x_pmax);
+                // ROS_WARN("y_pmax: %f", y_pmax);
+
+                // ROS_WARN("d_r: %f", d_r);
+
+                delta = ((x_p*y_pmax) - (x_pmax*y_p));
+
+                //determine points of intersection
+                
+                sgn_dy = sgn_fn(d_y);
+                mod_dy = mod_fn(d_y);
+
+
+                
+                
+
+                discriminant = (pow(radius, 2)*pow(d_r, 2) - pow(delta, 2));
+                // ROS_WARN("got till discriminant");
+                // ROS_WARN("discrimant value: %f", discriminant);
+                
+                //store intersection points in array
+                if(discriminant > 0.0){
+                    x_int_neg = ((delta*d_y - (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
+
+                    x_int_pos = ((delta*d_y + (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
+
+                    y_int_neg = ((-(delta*d_x) - (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+            
+                    y_int_pos = ((-(delta*d_x) + (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+
+                    
+                    //pos
+                    //calculate transform wrt obstacles for intersection points - pos
+                    turtlelib::Transform2D T_o_intpos{turtlelib::Vector2D{x_int_pos, y_int_pos}, 0.0};
+
+
+
+                    //transform points back to robot frame
+                    turtlelib::Transform2D T_r_intpos = Tro*T_o_intpos;
+
+                    //get intersection points in robot frame
+                    V_rint_pos = T_r_intpos.translation();
+
+                    //calculate distance from robot to the intersection point in robot frame
+                    d_xint_pos = V_rint_pos.x - x_r;
+                    d_yint_pos = V_rint_pos.y - y_r;
+                    
+                    
+                    //neg
+                    //calculate transform wrt obstacles for intersection points - pos
+                    turtlelib::Transform2D T_o_intneg{turtlelib::Vector2D{x_int_neg, y_int_neg}, 0.0};
+
+
+
+                    //transform points back to robot frame
+                    turtlelib::Transform2D T_r_intneg = Tro*T_o_intneg;
+
+                    //get intersection points in robot frame
+                    V_rint_neg = T_r_intneg.translation();
+
+                    //calculate distance from robot to the intersection point in robot frame
+                    d_xint_neg = V_rint_neg.x - x_r;
+                    d_yint_neg = V_rint_neg.y - y_r;
+
+
+                    intersection_distance_neg = distance_fn(d_xint_neg, d_yint_neg);
+                    intersection_distance_pos = distance_fn(d_xint_pos, d_yint_pos);
+
+                    // ROS_WARN("intersection distance_pos %f", intersection_distance_pos);
+                    // ROS_WARN("intersection distance_pos %f", intersection_distance_neg);
+
+                    min_distance = std::min(intersection_distance_neg, intersection_distance_pos);
+                    
+                    // ROS_WARN("min_distance: %f", min_distance);
+                    
+                }
+
+            //walls
+            // for(int k = 0; k < 4; k++){
             //     //compute points in robot frame
             //     x_r = 0.0;
             //     y_r = 0.0;
             //     x_max = (max_range*cos(theta_range)); // x = rcos(theta)
             //     y_max = (max_range*sin(theta_range)); // y = rsin(theta)
-                
-            //     // ROS_WARN("points in robot frame");
-                
+
             //     //transformation of robot wrt world
             //     turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
             //     turtlelib::Transform2D Trw = Twr.inv();
-            
-            //     //Transform of obstacles wrt world
-            //     turtlelib::Transform2D Two{turtlelib::Vector2D{x_m.at(j), y_m.at(j)}, 0.0};
 
-            //     // Transform from obstacles wrt robot
-            //     turtlelib::Transform2D Tro = Trw*Two;
-            //     turtlelib::Transform2D Tor = Tro.inv();
-             
-            
-            //     turtlelib::Vector2D V_op;
-            //     V_op = Tor(turtlelib::Vector2D{x_r, y_r});
+            //     //Transform of walls wrt world
+            //     turtlelib::Transform2D Twwall{turtlelib::Vector2D{wall_xpos.at(k), wall_ypos.at(j)}, 0.0};
 
-            //     turtlelib::Vector2D V_opmax;
-            //     V_opmax = Tor(turtlelib::Vector2D{x_max, y_max});
+            //     // Transform from walls wrt robot
+            //     turtlelib::Transform2D Trwall = Trw*Twwall;
+            //     turtlelib::Transform2D Twallr = Trwall.inv();
+
+            //     turtlelib::Vector2D V_wallsp;
+            //     V_wallsp = Twallsr(turtlelib::Vector2D{x_r, y_r});
+
+            //     turtlelib::Vector2D V_wallspmax;
+            //     V_wallspmax = Twallsr(turtlelib::Vector2D{x_max, y_max});
                 
-            //     //get points in obstacle frame
+            //     //get points in wall frame
             //     x_p = V_op.x;
             //     y_p = V_op.y;
 
-            //     //get points in obstacle frame
+            
             //     x_pmax = V_opmax.x;
             //     y_pmax = V_opmax.y;
 
-            //     //calculate distance from point on robot to the max point
-            //     d_x = x_pmax - x_p;
-            //     d_y = y_pmax - y_p;
-
-            //     d_r = distance_fn(d_x, d_y);
-            //     // ROS_WARN("x_p: %f", x_p);
-            //     // ROS_WARN("y_p: %f", y_p);
-            //     // ROS_WARN("x_pmax: %f", x_pmax);
-            //     // ROS_WARN("y_pmax: %f", y_pmax);
-
-            //     // ROS_WARN("d_r: %f", d_r);
-
-            //     delta = ((x_p*y_pmax) - (x_pmax*y_p));
-
-            //     //determine points of intersection
-                
-            //     sgn_dy = sgn_fn(d_y);
-            //     mod_dy = mod_fn(d_y);
 
 
-                
-                
 
-            //     discriminant = (pow(radius, 2)*pow(d_r, 2) - pow(delta, 2));
-            //     // ROS_WARN("got till discriminant");
-            //     // ROS_WARN("discrimant value: %f", discriminant);
-                
-            //     //store intersection points in array
-            //     if(discriminant > 0.0){
-            //         x_int_neg = ((delta*d_y - (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
 
-            //         x_int_pos = ((delta*d_y + (sgn_dy*d_x*sqrt(pow(radius, 2)*pow(d_r, 2) - pow(delta, 2))))/pow(d_r, 2));
 
-            //         y_int_neg = ((-(delta*d_x) - (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+            // } 
+                // a[j] = 2.0;
+
             
-            //         y_int_pos = ((-(delta*d_x) + (mod_dy*sqrt(pow(radius, 2)*pow(d_r, 2)) - pow(delta, 2)))/pow(d_r, 2));
+            
+        }
 
-                    
-            //         //pos
-            //         //calculate transform wrt obstacles for intersection points - pos
-            //         turtlelib::Transform2D T_o_intpos{turtlelib::Vector2D{x_int_pos, y_int_pos}, 0.0};
+            // scan.ranges[i] = 1;
 
-
-
-            //         //transform points back to robot frame
-            //         turtlelib::Transform2D T_r_intpos = Tro*T_o_intpos;
-
-            //         //get intersection points in robot frame
-            //         V_rint_pos = T_r_intpos.translation();
-
-            //         //calculate distance from robot to the intersection point in robot frame
-            //         d_xint_pos = V_rint_pos.x - x_r;
-            //         d_yint_pos = V_rint_pos.y - y_r;
-                    
-                    
-            //         //neg
-            //         //calculate transform wrt obstacles for intersection points - pos
-            //         turtlelib::Transform2D T_o_intneg{turtlelib::Vector2D{x_int_neg, y_int_neg}, 0.0};
-
-
-
-            //         //transform points back to robot frame
-            //         turtlelib::Transform2D T_r_intneg = Tro*T_o_intneg;
-
-            //         //get intersection points in robot frame
-            //         V_rint_neg = T_r_intneg.translation();
-
-            //         //calculate distance from robot to the intersection point in robot frame
-            //         d_xint_neg = V_rint_neg.x - x_r;
-            //         d_yint_neg = V_rint_neg.y - y_r;
-
-
-            //         intersection_distance_neg = distance_fn(d_xint_neg, d_yint_neg);
-            //         intersection_distance_pos = distance_fn(d_xint_pos, d_yint_pos);
-
-            //         ROS_WARN("intersection distance_pos %f", intersection_distance_pos);
-            //         ROS_WARN("intersection distance_pos %f", intersection_distance_neg);
-
-            //         min_distance = std::min(intersection_distance_neg, intersection_distance_pos);
-                    
-            //         ROS_WARN("min_distance: %f", min_distance);
-                    
-            //     }
-            // }
-
-            // walls
-            for(int k = 0; k < 4; k++){
-                //compute points in robot frame
-                x_r = 0.0; // x1
-                y_r = 0.0; // y1
-                x_max = (max_range*cos(theta_range + theta)); // x2
-                y_max = (max_range*sin(theta_range + theta)); // y2
-
-                //compute transformation of robot to world
-                // turtlelib::Transform2D Twr{turtlelib::Vector2D{x, y}, theta};
-                // turtlelib::Transform2D Trw = Twr.inv();
-                
-                // //x_max and y_max in world frame
-                // turtlelib::Vector2D V_world;
-                // V_world = Twr(turtlelib::Vector2D{x_max, y_max});
-
-                //position of robot in world frame
-                x_1 = x;
-                y_1 = y;
-                
-                //position of max point in world frame
-                x_2 = x + x_max;
-                y_2 = y + y_max;
-                
-                // ROS_WARN("x_2: %f", x_2);
-                // ROS_WARN("y_2: %f", y_2);
-
-                
-
-
-                // Transform to walls wrt robot
-                // turtlelib::Transform2D Trwall = Trw*Twwall;
-                // turtlelib::Transform2D Twallr = Trwall.inv();
-
-                //wall points in world frame
-                if(k == 0){
-                    x_3 = 3.0;
-                    y_3 = 6.1/2.0;
-                    x_4 = 3.0;
-                    y_4 = -6.1/2.0;
-                }
-
-                if(k == 1){
-                    x_3 = -3.0;
-                    y_3 = 6.1/2.0;
-                    x_4 = -3.0;
-                    y_4 = -6.1/2.0;
-                }
-
-                if(k == 2){
-                    x_3 = 3.0;
-                    y_3 = 6.1/2.0;
-                    x_4 = -3.0;
-                    y_4 = 6.1/2.0;
-                }
-
-                if(k == 3){
-                    x_3 = 3.0;
-                    y_3 = -6.1/2.0;
-                    x_4 = -3.0;
-                    y_4 = -6.1/2.0;
-                }
-
-                // ROS_WARN("x_3: %f", x_3);
-                // ROS_WARN("y_3: %f", y_3);
-
-                // ROS_WARN("x_4: %f", x_4);
-                // ROS_WARN("y_4: %f", y_4);
-
-
-              
-                //calculate intersection in world frame
-
-                d_new = ((x_1 - x_2)*(y_3 - y_4) - (y_1 - y_2)*(x_3 - x_4));
-
-                p_x = (((x_1*y_2 - y_1*x_2)*(x_3 - y_4) - (x_1 - x_2)*(x_3*y_4 - y_3*x_4))/d_new);
-
-                p_y = (((x_1*y_2 - y_1*x_2)*(y_3 - y_4) - (y_1 - y_2)*(x_3*y_4 - y_3*x_4))/d_new);
-
-                
-                // ROS_WARN("p_x: %f", p_x);
-                // ROS_WARN("p_y: %f", p_y);
-
-
-
-
-                //calculate intersection distance
-                d_x_new = p_x - x_1;
-                d_y_new = p_y - y_1;
-
-                intersection_distance_wall = distance_fn(d_x_new, d_y_new);
-
-
-
-        
-            }
-
-            // if(min_distance < intersection_distance_wall){
-            //     scan.ranges[i] = min_distance;
-
-            // }
-            // else{
-            //     scan.ranges[i] = intersection_distance_wall;
-            // }
-            scan.ranges[i] = intersection_distance_wall;
+            // scan.ranges[i] = *std::min_element(a.begin(), a.end());
+            scan.ranges[i] = min_distance;
 
             // ROS_WARN("scan.ranges[i]: %f", scan.ranges[i]);
             theta_range += scan.angle_increment; 
 
-        
-        
-        
         }
-
     
+
 
 
             
