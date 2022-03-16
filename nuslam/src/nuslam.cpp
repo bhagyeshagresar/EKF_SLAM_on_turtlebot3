@@ -20,9 +20,7 @@ namespace slamlib{
          r_mat(2, 2, arma::fill::zeros), 
          r{r}, 
          q{q},
-         m_vec(2, 1, arma::fill::zeros),
-         r_j{0.0},
-         phi{0.0}
+         m_vec(2, 1, arma::fill::zeros)
          { 
             prev_state_vector(0, 0) = 0;
             prev_state_vector(1, 0) = 0;
@@ -55,8 +53,8 @@ namespace slamlib{
         if (u.theta_dot == 0.0){
             //fill the state vector 
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + 0.0);
-            state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
-            state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
+            state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*std::cos(prev_state_vector(0, 0)));
+            state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*std::sin(prev_state_vector(0, 0)));
             
 
 
@@ -65,8 +63,8 @@ namespace slamlib{
         else{
             double delta = u.x_dot/u.theta_dot;
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
-            state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*sin(prev_state_vector(0, 0))) + ((delta)*sin(prev_state_vector(0, 0) + u.theta_dot));
-            state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*cos(prev_state_vector(0, 0))) - ((delta)*cos(prev_state_vector(0, 0) + u.theta_dot));
+            state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*std::sin(prev_state_vector(0, 0))) + ((delta)*std::sin(prev_state_vector(0, 0) + u.theta_dot));
+            state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*std::cos(prev_state_vector(0, 0))) - ((delta)*std::cos(prev_state_vector(0, 0) + u.theta_dot));
            
 
 
@@ -90,8 +88,8 @@ namespace slamlib{
 
             //second term
             
-            a_2(1, 0) = -u.x_dot*sin(prev_state_vector(0, 0));
-            a_2(2, 0) = u.x_dot*cos(prev_state_vector(0, 0));
+            a_2(1, 0) = -u.x_dot*std::sin(prev_state_vector(0, 0));
+            a_2(2, 0) = u.x_dot*std::cos(prev_state_vector(0, 0));
             a_3 = a_1 + a_2;
 
 
@@ -102,8 +100,8 @@ namespace slamlib{
             //second term
             double delta_2 = u.x_dot/u.theta_dot;
           
-            a_2(1, 0) = -((delta_2)*cos(prev_state_vector(0, 0))) + (delta_2)*cos(prev_state_vector(0, 0) + u.theta_dot);
-            a_2(2, 0) = -((delta_2)*sin(prev_state_vector(0, 0))) + (delta_2)*sin(prev_state_vector(0, 0) + u.theta_dot);
+            a_2(1, 0) = -((delta_2)*std::cos(prev_state_vector(0, 0))) + (delta_2)*std::cos(prev_state_vector(0, 0) + u.theta_dot);
+            a_2(2, 0) = -((delta_2)*std::sin(prev_state_vector(0, 0))) + (delta_2)*std::sin(prev_state_vector(0, 0) + u.theta_dot);
             a_3 = a_1 + a_2;
             
         }
@@ -121,8 +119,8 @@ namespace slamlib{
 
         d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
         d_y = state_vector(4+(2*i), 0) - state_vector(2, 0);
-        d = ((pow(d_x, 2) + pow(d_y, 2)));
-        d_root = sqrt(d);
+        d = ((std::pow(d_x, 2) + std::pow(d_y, 2)));
+        d_root = std::sqrt(d);
 
         arma::mat h_2(2, n, arma::fill::zeros);
         h_2(1,0) = -1;
@@ -165,10 +163,10 @@ namespace slamlib{
 
     
     //calculate z
-    arma::mat Estimate2d::calculate_z(){
+    arma::mat Estimate2d::calculate_z(double f, double g){
         arma::mat h(2, 1);
-        h(0, 0) = r_j;
-        h(1, 0) = turtlelib::normalize_angle(phi);
+        h(0, 0) = r;
+        h(1, 0) = turtlelib::normalize_angle(g);
         return h;
     }
 
@@ -178,8 +176,8 @@ namespace slamlib{
        
         arma::mat z_hat(2, 1, arma::fill::zeros);
 
-        z_hat(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
-        z_hat(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
+        z_hat(0, 0) = sqrt(std::pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + std::pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
+        z_hat(1, 0) = turtlelib::normalize_angle(std::atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
 
        
         
@@ -213,16 +211,16 @@ namespace slamlib{
         return r_mat;
     }
 
-    void Estimate2d::init_fn(arma::mat temp_vec, int m)
+    void Estimate2d::init_fn(arma::mat temp_vec, int marker)
     {
        
       
         // arma::mat m_vec(2, 1);
         
-        for(int i = 0; i < m; i++){
+        for(int i = 0; i < marker; i++){
             
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
+            m_vec(0, 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*std::cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
+            m_vec(1, 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*std::sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
 
             state_vector(3+(2*i), 0) = m_vec(0, 0);
             state_vector(4+(2*i), 0) = m_vec(1, 0);
@@ -241,19 +239,23 @@ namespace slamlib{
     }
 
 
-    void Estimate2d::calculate_range_bearing(double x, double y){
+    // void Estimate2d::calculate_range_bearing(double x, double y){
        
-        r_j = sqrt(pow(x, 2) + pow(y, 2));
-        phi = atan2(y, x);
+    //     r_j = std::sqrt(pow(x, 2) + pow(y, 2));
+    //     phi = std::atan2(y, x);
 
-    }
+    // }
 
-    double Estimate2d::get_rj(){
-        return r_j;
-    }
+    // double Estimate2d::get_rj(){
+    //     return r_j;
+    // }
 
-    double Estimate2d::get_phi(){
-        return phi;
+    // double Estimate2d::get_phi(){
+    //     return phi;
+    // }
+
+    void Estimate2d::set_prev_vector(arma::mat a){
+        prev_state_vector = a;
     }
 
     // //set r value
@@ -274,10 +276,3 @@ namespace slamlib{
 
 }
     
-    
-
-
-
-
-
-

@@ -28,8 +28,8 @@ namespace slamlib
         // double init_y_pos; 
         // double init_theta_pos;
         arma::mat m_vec;
-        double r_j;
-        double phi;
+        // double r_j;
+        // double phi;
         // arma::mat h_2;
         
         
@@ -55,7 +55,7 @@ namespace slamlib
         // arma::mat calculate_q_mat();
 
         //calculate z
-        arma::mat calculate_z();
+        arma::mat calculate_z(double f, double g);
 
         //calculate z_hat
         arma::mat calculate_z_hat(int i);
@@ -75,13 +75,15 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        void init_fn(arma::mat temp_vec, int m);
+        void init_fn(arma::mat temp_vec, int marker);
 
-        void calculate_range_bearing(double x, double y);
+        // void calculate_range_bearing(double x, double y);
 
-        double get_rj();
+        // double get_rj();
 
-        double get_phi();
+        // double get_phi();
+
+        void set_prev_vector(arma::mat a);
     
         // //set r value
         // void set_r(int a);

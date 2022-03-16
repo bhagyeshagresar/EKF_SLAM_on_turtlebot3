@@ -50,6 +50,8 @@ static double q_noise{1.0};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
+static double r_j{0.0};
+static double phi{0.0};
 // static int flag = 7;
 static arma::mat map_to_green(n, 1, arma::fill::zeros);
 static arma::mat delta_z(2, 1, arma::fill::zeros);
@@ -57,6 +59,7 @@ static arma::mat delta_z(2, 1, arma::fill::zeros);
 static arma::mat temp_vec(6, 1, arma::fill::zeros);
 // static arma::mat state_vector_1(n, 1);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
+
 
 
 
@@ -83,7 +86,7 @@ arma::mat slam_fn(int m, int n){
         sigma.print("step 6: sigma");
 
         // // //update step 1
-        arma::mat z_hat = slam_obj.calculate_h(i);
+        arma::mat z_hat = slam_obj.calculate_z_hat(i);
         z_hat.print("step 8: z_hat");
 
         // //update step 2
@@ -101,7 +104,8 @@ arma::mat slam_fn(int m, int n){
 
 
         //update step 3
-        arma::mat z = slam_obj.calculate_z();
+        
+        arma::mat z = slam_obj.calculate_z(r_j, phi);
         z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
@@ -122,15 +126,20 @@ arma::mat slam_fn(int m, int n){
         sigma.print("step 18: sigma");
 
         // prev_state_vector.print("step 19: prev_state_vector");
-        arma::mat prev_vector = slam_obj.get_prev_state_vector();
-        prev_vector = state_vector_1;
-        prev_vector.print("step 20: prev_state_vector");
+        // arma::mat prev_vector = slam_obj.get_prev_state_vector();
+        double theta = state_vector_1(0, 0);
+        state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
+        slam_obj.set_prev_vector(state_vector_1);
+        
+        
+        // prev_vector.print("step 19: prev_state_vector");
+        // prev_vector = state_vector_1;
+        // prev_vector.print("step 20: prev_state_vector");
         
 
     }
     
-    double theta = state_vector_1(0, 0);
-    state_vector_1(0, 0) = turtlelib::normalize_angle(theta);
+    
     return state_vector_1;
 }
 
@@ -143,13 +152,13 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     x_bar.resize(3);
     y_bar.resize(3);
     // ROS_WARN("m: %d", m);
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < 3; i++){
         // ROS_WARN("m: %d", m);
         x_bar.at(i) = msg.markers[i].pose.position.x;
         y_bar.at(i) = msg.markers[i].pose.position.y;
         ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
-        double r_j = slam_obj.get_rj();
-        double phi = slam_obj.get_phi();
+        // double r_j = slam_obj.get_rj();
+        // double phi = slam_obj.get_phi();
         r_j = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
         phi = atan2(y_bar.at(i), x_bar.at(i));
 
@@ -387,9 +396,9 @@ int main(int argc, char **argv){
 
         visualization_msgs::MarkerArray slam_array;
         //publish slam markers
-        for (int i = 0; i < m; i++){
+        for (int i = 0; i < 3; i++){
             // map_to_green.print("map");
-            
+        
 
             visualization_msgs::Marker slam_marker;
             slam_marker.header.frame_id = "map";
