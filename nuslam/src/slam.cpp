@@ -75,50 +75,51 @@ arma::mat slam_fn(){
 
     for(int i = 0; i < 3; i++){
         // prediction step 1
+        prev_state_vector.print("prev_state_vector in loop");
         state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
         state_vector_1.print("step 2: state_vector");
 
         arma::mat a = slam_obj.calculate_A_matrix(V_twist, n, prev_state_vector);
         arma::mat a2 = a.t();
-        a.print("step 4: a");
-        a.t().print("step 4: a+t");
+        // a.print("step 4: a");
+        // a.t().print("step 4: a+t");
     
         // // //prediction step 2
         // sigma_prev = slam_obj.get_covariance();
         arma::mat q_mat = slam_obj.get_q_matrix();
         sigma_new = (a*sigma_prev*a2) + q_mat;
-        sigma_new.print("step 6: sigma");
+        // sigma_new.print("step 6: sigma");
 
         // // //update step 1
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-        z_hat.print("step 8: z_hat");
+        // z_hat.print("step 8: z_hat");
 
         // //update step 2
         arma::mat h = slam_obj.calculate_h(i);
-        h.print("step 10: h");
+        // h.print("step 10: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
         arma::mat h_tranpose = h.t();
-        h_tranpose.print("step 11: h_transpose");
-        r_matrix.print("step 12: r_matrix");
+        // h_tranpose.print("step 11: h_transpose");
+        // r_matrix.print("step 12: r_matrix");
         arma::mat mat_inv = arma::inv((h * sigma_new * h_tranpose) + r_matrix);
-        mat_inv.print("step 13: matInv");
+        // mat_inv.print("step 13: matInv");
         arma::mat ki = (sigma_new * h_tranpose * mat_inv);
-        ki.print("step 12: ki");
+        // ki.print("step 12: ki");
 
 
         //update step 3
         arma::mat z = slam_obj.calculate_z(r_j, phi);
-        z.print("step 14: z");
+        // z.print("step 14: z");
 
         // // state_vector.print("step 15: state_vector");
         arma::mat delta_z(2, 1, arma::fill::zeros);
         delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
         delta_z(1, 0) = z(1, 0) - z_hat(1, 0);
         delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
-        delta_z.print("step 15: delta_z");
+        // delta_z.print("step 15: delta_z");
         state_vector_1 = state_vector_1 + (ki*(delta_z));
-        state_vector_1.print("step 16: state_vector_1");
+        // state_vector_1.print("step 16: state_vector_1");
         
         // state_vector_1.print("step 16: state_vector");
 
@@ -126,7 +127,7 @@ arma::mat slam_fn(){
         //update step 4
         arma::mat identity = arma::eye(n, n);
         sigma_new = (identity - (ki*h))*sigma_new;
-        sigma_new.print("step 18: sigma");
+        // sigma_new.print("step 18: sigma");
 
         
 
@@ -169,7 +170,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         prev_state_vector = slam_obj.init_fn(temp_vec, m, prev_state_vector);
         // state_vector_1 = slam_obj.get_state_vector();
     }
-       
+    prev_state_vector.print("prev vector after init");
     
     state = 0;
     map_to_green = slam_fn();

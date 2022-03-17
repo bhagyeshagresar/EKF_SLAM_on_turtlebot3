@@ -53,7 +53,13 @@ namespace slamlib{
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0));
             state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
             state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
-            
+            state_vector(3, 0) = prev_state_vector(3, 0);
+            state_vector(4, 0) = prev_state_vector(4, 0);
+            state_vector(5, 0) = prev_state_vector(5, 0);
+            state_vector(6, 0) = prev_state_vector(6, 0);
+            state_vector(7, 0) = prev_state_vector(7, 0);
+            state_vector(8, 0) = prev_state_vector(8, 0);
+
 
 
         
@@ -63,6 +69,13 @@ namespace slamlib{
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
             state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*sin(prev_state_vector(0, 0))) + ((delta)*sin(prev_state_vector(0, 0) + u.theta_dot));
             state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*cos(prev_state_vector(0, 0))) - ((delta)*cos(prev_state_vector(0, 0) + u.theta_dot));
+            state_vector(3, 0) = prev_state_vector(3, 0);
+            state_vector(4, 0) = prev_state_vector(4, 0);
+            state_vector(5, 0) = prev_state_vector(5, 0);
+            state_vector(6, 0) = prev_state_vector(6, 0);
+            state_vector(7, 0) = prev_state_vector(7, 0);
+            state_vector(8, 0) = prev_state_vector(8, 0);
+
            
 
 
@@ -211,12 +224,10 @@ namespace slamlib{
         
         for(int i = 0; i < 3; i++){
             
-            m_vec(0, 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
-            m_vec(1, 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
+            state_vector(3+(2*i), 0) = (prev_state_vector(1, 0)) + temp_vec(2*i, 0)*cos(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
+            state_vector(4+(2*i), 0) = (prev_state_vector(2, 0)) + temp_vec(2*i, 0)*sin(turtlelib::normalize_angle(temp_vec((2*i)+1, 0) + prev_state_vector(0, 0)));
 
-            state_vector(3+(2*i), 0) = m_vec(0, 0);
-            state_vector(4+(2*i), 0) = m_vec(1, 0);
-            // ROS_WARN("r: ")
+            
         }
 
        return state_vector;
