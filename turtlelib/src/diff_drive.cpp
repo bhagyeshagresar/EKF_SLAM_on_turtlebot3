@@ -74,8 +74,8 @@ namespace turtlelib
     Wheels_vel DiffDrive::inverse_kinematics(Twist2D V){
         Wheels_vel w_vel;
 
-        w_vel.w1_vel = (1/r)*((-d*V.theta_dot) + V.x_dot);
-        w_vel.w2_vel = (1/r)*((d*V.theta_dot) + V.x_dot);
+        w_vel.w1_vel = (-d/r)*V.theta_dot + (V.x_dot)/r;
+        w_vel.w2_vel = (d/r)*V.theta_dot + (V.x_dot)/r;
         
         // std::cout << "w_vel.w1_vel " << w_vel.w1_vel << std::endl;
         // std::cout << "w_vel.w2_vel " << w_vel.w2_vel << std::endl;

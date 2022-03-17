@@ -46,9 +46,9 @@ namespace slamlib{
         arma::mat state_vector(9, 1, arma::fill::zeros);
         if (turtlelib::almost_equal(u.theta_dot, 0.0)){
             //fill the state vector 
-            state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0));
-            state_vector(1, 0) = prev_state_vector(1, 0) + (u.x_dot*cos(prev_state_vector(0, 0)));
-            state_vector(2, 0) = prev_state_vector(2, 0) + (u.x_dot*sin(prev_state_vector(0, 0)));
+            state_vector(0, 0) = prev_state_vector(0,0);
+            state_vector(1, 0) = prev_state_vector(1, 0) + ((u.x_dot)*cos(prev_state_vector(0, 0)));
+            state_vector(2, 0) = prev_state_vector(2, 0) + ((u.x_dot)*sin(prev_state_vector(0, 0)));
             state_vector(3, 0) = prev_state_vector(3, 0);
             state_vector(4, 0) = prev_state_vector(4, 0);
             state_vector(5, 0) = prev_state_vector(5, 0);
@@ -61,7 +61,7 @@ namespace slamlib{
         
         }
         else{
-            double delta = u.x_dot/u.theta_dot;
+            double delta = (u.x_dot)/(u.theta_dot);
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0) + u.theta_dot);
             state_vector(1, 0) = prev_state_vector(1, 0) + (-(delta)*sin(prev_state_vector(0, 0))) + ((delta)*sin(prev_state_vector(0, 0) + u.theta_dot));
             state_vector(2, 0) = prev_state_vector(2, 0) + ((delta)*cos(prev_state_vector(0, 0))) - ((delta)*cos(prev_state_vector(0, 0) + u.theta_dot));
@@ -95,7 +95,7 @@ namespace slamlib{
 
             //second term
             
-            a_2(1, 0) = -u.x_dot*sin(prev_state_vector(0, 0));
+            a_2(1, 0) = -(u.x_dot)*sin(prev_state_vector(0, 0));
             a_2(2, 0) = u.x_dot*cos(prev_state_vector(0, 0));
             // a_3 = a_1 + a_2;
 

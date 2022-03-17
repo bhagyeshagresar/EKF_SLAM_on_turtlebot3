@@ -74,13 +74,13 @@ void sensor_data_callback(const nuturtlebot_msgs::SensorData& sensor_msg){
     left_wheel_angle = (double)(encoder_ticks_to_rad)*left_encoder_ticks;
     right_wheel_angle = (double)(encoder_ticks_to_rad)*right_encoder_ticks;
 
-    left_wheel_velocity = (double)(motor_cmd_to_rad_sec)*left_encoder_ticks;
-    right_wheel_velocity = (double)(motor_cmd_to_rad_sec)*right_encoder_ticks;
+    // left_wheel_velocity = (double)(motor_cmd_to_rad_sec)*left_encoder_ticks;
+    // right_wheel_velocity = (double)(motor_cmd_to_rad_sec)*right_encoder_ticks;
 
     js.header.stamp = ros::Time::now();
     js.name = {"red-wheel_left_joint", "red-wheel_right_joint"};
     js.position = {left_wheel_angle, right_wheel_angle};
-    js.velocity = {left_wheel_velocity, right_wheel_velocity};
+    js.velocity = {w_vel.w1_vel, w_vel.w2_vel};
     // js.position = {1, 2};
     // js.velocity = {2, 3};
     js.effort = {0.0, 0.0};
