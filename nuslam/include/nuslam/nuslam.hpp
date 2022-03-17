@@ -19,7 +19,7 @@ namespace slamlib
         int n; //size of matrix
         // arma::mat prev_state_vector;
         arma::mat covariance;
-        arma::mat state_vector;
+        // arma::mat state_vector;
         arma::mat q_mat;
         arma::mat r_mat;
         double r;
@@ -64,7 +64,7 @@ namespace slamlib
         arma::mat get_covariance();
 
         //get state_vector zeta
-        arma::mat get_state_vector();
+        // arma::mat get_state_vector();
 
         //get previous state
         // arma::mat get_prev_state_vector();
@@ -75,7 +75,7 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        void init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector);
+        arma::mat init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector);
 
         // void calculate_range_bearing(double x, double y);
 

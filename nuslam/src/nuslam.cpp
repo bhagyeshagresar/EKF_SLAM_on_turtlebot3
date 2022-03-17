@@ -14,8 +14,7 @@ namespace slamlib{
         :m{m}, 
          n{n},
         //  prev_state_vector(9, 1, arma::fill::zeros),
-         covariance(9, 9, arma::fill::zeros),
-         state_vector(9, 1, arma::fill::zeros), 
+         covariance(9, 9, arma::fill::zeros), 
          q_mat(9, 9, arma::fill::zeros), 
          r_mat(2, 2, arma::fill::zeros), 
          r{r}, 
@@ -48,7 +47,7 @@ namespace slamlib{
 
     //calculate state vector (zeta)
     arma::mat Estimate2d::updated_state_vector(turtlelib::Twist2D u, arma::mat prev_state_vector){
-
+        arma::mat state_vector(9, 1, arma::fill::zeros);
         if (turtlelib::almost_equal(u.theta_dot, 0.0)){
             //fill the state vector 
             state_vector(0, 0) = turtlelib::normalize_angle(prev_state_vector(0, 0));
@@ -115,6 +114,7 @@ namespace slamlib{
         double d_y{0.0};
         double d{0.0};
         double d_root{0.0};
+        arma::mat state_vector(9, 1, arma::fill::zeros);
 
         d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
         d_y = state_vector(4+(2*i), 0) - state_vector(2, 0);
@@ -175,6 +175,7 @@ namespace slamlib{
     arma::mat Estimate2d::calculate_z_hat(int i){
        
         arma::mat z_hat(2, 1, arma::fill::zeros);
+        arma::mat state_vector(9, 1, arma::fill::zeros);
 
         z_hat(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
         z_hat(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
@@ -190,16 +191,7 @@ namespace slamlib{
         return covariance;
     }
 
-    //get state_vector zeta
-    arma::mat Estimate2d::get_state_vector(){
-        return state_vector;
-    }
     
-    
-    //get previous state
-    // arma::mat Estimate2d::get_prev_state_vector(){
-    //     return prev_state_vector;
-    // }
 
     //get q_matrix
     arma::mat Estimate2d::get_q_matrix(){
@@ -211,9 +203,9 @@ namespace slamlib{
         return r_mat;
     }
 
-    void Estimate2d::init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector)
+    arma::mat Estimate2d::init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector)
     {
-       
+        arma::mat state_vector(9, 1, arma::fill::zeros);
       
         // arma::mat m_vec(2, 1);
         
@@ -227,13 +219,9 @@ namespace slamlib{
             // ROS_WARN("r: ")
         }
 
-        // state_vector.print("init state_vector");
+       return state_vector;
 
-        state_vector.print("state vector");
-        // covariance.print("covariance matrix");
-        // q_mat.print("q_matrix");
-        // r_mat.print("r_matrix");
-        prev_state_vector.print("prev state vector");
+
         // h_2.print("H matrix");
 
     }

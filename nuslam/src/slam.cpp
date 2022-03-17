@@ -60,16 +60,8 @@ double phi{0.0};
 // static arma::mat state_vector_1(n, 1);
 static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
 
-static arma::mat state_vector_1 = slam_obj.get_state_vector();
+static arma::mat state_vector_1(9, 1, arma::fill::zeros);
 static arma::mat prev_state_vector(9, 1, arma::fill::zeros);
-// static arma::mat sigma_prev(9, 9, arma::fill::zeros);
-// static arma::mat sigma_new(9, 9, arma::fill::zeros);
-// sigma_prev(3, 3) = 1000000;
-// sigma_prev(4, 4) = 1000000;
-// sigma_prev(5, 5) = 1000000;
-// sigma_prev(6, 6) = 1000000;
-// sigma_prev(7, 7) = 1000000;
-// sigma_prev(8, 8) = 1000000;
 static arma::mat sigma_prev = slam_obj.get_covariance();
 static arma::mat sigma_new = slam_obj.get_covariance();
 
@@ -174,7 +166,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     if(state == 1){
         // ROS_WARN("calling init fn");
         ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
-        slam_obj.init_fn(temp_vec, m, prev_state_vector);
+        prev_state_vector = slam_obj.init_fn(temp_vec, m, prev_state_vector);
         // state_vector_1 = slam_obj.get_state_vector();
     }
        
