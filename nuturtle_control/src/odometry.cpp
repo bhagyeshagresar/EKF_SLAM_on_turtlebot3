@@ -58,8 +58,8 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
 
     // twist comes from wheel velocities in joint states
 
-    V_twist.x_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w1_vel +  wheel_vel.w2_vel))/2))/(500.0);
-    V_twist.theta_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w2_vel -  wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d())))/(500.0);
+    V_twist.x_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w1_vel +  wheel_vel.w2_vel))/2));
+    V_twist.theta_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w2_vel -  wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d())));
 
     ROS_WARN("forward twist: %f", V_twist.x_dot);
     ROS_WARN("forward twist: %f", V_twist.theta_dot);

@@ -28,10 +28,14 @@
 
 static nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
+static turtlelib::Configuration current_config_slam;
+
 static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   
 static turtlelib::Twist2D V_twist;
 static turtlelib::DiffDrive fwd_diff_drive;
+static turtlelib::DiffDrive fwd_diff_drive_slam;
+
 static double init_x_pos{0.0};
 static double init_y_pos{0.0};
 static double init_theta_pos{0.0};
@@ -71,8 +75,16 @@ static arma::mat sigma_new = slam_obj.get_covariance();
 
 
 arma::mat slam_fn(){
-    state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
+    // state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
         // state_vector_1.print("step 2: state_vector");
+    // current_config_slam = fwd_diff_drive_slam.forward_kinematics(wheel_angle);
+
+    // prev_state_vector(0, 0) = current_config_slam.theta_config;
+    // prev_state_vector(1, 0) = current_config_slam.x_config;
+    // prev_state_vector(2, 0) = current_config_slam.y_config;
+    // prev_state_vector.print("prev_state_vector in loop");
+
+    
 
     arma::mat a = slam_obj.calculate_A_matrix(V_twist, prev_state_vector);
     arma::mat a2 = a.t();
@@ -131,9 +143,9 @@ arma::mat slam_fn(){
         // delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
         // delta_z.print("step 15: delta_z");
         // state_vector_1 = state_vector_1 + (ki*(delta_z));
-        // state_vector_1.print("step 16: state_vector_1");
+        // // state_vector_1.print("step 16: state_vector_1");
         
-        // state_vector_1.print("step 16: state_vector");
+        // // state_vector_1.print("step 16: state_vector");
 
 
         // // update step 4
@@ -191,7 +203,8 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     state = 0;
     map_to_green = slam_fn();
    
-
+    // auto fake_sensor_time = ros::Time::now();
+    // ROS_WARN_STREAM("fake sensor time: " << fake_sensor_time);
     // map_to_green.print("map");
     // ROS_WARN("state changed");
    
@@ -232,8 +245,11 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     // V_twist.theta_dot = 0.1;
     // V_twist.y_dot = 0.0;
 
-    ROS_WARN("V_twist is: %f", V_twist.x_dot);
-    ROS_WARN("V_twist is: %f", V_twist.theta_dot);
+    // ROS_WARN("V_twist is: %f", V_twist.x_dot);
+    // ROS_WARN("V_twist is: %f", V_twist.theta_dot);
+
+    // auto joint_state_time = ros::Time::now();
+    // ROS_WARN_STREAM("joint state time: " << joint_state_time);
 
 
 
