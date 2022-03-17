@@ -54,6 +54,16 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     // wheel_vel.w2_vel = 4.0;
     // ROS_WARN("wheel_vel.w1_vel: %f", wheel_vel.w1_vel);
 
+    V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
+    V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
+
+
+    ROS_WARN("forward twist: %f", V_twist.x_dot);
+    ROS_WARN("forward twist: %f", V_twist.theta_dot);
+
+
+
+
 }
 
 /// \brief function to set the pose of the blue robot
@@ -125,8 +135,9 @@ int main(int argc, char **argv){
 
     
         //calculate twist
-        V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
-        V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
+        // V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
+        // V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
+
 
 
         //get the current configuration of the blue robot

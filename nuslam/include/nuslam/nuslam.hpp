@@ -15,8 +15,8 @@ namespace slamlib
     class Estimate2d
     {
     private:
-        int m; //number of obstacles
-        int n; //size of matrix
+        // int m; //number of obstacles
+        // int n; //size of matrix
         // arma::mat prev_state_vector;
         arma::mat covariance;
         // arma::mat state_vector;
@@ -37,16 +37,16 @@ namespace slamlib
 
     public:
     
-        Estimate2d(int m, int n, double r, double q);
+        Estimate2d(double r, double q);
 
         //calculate state vector (zeta)
         arma::mat updated_state_vector(turtlelib::Twist2D u, arma::mat prev_state_vector);
 
         //calculate A matrix
-        arma::mat calculate_A_matrix(turtlelib::Twist2D u, int n, arma::mat prev_state_vector);
+        arma::mat calculate_A_matrix(turtlelib::Twist2D u, arma::mat prev_state_vector);
 
         //function to compute H
-        arma::mat calculate_h(int i);
+        arma::mat calculate_h(int i, arma::mat state_vector_h);
 
         // //calculate r matrix
         // arma::mat calculate_r_mat();
@@ -58,7 +58,7 @@ namespace slamlib
         arma::mat calculate_z(double g, double y);
 
         //calculate z_hat
-        arma::mat calculate_z_hat(int i);
+        arma::mat calculate_z_hat(int i, arma::mat state_vector_z_hat);
 
         //get covariance
         arma::mat get_covariance();
@@ -75,7 +75,7 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        arma::mat init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector);
+        arma::mat init_fn(arma::mat temp_vec, arma::mat prev_state_vector);
 
         // void calculate_range_bearing(double x, double y);
 

@@ -10,10 +10,8 @@
 namespace slamlib{
     
     //default constructor
-    Estimate2d::Estimate2d(int m, int n, double r, double q)
-        :m{m}, 
-         n{n},
-        //  prev_state_vector(9, 1, arma::fill::zeros),
+    Estimate2d::Estimate2d(double r, double q)
+        ://  prev_state_vector(9, 1, arma::fill::zeros),
          covariance(9, 9, arma::fill::zeros), 
          q_mat(9, 9, arma::fill::zeros), 
          r_mat(2, 2, arma::fill::zeros), 
@@ -21,9 +19,7 @@ namespace slamlib{
          q{q},
          m_vec(2, 1, arma::fill::zeros)
          { 
-            // prev_state_vector(0, 0) = 0;
-            // prev_state_vector(1, 0) = 0;
-            // prev_state_vector(2, 0) = 0;
+            
             covariance(3, 3) = 10000000;
             covariance(4, 4) = 10000000;
             covariance(5, 5) = 10000000;
@@ -87,7 +83,7 @@ namespace slamlib{
 
 
     //calculate A matrix
-    arma::mat Estimate2d::calculate_A_matrix(turtlelib::Twist2D u, int n, arma::mat prev_state_vector){
+    arma::mat Estimate2d::calculate_A_matrix(turtlelib::Twist2D u, arma::mat prev_state_vector){
         arma::mat a_1 = arma::eye(9, 9);
         arma::mat a_2(9, 9, arma::fill::zeros);
         arma::mat a_3(9, 9, arma::fill::zeros);
@@ -101,7 +97,7 @@ namespace slamlib{
             
             a_2(1, 0) = -u.x_dot*sin(prev_state_vector(0, 0));
             a_2(2, 0) = u.x_dot*cos(prev_state_vector(0, 0));
-            a_3 = a_1 + a_2;
+            // a_3 = a_1 + a_2;
 
 
 
@@ -113,24 +109,26 @@ namespace slamlib{
           
             a_2(1, 0) = -(delta_2)*cos(prev_state_vector(0, 0)) + (delta_2)*cos(prev_state_vector(0, 0) + u.theta_dot);
             a_2(2, 0) = -(delta_2)*sin(prev_state_vector(0, 0)) + (delta_2)*sin(prev_state_vector(0, 0) + u.theta_dot);
-            a_3 = a_1 + a_2;
+            // a_3 = a_1 + a_2;
             
         }
+
+        a_3 = a_1 + a_2;
+
         return a_3;        
     }
     
     
     
     //function to compute H
-    arma::mat Estimate2d::calculate_h(int i){
+    arma::mat Estimate2d::calculate_h(int i, arma::mat state_vector_h){
         double d_x{0.0};
         double d_y{0.0};
         double d{0.0};
         double d_root{0.0};
-        arma::mat state_vector(9, 1, arma::fill::zeros);
 
-        d_x = state_vector(3+(2*i), 0) - state_vector(1, 0);
-        d_y = state_vector(4+(2*i), 0) - state_vector(2, 0);
+        d_x = state_vector_h(3+(2*i), 0) - state_vector_h(1, 0);
+        d_y = state_vector_h(4+(2*i), 0) - state_vector_h(2, 0);
         d = ((pow(d_x, 2) + pow(d_y, 2)));
         // d_root = sqrt(d);
 
@@ -147,8 +145,7 @@ namespace slamlib{
             h_2(1, 4+(2*i)) = (d_x/d);
         }
         
-        // h_2.print("check h calculations");
-        // std::cout << "d_root %f" << d_root << std::endl;
+        
 
 
         return h_2;
@@ -157,22 +154,7 @@ namespace slamlib{
     }
 
 
-    // //calculate r matrix
-    // arma::mat Estimate2d::calculate_r_mat(){
-    //     r_mat(0, 0) = r;
-    //     r_mat(1, 1) = r;
-    //     return r_mat;
-    // }
-
-    
-    // //calculate q matrix
-    // arma::mat Estimate2d::calculate_q_mat(){
-        
-    //     q_mat(0, 0) = q;
-    //     q_mat(1, 1) = q;
-    //     q_mat(2, 2) = q;
-    //     return q_mat;
-    // }
+  
 
     
     //calculate z
@@ -185,13 +167,12 @@ namespace slamlib{
 
     
     //calculate z_hat
-    arma::mat Estimate2d::calculate_z_hat(int i){
+    arma::mat Estimate2d::calculate_z_hat(int i, arma::mat state_vector_z_hat){
        
         arma::mat z_hat(2, 1, arma::fill::zeros);
-        arma::mat state_vector(9, 1, arma::fill::zeros);
 
-        z_hat(0, 0) = sqrt(pow(state_vector(3+(2*i), 0) - state_vector(1,0), 2) + pow(state_vector(4+(2*i), 0) - state_vector(2,0), 2));
-        z_hat(1, 0) = turtlelib::normalize_angle(atan2(state_vector(4+(2*i), 0) - state_vector(2,0), state_vector(3+(2*i),0) - state_vector(1,0)) - state_vector(0,0));
+        z_hat(0, 0) = sqrt(pow(state_vector_z_hat(3+(2*i), 0) - state_vector_z_hat(1,0), 2) + pow(state_vector_z_hat(4+(2*i), 0) - state_vector_z_hat(2,0), 2));
+        z_hat(1, 0) = turtlelib::normalize_angle(atan2(state_vector_z_hat(4+(2*i), 0) - state_vector_z_hat(2,0), state_vector_z_hat(3+(2*i),0) - state_vector_z_hat(1,0)) - state_vector_z_hat(0,0));
 
        
         
@@ -216,7 +197,7 @@ namespace slamlib{
         return r_mat;
     }
 
-    arma::mat Estimate2d::init_fn(arma::mat temp_vec, int m, arma::mat prev_state_vector)
+    arma::mat Estimate2d::init_fn(arma::mat temp_vec, arma::mat prev_state_vector)
     {
         arma::mat state_vector(9, 1, arma::fill::zeros);
       
@@ -236,36 +217,6 @@ namespace slamlib{
         // h_2.print("H matrix");
 
     }
-
-
-    // void Estimate2d::calculate_range_bearing(double x, double y){
-       
-    //     r_j = sqrt(pow(x, 2) + pow(y, 2));
-    //     phi = atan2(y, x);
-
-    // }
-
-    // double Estimate2d::get_rj(){
-    //     return r_j;
-    // }
-
-    // double Estimate2d::get_phi(){
-    //     return phi;
-    // }
-
-    // void Estimate2d::set_prev_vector(arma::mat a){
-    //     prev_state_vector = a;
-    // }
-
-    // //set r value
-    // void Estimate2d::set_r(int a){
-    //     r = a;
-    // }
-
-    // //set q value
-    // void Estimate2d::set_q(int a){
-    //     q = a;
-    // }
 
 
 

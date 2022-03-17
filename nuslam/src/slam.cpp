@@ -40,11 +40,11 @@ static std::vector <double> velocities;
 
 
 //slam variables
-static int m{3};
-static int n{9};
+// static int m{3};
+// static int n{9};
 static double radius{0.038};
-static double r_noise{10};
-static double q_noise{100};
+static double r_noise{1};
+static double q_noise{0.1};
 // static double r{0.0};
 // static double phi{0.0};
 static std::vector <double> x_bar;
@@ -58,7 +58,7 @@ static arma::mat temp_vec(6, 1, arma::fill::zeros);
 double r_j{0.0};
 double phi{0.0};
 // static arma::mat state_vector_1(n, 1);
-static slamlib::Estimate2d slam_obj(m, n, r_noise, q_noise);
+static slamlib::Estimate2d slam_obj(r_noise, q_noise);
 
 static arma::mat state_vector_1(9, 1, arma::fill::zeros);
 static arma::mat prev_state_vector(9, 1, arma::fill::zeros);
@@ -71,31 +71,32 @@ static arma::mat sigma_new = slam_obj.get_covariance();
 
 
 arma::mat slam_fn(){
+
+    
    
 
     for(int i = 0; i < 3; i++){
         // prediction step 1
-        prev_state_vector.print("prev_state_vector in loop");
+        // prev_state_vector.print("prev_state_vector in loop");
         state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
-        state_vector_1.print("step 2: state_vector");
+        // state_vector_1.print("step 2: state_vector");
 
-        arma::mat a = slam_obj.calculate_A_matrix(V_twist, n, prev_state_vector);
+        arma::mat a = slam_obj.calculate_A_matrix(V_twist, prev_state_vector);
         arma::mat a2 = a.t();
         // a.print("step 4: a");
         // a.t().print("step 4: a+t");
     
-        // // //prediction step 2
-        // sigma_prev = slam_obj.get_covariance();
+        // // // //prediction step 2
         arma::mat q_mat = slam_obj.get_q_matrix();
         sigma_new = (a*sigma_prev*a2) + q_mat;
         // sigma_new.print("step 6: sigma");
 
-        // // //update step 1
-        arma::mat z_hat = slam_obj.calculate_z_hat(i);
+        // // // //update step 1
+        arma::mat z_hat = slam_obj.calculate_z_hat(i, state_vector_1);
         // z_hat.print("step 8: z_hat");
 
-        // //update step 2
-        arma::mat h = slam_obj.calculate_h(i);
+        //update step 2
+        arma::mat h = slam_obj.calculate_h(i, state_vector_1);
         // h.print("step 10: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
@@ -124,19 +125,23 @@ arma::mat slam_fn(){
         // state_vector_1.print("step 16: state_vector");
 
 
-        //update step 4
-        arma::mat identity = arma::eye(n, n);
+        // update step 4
+        arma::mat identity = arma::eye(9, 9);
         sigma_new = (identity - (ki*h))*sigma_new;
         // sigma_new.print("step 18: sigma");
 
-        
-
+        // prev_state_vector = state_vector_1;
+        // sigma_prev = sigma_new;
     }
     
     // double theta = state_vector_1(0, 0);
     // state_vector_1(0, 0) = theta;
     prev_state_vector = state_vector_1;
     sigma_prev = sigma_new;
+    // V_twist.x_dot = 0;
+    // V_twist.y_dot = 0;
+    // V_twist.theta_dot = 0;
+
 
 
     return state_vector_1;
@@ -151,11 +156,11 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     x_bar.resize(3);
     y_bar.resize(3);
     // ROS_WARN("m: %d", m);
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < 3; i++){
         // ROS_WARN("m: %d", m);
         x_bar.at(i) = msg.markers[i].pose.position.x;
         y_bar.at(i) = msg.markers[i].pose.position.y;
-        ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
+        // ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
        
         r_j = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
         phi = atan2(y_bar.at(i), x_bar.at(i));
@@ -166,14 +171,17 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     }
     if(state == 1){
         // ROS_WARN("calling init fn");
-        ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
-        prev_state_vector = slam_obj.init_fn(temp_vec, m, prev_state_vector);
+        // ROS_WARN("check x_bar.at(i) outside the for loop %f", x_bar.at(0));
+        prev_state_vector = slam_obj.init_fn(temp_vec, prev_state_vector);
+     
         // state_vector_1 = slam_obj.get_state_vector();
     }
-    prev_state_vector.print("prev vector after init");
+    // prev_state_vector.print("prev vector after init");
     
     state = 0;
     map_to_green = slam_fn();
+   
+
     // map_to_green.print("map");
     // ROS_WARN("state changed");
    
@@ -206,6 +214,13 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
     wheel_vel.w1_vel = velocities[0]; //wheel velocity 1
     wheel_vel.w2_vel = velocities[1]; //wheel velocity 2
     
+    V_twist.x_dot = ((fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2);
+    V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
+
+    ROS_WARN("V_twist is: %f", V_twist.x_dot);
+    ROS_WARN("V_twist is: %f", V_twist.theta_dot);
+
+
 
 }
 
@@ -280,7 +295,7 @@ int main(int argc, char **argv){
 
 
 
-    ros::Rate r(100);
+    ros::Rate r(500);
 
     
     while(ros::ok()){
@@ -288,9 +303,7 @@ int main(int argc, char **argv){
 
     
         //calculate twist
-        V_twist.x_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w1_vel + wheel_vel.w2_vel))/2;
-        V_twist.theta_dot = (fwd_diff_drive.get_radius()*(wheel_vel.w2_vel - wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d());
-
+       
 
         //get the current configuration of the blue robot
         current_config = fwd_diff_drive.get_config();
@@ -394,7 +407,7 @@ int main(int argc, char **argv){
 
         visualization_msgs::MarkerArray slam_array;
         //publish slam markers
-        for (int i = 0; i < m; i++){
+        for (int i = 0; i < 3; i++){
             // map_to_green.print("map");
             
 
