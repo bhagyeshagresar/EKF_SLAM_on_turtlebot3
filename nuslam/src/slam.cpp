@@ -28,7 +28,7 @@
 
 static nav_msgs::Odometry odom;
 static turtlelib::Configuration current_config;
-static turtlelib::Configuration current_config_slam;
+// static turtlelib::Configuration current_config_slam;
 
 static turtlelib::Wheel_angles wheel_angle;
 static turtlelib::Wheels_vel wheel_vel;   
@@ -71,29 +71,46 @@ static arma::mat sigma_new = slam_obj.get_covariance();
 
 
 
-
-
-
 arma::mat slam_fn(){
+    turtlelib::Configuration current_config_slam = fwd_diff_drive_slam.get_config();
+
+    arma::mat predict_vector(9, 1, arma::fill::zeros);
+
+    predict_vector(0, 0) = current_config_slam.theta_config;
+    predict_vector(1, 0) = current_config_slam.x_config;
+    predict_vector(2, 0) = current_config_slam.y_config;
+    // predict_vector(0, 0) = current_config_slam.theta_config;
+
+
+
+    return predict_vector;
+}
+
+
+
+
+arma::mat slam_fn_1(){
     // state_vector_1 = slam_obj.updated_state_vector(V_twist, prev_state_vector);
         // state_vector_1.print("step 2: state_vector");
-    // current_config_slam = fwd_diff_drive_slam.forward_kinematics(wheel_angle);
-
+    // current_config_slam = fwd_diff_drive_slam.get_config();
     // prev_state_vector(0, 0) = current_config_slam.theta_config;
     // prev_state_vector(1, 0) = current_config_slam.x_config;
     // prev_state_vector(2, 0) = current_config_slam.y_config;
     // prev_state_vector.print("prev_state_vector in loop");
 
-    
+    // state_vector_1(0, 0) = prev_state_vector(0, 0);
+    // state_vector_1(1, 0) = prev_state_vector(1, 0);
+    // state_vector_1(2, 0) = prev_state_vector(2, 0);
 
-    arma::mat a = slam_obj.calculate_A_matrix(V_twist, prev_state_vector);
-    arma::mat a2 = a.t();
-    // a.print("step 4: a");
-    // a.t().print("step 4: a+t");
 
-    // // // //prediction step 2
-    arma::mat q_mat = slam_obj.get_q_matrix();
-    sigma_new = (a*sigma_prev*a2) + q_mat;
+    // arma::mat a = slam_obj.calculate_A_matrix(V_twist, prev_state_vector);
+    // arma::mat a2 = a.t();
+    // // a.print("step 4: a");
+    // // a.t().print("step 4: a+t");
+
+    // // // // //prediction step 2
+    // arma::mat q_mat = slam_obj.get_q_matrix();
+    // sigma_new = (a*sigma_prev*a2) + q_mat;
 
 
    
@@ -114,7 +131,7 @@ arma::mat slam_fn(){
         // sigma_new = (a*sigma_prev*a2) + q_mat;
         // sigma_new.print("step 6: sigma");
 
-        // // // // //update step 1
+        // // // //update step 1
         // arma::mat z_hat = slam_obj.calculate_z_hat(i, state_vector_1);
         // // z_hat.print("step 8: z_hat");
 
@@ -143,12 +160,12 @@ arma::mat slam_fn(){
         // delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
         // delta_z.print("step 15: delta_z");
         // state_vector_1 = state_vector_1 + (ki*(delta_z));
-        // // state_vector_1.print("step 16: state_vector_1");
+        // state_vector_1.print("step 16: state_vector_1");
         
-        // // state_vector_1.print("step 16: state_vector");
+        // state_vector_1.print("step 16: state_vector");
 
 
-        // // update step 4
+        // update step 4
         // arma::mat identity = arma::eye(9, 9);
         // sigma_new = (identity - (ki*h))*sigma_new;
         // sigma_new.print("step 18: sigma");
@@ -232,13 +249,15 @@ void joint_state_callback(const sensor_msgs::JointState::ConstPtr&  js_msg){
    
 
     current_config = fwd_diff_drive.forward_kinematics(wheel_angle);
-    
+    // current_config_slam = fwd_diff_drive_slam.forward_kinematics(wheel_angle);
+
+    fwd_diff_drive_slam.forward_kinematics(wheel_angle);
 
     wheel_vel.w1_vel = velocities[0]; //wheel velocity 1
     wheel_vel.w2_vel = velocities[1]; //wheel velocity 2
     
     V_twist.x_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w1_vel +  wheel_vel.w2_vel))/2))/(500.0);
-    V_twist.theta_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w2_vel -  wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d())))/500.0;
+    V_twist.theta_dot = (((fwd_diff_drive.get_radius()*(wheel_vel.w2_vel -  wheel_vel.w1_vel))/(2*fwd_diff_drive.get_length_d())))/(500.0);
     // V_twist.theta_dot = 0.0;
     // V_twist.y_dot = 0.0;
     // V_twist.x_dot = 0.0;
