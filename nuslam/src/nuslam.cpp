@@ -200,6 +200,7 @@ namespace slamlib{
     arma::mat Estimate2d::init_fn(arma::mat temp_vec, arma::mat prev_state_vector)
     {
         arma::mat state_vector(9, 1, arma::fill::zeros);
+        // arma::mat prev_state_vector(9, 1, arma::fill::zeros);
       
         // arma::mat m_vec(2, 1);
         
