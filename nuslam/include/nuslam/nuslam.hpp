@@ -76,7 +76,7 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        void init_fn(arma::mat temp_vec);
+        arma::mat init_fn(arma::mat temp_vec);
 
         // void calculate_range_bearing(double x, double y);
 
@@ -89,6 +89,8 @@ namespace slamlib
         void set_predict_vector(arma::mat final_vector);
 
         arma::mat get_predict_vector();
+
+        void set_covariance(arma::mat c);
     
         // //set r value
         // void set_r(int a);

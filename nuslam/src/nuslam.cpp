@@ -204,7 +204,7 @@ namespace slamlib{
     }
 
 
-    void Estimate2d::init_fn(arma::mat temp_vec)
+    arma::mat Estimate2d::init_fn(arma::mat temp_vec)
     {
         // arma::mat state_vector(9, 1, arma::fill::zeros);
         // arma::mat prev_state_vector(9, 1, arma::fill::zeros);
@@ -218,15 +218,23 @@ namespace slamlib{
 
             
         }
+        return predict_vector;
     }
 
     //    return state_vector;
+
+    void Estimate2d::set_covariance(arma::mat c)
+    {
+        covariance = c;
+    }
 
     void Estimate2d::set_predict_vector(arma::mat final_vector)
     {
         predict_vector = final_vector;
     }
 
+
+  
         // h_2.print("H matrix");
 
     

@@ -55,6 +55,8 @@ static arma::mat temp_vec(6, 1, arma::fill::zeros);
 static double r_j{0.0};
 static double phi{0.0};
 static slamlib::Estimate2d slam_obj(r_noise, q_noise);
+// static arma::mat sigma_prev = slam_obj.get_covariance();
+
 // static arma::mat predict_vector(9, 1, arma::fill::zeros);
 // static arma::mat init_vector(9, 1, arma::fill::zeros);
 
@@ -96,7 +98,7 @@ arma::mat slam_fn(){
         arma::mat h_tranpose = h.t();
         h_tranpose.print("step 11: h_transpose");
         r_matrix.print("step 12: r_matrix");
-        arma::mat mat_inv = arma::inv((h * sigma_new * h_tranpose) + r_matrix);
+        arma::mat mat_inv = arma::inv((h*sigma_new*h_tranpose) + r_matrix);
         mat_inv.print("step 13: matInv");
         arma::mat ki = (sigma_new * h_tranpose * mat_inv);
         ki.print("step 12: ki");
@@ -129,6 +131,7 @@ arma::mat slam_fn(){
 
     // predict_vector = state_vector_1;
     sigma_prev = sigma_new;
+    slam_obj.set_covariance(sigma_prev);
     slam_obj.set_predict_vector(predict_vector);
 
     

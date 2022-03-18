@@ -627,7 +627,7 @@ int main(int argc, char ** argv){
                     d_xint_pos = V_rint_pos.x - x_r;
                     d_yint_pos = V_rint_pos.y - y_r;
                     
-                    ROS_WARN("d_xint_pos: %f", d_xint_pos);
+                    // ROS_WARN("d_xint_pos: %f", d_xint_pos);
                     //neg
                     //calculate transform wrt obstacles for intersection points - neg
                     turtlelib::Transform2D T_o_intneg{turtlelib::Vector2D{x_int_neg, y_int_neg}, 0.0};
@@ -644,7 +644,7 @@ int main(int argc, char ** argv){
                     d_xint_neg = V_rint_neg.x - x_r;
                     d_yint_neg = V_rint_neg.y - y_r;
                     
-                    ROS_WARN("d_xint_neg: %f", d_xint_neg);
+                    // ROS_WARN("d_xint_neg: %f", d_xint_neg);
 
 
 
@@ -829,9 +829,9 @@ int main(int argc, char ** argv){
         path_pub3.publish(path3);
 
 
-        // old_x = current_config.x_config;
-        // old_y = current_config.y_config;
-        // old_theta = current_config.theta_config;
+        old_x = current_config.x_config;
+        old_y = current_config.y_config;
+        old_theta = current_config.theta_config;
         
 
 
