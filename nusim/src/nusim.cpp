@@ -584,22 +584,13 @@ int main(int argc, char ** argv){
                 d_y = y_pmax - y_p;
 
                 d_r = distance_fn(d_x, d_y);
-                // ROS_WARN("x_p: %f", x_p);
-                // ROS_WARN("y_p: %f", y_p);
-                // ROS_WARN("x_pmax: %f", x_pmax);
-                // ROS_WARN("y_pmax: %f", y_pmax);
-
-                // ROS_WARN("d_r: %f", d_r);
-
+               
                 delta = ((x_p*y_pmax) - (x_pmax*y_p));
 
                 //determine points of intersection
                 
                 sgn_dy = sgn_fn(d_y);
-                mod_dy = mod_fn(d_y);
-
-
-                
+                mod_dy = mod_fn(d_y);                
                 
 
                 discriminant = (pow(radius, 2)*pow(d_r, 2) - pow(delta, 2));
@@ -633,9 +624,9 @@ int main(int argc, char ** argv){
                     d_xint_pos = V_rint_pos.x - x_r;
                     d_yint_pos = V_rint_pos.y - y_r;
                     
-                    
+                    ROS_WARN("d_xint_pos: %f", d_xint_pos);
                     //neg
-                    //calculate transform wrt obstacles for intersection points - pos
+                    //calculate transform wrt obstacles for intersection points - neg
                     turtlelib::Transform2D T_o_intneg{turtlelib::Vector2D{x_int_neg, y_int_neg}, 0.0};
 
 
@@ -649,8 +640,12 @@ int main(int argc, char ** argv){
                     //calculate distance from robot to the intersection point in robot frame
                     d_xint_neg = V_rint_neg.x - x_r;
                     d_yint_neg = V_rint_neg.y - y_r;
+                    
+                    ROS_WARN("d_xint_neg: %f", d_xint_neg);
 
 
+
+                    //if distance between point and the markers is less than the distance between robot and maker , its good, then add that point
                     intersection_distance_neg = distance_fn(d_xint_neg, d_yint_neg);
                     intersection_distance_pos = distance_fn(d_xint_pos, d_yint_pos);
 
@@ -658,6 +653,11 @@ int main(int argc, char ** argv){
                     // ROS_WARN("intersection distance_pos %f", intersection_distance_neg);
 
                     min_distance = std::min(intersection_distance_neg, intersection_distance_pos);
+
+                    double og_x = min_distance*std::cos(theta_range);
+                    double og_y = min_distance*std::sin(theta_range);
+
+                    double dist_og_m = std::sqrt(pow())
                     
                     // ROS_WARN("min_distance: %f", min_distance);
                     
