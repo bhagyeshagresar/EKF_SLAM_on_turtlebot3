@@ -118,7 +118,7 @@ namespace slamlib{
 
         return a_3;        
     }
-    
+     
     
     
     //function to compute H

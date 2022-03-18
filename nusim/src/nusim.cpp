@@ -72,6 +72,7 @@ static double x_max{0.0};
 static double y_r{0.0};
 static double y_max{0.0};
 static double max_range{3.5};
+static double min_range{0.120};
 static double theta_range{0.0};
 static double x_p{0.0};
 static double y_p{0.0};
@@ -549,8 +550,8 @@ int main(int argc, char ** argv){
 
                 
                 //compute points in robot frame
-                x_r = 0.0;
-                y_r = 0.0;
+                x_r = (min_range*cos(theta_range));
+                y_r = (min_range*sin(theta_range));
                 x_max = (max_range*cos(theta_range)); // x = rcos(theta)
                 y_max = (max_range*sin(theta_range)); // y = rsin(theta)
                 
@@ -582,7 +583,7 @@ int main(int argc, char ** argv){
                 x_pmax = V_opmax.x;
                 y_pmax = V_opmax.y;
 
-                //calculate distance from point on robot to the max point
+                //calculate distance from min point to the max point
                 d_x = x_pmax - x_p;
                 d_y = y_pmax - y_p;
 
@@ -679,18 +680,18 @@ int main(int argc, char ** argv){
                     }
 
 
-
-                    double a_x = 0.2*std::cos(theta_range);
-                    double a_y = 0.2*std::sin(theta_range);
+                    double d_3 = std::sqrt(std::pow(min_int_x, 2) + std::pow(min_int_y, 2));
+                    // double a_x = 0.2*std::cos(theta_range);
+                    // double a_y = 0.2*std::sin(theta_range);
 
                     //calculate d1
-                    double dist_random = std::sqrt(pow(a_x - min_int_x, 2) + pow(a_y - min_int_y, 2));
+                    double dist_random = std::sqrt(std::pow(x_r - min_int_x, 2) + std::pow(y_r - min_int_y, 2));
 
                    
 
 
 
-                    if(dist_random <= min_distance){
+                    if(dist_random <= d_3){
                         scan.ranges[i] = min_distance;
                     }
                     
