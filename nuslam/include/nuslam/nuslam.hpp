@@ -28,6 +28,7 @@ namespace slamlib
         // double init_y_pos; 
         // double init_theta_pos;
         arma::mat m_vec;
+        arma::mat predict_vector;
         // double r_j;
         // double phi;
         // arma::mat h_2;
@@ -43,10 +44,10 @@ namespace slamlib
         arma::mat updated_state_vector(turtlelib::Twist2D u, arma::mat prev_state_vector);
 
         //calculate A matrix
-        arma::mat calculate_A_matrix(turtlelib::Twist2D u, arma::mat prev_state_vector);
+        arma::mat calculate_A_matrix(turtlelib::Twist2D u);
 
         //function to compute H
-        arma::mat calculate_h(int i, arma::mat state_vector_h);
+        arma::mat calculate_h(int i);
 
         // //calculate r matrix
         // arma::mat calculate_r_mat();
@@ -58,7 +59,7 @@ namespace slamlib
         arma::mat calculate_z(double g, double y);
 
         //calculate z_hat
-        arma::mat calculate_z_hat(int i, arma::mat state_vector_z_hat);
+        arma::mat calculate_z_hat(int i);
 
         //get covariance
         arma::mat get_covariance();
@@ -75,7 +76,7 @@ namespace slamlib
         //get r_matrix
         arma::mat get_r_matrix();
 
-        arma::mat init_fn(arma::mat temp_vec, arma::mat prev_state_vector);
+        void init_fn(arma::mat temp_vec);
 
         // void calculate_range_bearing(double x, double y);
 
@@ -84,6 +85,10 @@ namespace slamlib
         // double get_phi();
 
         void set_prev_vector(arma::mat a);
+
+        void set_predict_vector(arma::mat final_vector);
+
+        arma::mat get_predict_vector();
     
         // //set r value
         // void set_r(int a);
