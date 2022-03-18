@@ -43,8 +43,8 @@ static std::vector <double> velocities;
 
 
 static double radius{0.038};
-static double r_noise{1};
-static double q_noise{0.1};
+static double r_noise{100};
+static double q_noise{1};
 static std::vector <double> x_bar;
 static std::vector <double> y_bar;
 static int state = 1;
@@ -177,6 +177,7 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         slam_obj.init_fn(temp_vec);
 
     }
+    state = 0;
     
     
     map_to_green = slam_fn();
