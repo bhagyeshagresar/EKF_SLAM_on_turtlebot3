@@ -116,7 +116,10 @@ static double p_x{0.0};
 static double p_y{0.0};
 static double d_x_new{0.0};
 static double d_y_new{0.0};
-
+static double min_int_x{0.0};
+static double min_int_y{0.0};
+static double large_int_x{0.0};
+static double large_int_y{0.0};
 
 
 
@@ -652,12 +655,50 @@ int main(int argc, char ** argv){
                     // ROS_WARN("intersection distance_pos %f", intersection_distance_pos);
                     // ROS_WARN("intersection distance_pos %f", intersection_distance_neg);
 
-                    min_distance = std::min(intersection_distance_neg, intersection_distance_pos);
+                    // min_distance = std::min(intersection_distance_neg, intersection_distance_pos);
 
-                    double og_x = min_distance*std::cos(theta_range);
-                    double og_y = min_distance*std::sin(theta_range);
+                    // double og_x = min_distance*std::cos(theta_range);
+                    // double og_y = min_distance*std::sin(theta_range);
+                    
 
-                    double dist_og_m = std::sqrt(pow())
+                    //calculate distance 3
+                    if(intersection_distance_pos < intersection_distance_neg){
+                        min_distance = intersection_distance_pos;
+                        min_int_x = V_rint_pos.x;
+                        min_int_y = V_rint_pos.y;
+                        large_int_x = V_rint_neg.x;
+                        large_int_y = V_rint_neg.y;
+
+                    }
+                    else{
+                         min_distance = intersection_distance_neg;
+                         min_int_x = V_rint_neg.x;
+                         min_int_y = V_rint_neg.y;
+                         large_int_x = V_rint_pos.x;
+                         large_int_y = V_rint_pos.y;
+                    }
+
+
+
+                    double a_x = 0.2*std::cos(theta_range);
+                    double a_y = 0.2*std::sin(theta_range);
+
+                    //calculate d1
+                    double dist_random = std::sqrt(pow(a_x - min_int_x, 2) + pow(a_y - min_int_y, 2));
+
+                   
+
+
+
+                    if(dist_random <= min_distance){
+                        scan.ranges[i] = min_distance;
+                    }
+                    
+                    
+
+                    // if(dist_og_m <= min_distance){
+                    //     scan.ranges[i] = dist_og_m;
+                    // }
                     
                     // ROS_WARN("min_distance: %f", min_distance);
                     
@@ -706,12 +747,13 @@ int main(int argc, char ** argv){
 
             
             
-        }
+            }
+        
 
             // scan.ranges[i] = 1;
 
             // scan.ranges[i] = *std::min_element(a.begin(), a.end());
-            scan.ranges[i] = min_distance;
+            // scan.ranges[i] = min_distance;
 
             // ROS_WARN("scan.ranges[i]: %f", scan.ranges[i]);
             theta_range += scan.angle_increment; 
