@@ -121,6 +121,7 @@ static double min_int_x{0.0};
 static double min_int_y{0.0};
 static double large_int_x{0.0};
 static double large_int_y{0.0};
+static double mu_1{0.01};
 
 
 
@@ -205,16 +206,19 @@ void wheel_cmd_callback(const nuturtlebot_msgs::WheelCommands::ConstPtr& msg){
 
     
     
-    // std::normal_distribution<> d1(wheel_velocity_left, 0.01);
-    // std::normal_distribution<> d2(wheel_velocity_right, 0.01);
+    std::normal_distribution<> d1(wheel_velocity_left, 0.01);
+    std::normal_distribution<> d2(wheel_velocity_right, 0.01);
 
     // //wheel velocities with noise 
-    // left_wheel_noise = d1(get_random());
-    // right_wheel_noise = d2(get_random());
+    left_wheel_noise = d1(get_random());
+    right_wheel_noise = d2(get_random());
 
 
-    wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
-    wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
+    // wheel_velocities.w1_vel = (wheel_velocity_left*0.024);
+    // wheel_velocities.w2_vel = (wheel_velocity_right*0.024);
+
+    wheel_velocities.w1_vel = (left_wheel_noise*0.024);
+    wheel_velocities.w2_vel = (right_wheel_noise*0.024);
 
    
 
@@ -397,11 +401,11 @@ int main(int argc, char ** argv){
 
 
         //calculate the wheel angles using wheel velocities
-        wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
-        wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
+        // wheel_angle.w_ang1 = ((wheel_velocities.w1_vel/rate) + wheel_angle.w_ang1);
+        // wheel_angle.w_ang2 = ((wheel_velocities.w2_vel/rate) + wheel_angle.w_ang2);
 
-        // wheel_angle.w_ang1 = wheel_angle.w_ang1 + (mu_1*wheel_velocities.w1_vel);
-        // wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
+        wheel_angle.w_ang1 = wheel_angle.w_ang1 + (mu_1*wheel_velocities.w1_vel);
+        wheel_angle.w_ang2 = wheel_angle.w_ang2 + (mu_1*wheel_velocities.w2_vel);
 
        //Get the current_configuration of the robot using forward kinematics function
         current_config = update_config.forward_kinematics(wheel_angle);
@@ -796,8 +800,8 @@ int main(int argc, char ** argv){
             marker_noise.id = i;
             marker_noise.type = visualization_msgs::Marker:: CYLINDER;
             marker_noise.action = visualization_msgs::Marker::ADD;
-            marker_noise.pose.position.x = V_rel.x;
-            marker_noise.pose.position.y = V_rel.y;
+            marker_noise.pose.position.x = V_rel.x + obstacle_noise;
+            marker_noise.pose.position.y = V_rel.y + obstacle_noise;
             marker_noise.pose.position.z = 0;
             marker_noise.pose.orientation.x = 0.0;
             marker_noise.pose.orientation.y = 0.0;
