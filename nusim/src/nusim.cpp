@@ -430,53 +430,53 @@ int main(int argc, char ** argv){
         // ROS_WARN("distance_2 %f", distance_2);
         // ROS_WARN("distance_3 %f", distance_3);
 
-        // distance_1 = 0.1;
-        if(distance_1 <= 0.180){
-            ROS_INFO_STREAM("state reached_1");
-            // x = old_x;
-            // y = old_y;
-            // theta = old_theta;
-        }
-        else{
-            // current_config = update_config.forward_kinematics(wheel_angle);
-            // x = current_config.x_config;
-            // y = current_config.y_config;
-            // theta = current_config.theta_config;
-            ROS_INFO_STREAM("state not reached_1");
+        // // distance_1 = 0.1;
+        // if(distance_1 <= 0.180){
+        //     ROS_INFO_STREAM("state reached_1");
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
+        // }
+        // else{
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
+        //     ROS_INFO_STREAM("state not reached_1");
 
-        }
+        // }
         
-        if(distance_2 <= 0.180){
-            ROS_INFO_STREAM("state reached_2");
-            // x = old_x;
-            // y = old_y;
-            // theta = old_theta;
-        }
-        else{
-            // current_config = update_config.forward_kinematics(wheel_angle);
-            // x = current_config.x_config;
-            // y = current_config.y_config;
-            // theta = current_config.theta_config;
-            ROS_INFO_STREAM("state reached_2");
+        // if(distance_2 <= 0.180){
+        //     ROS_INFO_STREAM("state reached_2");
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
+        // }
+        // else{
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
+        //     ROS_INFO_STREAM("state reached_2");
 
 
-        }
+        // }
 
-        if(distance_3 <= 0.180){
-            ROS_INFO_STREAM("state reached_3");
-            // x = old_x;
-            // y = old_y;
-            // theta = old_theta;
-        }
-        else{
-            // current_config = update_config.forward_kinematics(wheel_angle);
-            // x = current_config.x_config;
-            // y = current_config.y_config;
-            // theta = current_config.theta_config;
-            ROS_INFO_STREAM("state reached_3");
+        // if(distance_3 <= 0.180){
+        //     ROS_INFO_STREAM("state reached_3");
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
+        // }
+        // else{
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
+        //     ROS_INFO_STREAM("state reached_3");
 
 
-        }        
+        // }        
 
        
         //broadcast the transform between nusim and red-base_footprint
