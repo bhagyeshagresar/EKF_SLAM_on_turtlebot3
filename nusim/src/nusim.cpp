@@ -418,45 +418,45 @@ int main(int argc, char ** argv){
 
         // // ROS_WARN("distance_1 %f", distance_1);
         // // distance_1 = 0.1;
-        // if(distance_1 <= 0.148){
+        // if(distance_1 <= 0.180){
         //     ROS_INFO_STREAM("state reached");
-        //     x = old_x;
-        //     y = old_y;
-        //     theta = old_theta;
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
         // }
         // else{
-        //     current_config = update_config.forward_kinematics(wheel_angle);
-        //     x = current_config.x_config;
-        //     y = current_config.y_config;
-        //     theta = current_config.theta_config;
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
 
         // }
         
-        // if(distance_2 <= 0.148){
+        // if(distance_2 <= 0.180){
         //     ROS_INFO_STREAM("state reached");
-        //     x = old_x;
-        //     y = old_y;
-        //     theta = old_theta;
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
         // }
         // else{
-        //     current_config = update_config.forward_kinematics(wheel_angle);
-        //     x = current_config.x_config;
-        //     y = current_config.y_config;
-        //     theta = current_config.theta_config;
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
 
         // }
 
-        // if(distance_3 <= 0.148){
+        // if(distance_3 <= 0.180){
         //     ROS_INFO_STREAM("state reached");
-        //     x = old_x;
-        //     y = old_y;
-        //     theta = old_theta;
+        //     // x = old_x;
+        //     // y = old_y;
+        //     // theta = old_theta;
         // }
         // else{
-        //     current_config = update_config.forward_kinematics(wheel_angle);
-        //     x = current_config.x_config;
-        //     y = current_config.y_config;
-        //     theta = current_config.theta_config;
+        //     // current_config = update_config.forward_kinematics(wheel_angle);
+        //     // x = current_config.x_config;
+        //     // y = current_config.y_config;
+        //     // theta = current_config.theta_config;
 
         // }        
 
@@ -830,9 +830,9 @@ int main(int argc, char ** argv){
         path_pub3.publish(path3);
 
 
-        old_x = current_config.x_config;
-        old_y = current_config.y_config;
-        old_theta = current_config.theta_config;
+        // old_x = current_config.x_config;
+        // old_y = current_config.y_config;
+        // old_theta = current_config.theta_config;
         
 
 

@@ -63,7 +63,7 @@ static slamlib::Estimate2d slam_obj(r_noise, q_noise);
 
 
 
-arma::mat slam_fn(){
+arma::mat slam_fn(arma::mat temp_vec){
     turtlelib::Configuration current_config_slam = fwd_diff_drive_slam.get_config();
     
    
@@ -73,6 +73,8 @@ arma::mat slam_fn(){
     predict_vector(1, 0) = current_config_slam.x_config;
     predict_vector(2, 0) = current_config_slam.y_config;
     predict_vector.print("step 1 predict vector");
+    slam_obj.set_predict_vector(predict_vector);
+
 
     //predict step 2
     arma::mat a = slam_obj.calculate_A_matrix(V_twist);
@@ -82,52 +84,65 @@ arma::mat slam_fn(){
     //predict step 3
     arma::mat q_mat = slam_obj.get_q_matrix();
     arma::mat sigma_prev = slam_obj.get_covariance();
+    sigma_prev.print("sigma_prev");
     arma::mat sigma_new = (a*sigma_prev*a2) + q_mat;
-    sigma_new.print("step 6: sigma");
+    sigma_new.print("step 3: sigma");
 
     for(int i = 0; i < 3; i++){
-        
+        predict_vector.print("predict vector before z_hat");
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-        z_hat.print("step 8: z_hat");
+        z_hat.print("step 4: z_hat");
+        predict_vector.print("predict vector after z_hat");
+
 
         // update step 2
         arma::mat h = slam_obj.calculate_h(i);
-        h.print("step 10: h");
+        h.print("step 5: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
         arma::mat h_tranpose = h.t();
-        h_tranpose.print("step 11: h_transpose");
-        r_matrix.print("step 12: r_matrix");
+        h_tranpose.print("step 6: h_transpose");
+        r_matrix.print("step 7: r_matrix");
         arma::mat mat_inv = arma::inv((h*sigma_new*h_tranpose) + r_matrix);
-        mat_inv.print("step 13: matInv");
+        mat_inv.print("step 8: matInv");
         arma::mat ki = (sigma_new * h_tranpose * mat_inv);
-        ki.print("step 12: ki");
+        ki.print("step 9: ki");
 
         //update step 3
-        arma::mat z = slam_obj.calculate_z(r_j, phi);
-        z.print("step 14: z");
+        double g = temp_vec((2*i), 0);
+        double k = temp_vec((2*i)+1, 0);
+        arma::mat z = slam_obj.calculate_z(g, k);
+        z.print("step 10: z");
 
         arma::mat delta_z(2, 1, arma::fill::zeros);
         delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
         delta_z(1, 0) = z(1, 0) - z_hat(1, 0);
         delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
-        delta_z.print("step 15: delta_z");
-        predict_vector = predict_vector + (ki*(delta_z));
-        predict_vector.print("step 16: state_vector_1");
+        delta_z.print("step 11: delta_z");
+        arma::mat temp_mat = (ki*(delta_z));
+        temp_mat.print("temp mat");
+        // temp_mat(3, 0) = 0.0;
+        // temp_mat(4, 0) = 0.0;
+        predict_vector.print("step 12: state_vector_1");
+        predict_vector = predict_vector + temp_mat;
+        predict_vector.print("step 13: state_vector_1");
         
-        predict_vector.print("step 16: state_vector");
 
 
         // update step 4
         arma::mat identity = arma::eye(9, 9);
         sigma_new = (identity - (ki*h))*sigma_new;
-        sigma_new.print("step 18: sigma");
-        
+        sigma_new.print("step 14: sigma");
+
+        // abort();
+
+
 
 
 
 
     }
+
 
     // predict_vector = state_vector_1;
     sigma_prev = sigma_new;
@@ -162,8 +177,11 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
         y_bar.at(i) = msg.markers[i].pose.position.y;
         // ROS_WARN("x_bar.at(i) %f", x_bar.at(i));
        
-        r_j = sqrt(pow(x_bar.at(i), 2) + pow(y_bar.at(i), 2));
-        phi = atan2(y_bar.at(i), x_bar.at(i));
+        r_j = std::sqrt(std::pow(x_bar.at(i), 2) + std::pow(y_bar.at(i), 2));
+        phi = std::atan2(y_bar.at(i), x_bar.at(i));
+        ROS_WARN("r_j: %f", r_j);
+        ROS_WARN("phi: %f", phi);
+
 
         temp_vec(2*i, 0) = r_j;
         temp_vec((2*i)+1, 0) = phi;
@@ -179,8 +197,8 @@ void fake_sensor_callback(const visualization_msgs::MarkerArray & msg){
     }
     state = 0;
     
-    
-    map_to_green = slam_fn();
+   
+    map_to_green = slam_fn(temp_vec);
    
     // auto fake_sensor_time = ros::Time::now();
     // ROS_WARN_STREAM("fake sensor time: " << fake_sensor_time);
@@ -309,8 +327,9 @@ int main(int argc, char **argv){
 
     ros::Rate r(500);
 
-    
+  
     while(ros::ok()){
+
         current_time = ros::Time::now();
 
     

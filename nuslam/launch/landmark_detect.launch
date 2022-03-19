@@ -1,0 +1,10 @@
+<launch>
+
+<arg name="robot" default="nusim"/>
+
+<node name="landmarks" type="landmarks" pkg="nuslam" output="screen"/>
+
+
+
+
+</launch>
