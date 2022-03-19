@@ -72,67 +72,67 @@ arma::mat slam_fn(arma::mat temp_vec){
     predict_vector(0, 0) = turtlelib::normalize_angle(current_config_slam.theta_config);
     predict_vector(1, 0) = current_config_slam.x_config;
     predict_vector(2, 0) = current_config_slam.y_config;
-    predict_vector.print("step 1 predict vector");
+    // predict_vector.print("step 1 predict vector");
     slam_obj.set_predict_vector(predict_vector);
 
 
     //predict step 2
     arma::mat a = slam_obj.calculate_A_matrix(V_twist);
     arma::mat a2 = a.t();
-    a.print("step 2: a matrix");
+    // a.print("step 2: a matrix");
     
     //predict step 3
     arma::mat q_mat = slam_obj.get_q_matrix();
     arma::mat sigma_prev = slam_obj.get_covariance();
-    sigma_prev.print("sigma_prev");
+    // sigma_prev.print("sigma_prev");
     arma::mat sigma_new = (a*sigma_prev*a2) + q_mat;
-    sigma_new.print("step 3: sigma");
+    // sigma_new.print("step 3: sigma");
 
     for(int i = 0; i < 3; i++){
-        predict_vector.print("predict vector before z_hat");
+        // predict_vector.print("predict vector before z_hat");
         arma::mat z_hat = slam_obj.calculate_z_hat(i);
-        z_hat.print("step 4: z_hat");
-        predict_vector.print("predict vector after z_hat");
+        // z_hat.print("step 4: z_hat");
+        // predict_vector.print("predict vector after z_hat");
 
 
         // update step 2
         arma::mat h = slam_obj.calculate_h(i);
-        h.print("step 5: h");
+        // h.print("step 5: h");
 
         arma::mat r_matrix = slam_obj.get_r_matrix();
         arma::mat h_tranpose = h.t();
-        h_tranpose.print("step 6: h_transpose");
-        r_matrix.print("step 7: r_matrix");
+        // h_tranpose.print("step 6: h_transpose");
+        // r_matrix.print("step 7: r_matrix");
         arma::mat mat_inv = arma::inv((h*sigma_new*h_tranpose) + r_matrix);
-        mat_inv.print("step 8: matInv");
+        // mat_inv.print("step 8: matInv");
         arma::mat ki = (sigma_new * h_tranpose * mat_inv);
-        ki.print("step 9: ki");
+        // ki.print("step 9: ki");
 
         //update step 3
         double g = temp_vec((2*i), 0);
         double k = temp_vec((2*i)+1, 0);
         arma::mat z = slam_obj.calculate_z(g, k);
-        z.print("step 10: z");
+        // z.print("step 10: z");
 
         arma::mat delta_z(2, 1, arma::fill::zeros);
         delta_z(0, 0) = z(0, 0) - z_hat(0, 0);
         delta_z(1, 0) = z(1, 0) - z_hat(1, 0);
         delta_z(1, 0) = turtlelib::normalize_angle(delta_z(1,0));
-        delta_z.print("step 11: delta_z");
+        // delta_z.print("step 11: delta_z");
         arma::mat temp_mat = (ki*(delta_z));
-        temp_mat.print("temp mat");
+        // temp_mat.print("temp mat");
         // temp_mat(3, 0) = 0.0;
         // temp_mat(4, 0) = 0.0;
-        predict_vector.print("step 12: state_vector_1");
+        // predict_vector.print("step 12: state_vector_1");
         predict_vector = predict_vector + temp_mat;
-        predict_vector.print("step 13: state_vector_1");
+        // predict_vector.print("step 13: state_vector_1");
         
 
 
         // update step 4
         arma::mat identity = arma::eye(9, 9);
         sigma_new = (identity - (ki*h))*sigma_new;
-        sigma_new.print("step 14: sigma");
+        // sigma_new.print("step 14: sigma");
 
         // abort();
 
