@@ -1,0 +1,2 @@
+# nusim package:
+The nusim package is used to visualise the red and blue robot. The nusim node publishes fake_sensor and laser_scan data. The nusim node provides a simulation for the red and blue robot and for other obstacles and walls in the environmen.

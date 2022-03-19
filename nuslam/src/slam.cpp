@@ -1,7 +1,7 @@
-/// \file the odometry node broadcasts the transform between odom and the blue-base footprint. The odometry node also 
-/// publishes odometry messages on the odom topic
-/// subscriber: topics - red/joint_states
-/// publisher: topics - /odom
+/// \file the slam node broadcasts the transform between odom and the blue-base footprint. The slam node computes transform from 
+/// map to odom frame. The slam node also subscribes to fake sensor and publishes markers based on SLAM measurements
+/// subscriber: topics - /fale_sensor
+/// publisher: topics - /slam_markers
 
 
 
