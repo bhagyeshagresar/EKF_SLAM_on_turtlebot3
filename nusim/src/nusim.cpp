@@ -807,9 +807,9 @@ int main(int argc, char ** argv){
             marker_noise.scale.y = radius*2;
             marker_noise.scale.z = 0.25;
             marker_noise.color.a = 1.0;
-            marker_noise.color.r = 0.0;
-            marker_noise.color.g = 0.0;
-            marker_noise.color.b = 1.0;
+            marker_noise.color.r = 1.0;
+            marker_noise.color.g = 1.0;
+            marker_noise.color.b = 0.0;
             marker_noise.lifetime = ros::Duration();
             
             marker_array_noise.markers.push_back(marker_noise);
