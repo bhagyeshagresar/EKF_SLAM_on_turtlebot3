@@ -18,3 +18,8 @@ This repository consists of the following ROS Packages:
 
 
 
+# SLAM demonstration using circle
+https://drive.google.com/file/d/1UBAUTxhwt_USfvPnnG-ovhaaCyD-QMpE/view?usp=sharing
+
+# SLAM demonstration using teleop
+https://drive.google.com/file/d/15R2XYYtbNbsTK84Jbqt-jAXDnkf9l9Xq/view?usp=sharing
