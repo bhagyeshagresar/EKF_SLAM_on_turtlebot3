@@ -12,7 +12,7 @@ This repository consists of the following ROS Packages:
 
 3)nusim - This package loads 4 red cylinders and a red turtlebot3 burger in rviz. The package is used to drive the red robot in simulation. The package publishes laser_scan data and publishes obstacles with noise.
 
-4) nuturtle_control - This package consists of nodes such as the circle, odometry and turtle_interface. These nodes help to control the motion of the turtlebot.
+4)nuturtle_control - This package consists of nodes such as the circle, odometry and turtle_interface. These nodes help to control the motion of the turtlebot.
 
 5)nuslam - This package implements Extended Kalman Filter SLAM algorithm on Turtlebot3. The nuslam package consists of nuslam.cpp which is a cpp library consisting of functions required to compute the prediction and update steps of the SLAM algorithm. The slam.cpp is a slam node that executes the slam predict and update steps using the nuslam library.
 
